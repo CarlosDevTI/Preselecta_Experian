@@ -1,0 +1,33 @@
+# Python / Django
+__pycache__/
+*.py[cod]
+*.sqlite3
+db.sqlite3*
+*.log
+
+# Envs & secrets
+.env
+*.env
+
+# Virtualenv
+venv/
+.venv/
+
+# Django collected static
+staticfiles/
+
+# IDE / OS
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Byte-compiled / cache
+*.pyo
+*.pyd
+*.pdb
+
+# Migrations cache
+*.pyc
+
+# JetBrains
+.idea/

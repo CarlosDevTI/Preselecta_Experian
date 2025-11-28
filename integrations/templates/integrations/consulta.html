@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta Preselecta - Congente</title>
+    <link rel="icon" href="{% static 'img/ico.png' %}" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #D7620C;
+            --secondary-color: #315675;
+            --accent-color: #00a3e0;
+            --bg-light: #f8f9fa;
+            --border-color: #e1e4e8;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f5f7fa;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        .main-header {
+            background: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        .logo-img {
+            height: 70px;
+            width: auto;
+        }
+        .main-content {
+            flex: 1;
+            padding: 1.5rem 0;
+        }
+        .page-title-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid var(--primary-color);
+        }
+        .page-title {
+            color: var(--secondary-color);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .page-description {
+            color: #6c757d;
+            margin: 0;
+        }
+        .badge-demo {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background: white;
+            height: 100%;
+        }
+        {% comment %} .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        } {% endcomment %}
+        .card-header {
+            background: #e9ecef;
+            border-bottom: 2px solid var(--primary-color);
+            border-radius: 12px 12px 0 0 !important;
+            padding: 1rem 1.25rem;
+        }
+        .card-title {
+            color: var(--secondary-color);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .card-subtitle {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* ---- FORMULARIO MÁS COMPACTO ---- */
+        .card-body--compact {
+            padding: 0.9rem 1rem 1.1rem;
+        }
+        .compact-form .form-label {
+            font-weight: 500;
+            color: var(--secondary-color);
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+        .compact-form .form-text {
+            font-size: 0.75rem;
+        }
+        .compact-form .form-control,
+        .compact-form .form-select {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            padding: 0.3rem 0.75rem;
+            font-size: 0.9rem;
+            min-height: 2.1rem;
+        }
+        .compact-form .form-control:focus,
+        .compact-form .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.15rem rgba(215, 98, 12, 0.1);
+        }
+        .compact-form .mb-2 {
+            margin-bottom: 0.6rem !important;
+        }
+        .compact-form .mb-3 {
+            margin-bottom: 0.75rem !important;
+        }
+        .step-indicator {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+        .step-indicator span {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        .mini-summary {
+            background: #f1f3f5;
+            border-radius: 8px;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid #e1e4e8;
+            font-size: 0.8rem;
+            margin-bottom: 0.75rem;
+        }
+        .mini-summary-title {
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-bottom: 0.25rem;
+        }
+        .mini-summary span {
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            border: none;
+            padding: 0.55rem 1.4rem;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            background: #a94a09;
+            box-shadow: 0 4px 12px rgba(215, 98, 12, 0.3);
+        }
+        .btn-outline-secondary {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.45rem 1rem;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+        }
+        .btn-outline-secondary:hover {
+            background: var(--bg-light);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        .nav-tabs {
+            border-bottom: 2px solid var(--border-color);
+        }
+        .nav-tabs .nav-link {
+            border: none;
+            color: #6c757d;
+            font-weight: 500;
+            padding: 0.65rem 1.3rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        .nav-tabs .nav-link:hover {
+            color: var(--primary-color);
+            border-bottom-color: var(--accent-color);
+        }
+        .nav-tabs .nav-link.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background: transparent;
+        }
+        .badge-status {
+            padding: 0.4rem 0.9rem;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+        .badge-success {
+            background: #28a745;
+            color: white;
+        }
+        .badge-pending {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+        }
+        .data-item {
+            padding: 0.8rem 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.2s ease;
+        }
+        .data-item:last-child {
+            border-bottom: none;
+        }
+        .data-item:hover {
+            background: var(--bg-light);
+        }
+        .data-label {
+            font-size: 0.8rem;
+            color: #6c757d;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.15rem;
+        }
+        .data-value {
+            font-size: 0.95rem;
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+        .table {
+            margin-bottom: 0;
+        }
+        .table thead th {
+            background: var(--bg-light);
+            color: var(--secondary-color);
+            font-weight: 600;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        .table tbody tr {
+            transition: background 0.2s ease;
+        }
+        .table tbody tr:hover {
+            background: var(--bg-light);
+        }
+        .main-footer {
+            background: var(--secondary-color);
+            color: white;
+            padding: 1rem 0;
+            margin-top: auto;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .footer-icon {
+            font-size: 1.5rem;
+            color: var(--accent-color);
+        }
+        .footer-info {
+            text-align: right;
+            font-size: 0.9rem;
+        }
+        .footer-company {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .footer-team {
+            opacity: 0.9;
+            font-size: 0.85rem;
+        }
+        .alert {
+            border: none;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        .alert-danger {
+            background: #fff5f5;
+            border-left-color: #dc3545;
+            color: #721c24;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6c757d;
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        @media print {
+            body {
+                background: white;
+            }
+            .main-header,
+            .main-footer,
+            .d-print-none {
+                display: none !important;
+            }
+            {% comment %} .card {
+                box-shadow: none;
+                page-break-inside: avoid;
+            } {% endcomment %}
+            .nav-tabs {
+                display: none !important;
+            }
+            .tab-content > .tab-pane {
+                display: block !important;
+                opacity: 1 !important;
+            }
+        }
+        @media (max-width: 768px) {
+            .header-title {
+                font-size: 1.25rem;
+            }
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            .footer-info {
+                text-align: center;
+            }
+        }
+        @media print {
+            body {
+                background: white;
+            }
+            .main-header,
+            .page-title-section,
+            .d-print-none {
+                display: none !important;
+            }
+            .card {
+                box-shadow: none;
+                border: 1px solid #e1e4e8;
+            }
+            .main-content {
+                padding: 0;
+            }
+            .nav-tabs,
+            .card-header {
+                display: none !important;
+            }
+            .tab-content > .tab-pane {
+                display: block !important;
+                opacity: 1 !important;
+            }
+            .print-summary table {
+                width: 100%;
+                font-size: 12px;
+            }
+            .print-summary th,
+            .print-summary td {
+                border: 1px solid #e1e4e8;
+                padding: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="logo-container">
+                    <img src="/static/img/LogoHD.png" alt="Congente Logo" class="logo-img">
+                </div>
+                <span class="badge-demo">
+                    <i class="bi bi-shield-check"></i> Entorno Demo
+                </span>
+            </div>
+        </div>
+    </header>
+    <main class="main-content">
+        <div class="container">
+            <div class="d-none d-print-block text-center mb-4">
+                <img src="/static/img/LogoHD.png" alt="Congente Logo" style="height: 60px; width: auto;">
+            </div>
+            <div class="page-title-section">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h1 class="page-title">
+                            <i class="bi bi-search"></i> Consulta Preselecta
+                        </h1>
+                        <p class="page-description">
+                            Ingrese los datos de identificación para realizar la consulta al motor de decisión
+                        </p>
+                    </div>
+                    <div>
+                        <a href="." class="btn btn-primary">
+                            <i class="bi bi-arrow-clockwise"></i> Nueva Consulta
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-lg-4 d-print-none">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title h5">
+                                <i class="bi bi-person-badge"></i> Datos de Consulta
+                            </h2>
+                            <p class="card-subtitle">
+                                Complete los campos obligatorios
+                            </p>
+                        </div>
+                        <div class="card-body card-body--compact">
+                            {# Paso 1 solo se muestra cuando aún no hay paso 2 #}
+                            {% if not show_step2 %}
+                            <div class="step-indicator">
+                                Paso <span>1</span> de 2 · Identificación
+                            </div>
+                            <form method="post" class="needs-validation compact-form" novalidate>
+                                {% csrf_token %}
+                                <input type="hidden" name="step" value="1">
+                                <div class="mb-2">
+                                    <label for="id_number" class="form-label">
+                                        <i class="bi bi-card-text"></i> Número de Identificación
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="id_number" name="id_number"
+                                           value="{{ step1_data.idNumber|default:'' }}" placeholder="Ej: 1234567890" required>
+                                    <div class="invalid-feedback">Debe ingresar un número de identificación válido</div>
+                                </div>
+                                <div class="mb-2">
+                                    <label for="id_type" class="form-label">
+                                        <i class="bi bi-file-text"></i> Tipo de Identificación
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="id_type" name="id_type" required>
+                                        <option value="" {% if not step1_data.idType %}selected{% endif %} disabled>Selecciona...</option>
+                                        <option value="1" {% if step1_data.idType == "1" %}selected{% endif %}>Cédula de ciudadanía</option>
+                                        <option value="2" {% if step1_data.idType == "2" %}selected{% endif %}>NIT</option>
+                                        <option value="3" {% if step1_data.idType == "3" %}selected{% endif %}>NIT de extranjería</option>
+                                        <option value="4" {% if step1_data.idType == "4" %}selected{% endif %}>Cédula de extranjería</option>
+                                        <option value="5" {% if step1_data.idType == "5" %}selected{% endif %}>Pasaporte</option>
+                                        <option value="6" {% if step1_data.idType == "6" %}selected{% endif %}>Carné diplomático</option>
+                                    </select>
+                                    <div class="invalid-feedback">Debe especificar el tipo de identificación</div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="first_last_name" class="form-label">
+                                        <i class="bi bi-person"></i> Primer Apellido
+                                    </label>
+                                    <input type="text" class="form-control" id="first_last_name" name="first_last_name"
+                                           value="{{ step1_data.firstLastName|default:'' }}" placeholder="Requerido por la estrategia" required>
+                                    <div class="form-text">
+                                        <i class="bi bi-info-circle"></i> Requerido por Preselecta para continuar
+                                    </div>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-chevron-double-right"></i> Continuar al paso 2
+                                    </button>
+                                </div>
+                                <div class="text-center mt-2">
+                                    <small class="text-muted">
+                                        <i class="bi bi-lock"></i> Datos protegidos y encriptados
+                                    </small>
+                                </div>
+                            </form>
+
+                            {% else %}
+                            {# Paso 2: se muestra solo cuando show_step2 es True #}
+                            <div class="step-indicator">
+                                Paso <span>2</span> de 2 · Variables de crédito
+                            </div>
+
+                            <div class="mini-summary">
+                                <div class="mini-summary-title">Datos de identificación</div>
+                                <div>
+                                    <span><strong>Número:</strong> {{ step1_data.idNumber }}</span>
+                                    <span><strong>Primer apellido:</strong> {{ step1_data.firstLastName }}</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-2">
+                                <span class="badge bg-primary-subtle text-primary px-3 py-1">
+                                    Paso 2 - Variables PRECREDITO_CONGENTE
+                                </span>
+                            </div>
+
+                            <!-- Paso 2: variables de la estrategia -->
+                            <form method="post" class="needs-validation compact-form" novalidate>
+                                {% csrf_token %}
+                                <input type="hidden" name="step" value="2">
+                                <input type="hidden" name="id_number" value="{{ step1_data.idNumber }}">
+                                <input type="hidden" name="id_type" value="{{ step1_data.idType }}">
+                                <input type="hidden" name="first_last_name" value="{{ step1_data.firstLastName }}">
+
+                                <div class="mb-2">
+                                    <label class="form-label" for="linea_credito">
+                                        Línea de crédito <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="linea_credito" name="linea_credito" required>
+                                        <option value="" {% if not step2_data.linea_credito %}selected{% endif %} disabled>Selecciona...</option>
+                                        <option value="1" {% if step2_data.linea_credito == "1" %}selected{% endif %}>Consumo</option>
+                                        <option value="2" {% if step2_data.linea_credito == "2" %}selected{% endif %}>Comercial</option>
+                                        <option value="3" {% if step2_data.linea_credito == "3" %}selected{% endif %}>Microcrédito</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label" for="tipo_asociado">
+                                        Tipo de asociado <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="tipo_asociado" name="tipo_asociado" required>
+                                        <option value="" {% if not step2_data.tipo_asociado %}selected{% endif %} disabled>Selecciona...</option>
+                                        <option value="1" {% if step2_data.tipo_asociado == "1" %}selected{% endif %}>Nuevo</option>
+                                        <option value="2" {% if step2_data.tipo_asociado == "2" %}selected{% endif %}>Renovación</option>
+                                        <option value="3" {% if step2_data.tipo_asociado == "3" %}selected{% endif %}>No aplica</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="form-label" for="medio_pago">
+                                        Medio de pago <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="medio_pago" name="medio_pago" required>
+                                        <option value="" {% if not step2_data.medio_pago %}selected{% endif %} disabled>Selecciona...</option>
+                                        <option value="1" {% if step2_data.medio_pago == "1" %}selected{% endif %}>Ventanilla</option>
+                                        <option value="2" {% if step2_data.medio_pago == "2" %}selected{% endif %}>Nómina</option>
+                                        <option value="3" {% if step2_data.medio_pago == "3" %}selected{% endif %}>No aplica</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label" for="actividad">
+                                        Actividad <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="actividad" name="actividad" required>
+                                        <option value="" {% if not step2_data.actividad %}selected{% endif %} disabled>Selecciona...</option>
+                                        <option value="1" {% if step2_data.actividad == "1" %}selected{% endif %}>Empleado</option>
+                                        <option value="2" {% if step2_data.actividad == "2" %}selected{% endif %}>Pensionado</option>
+                                        <option value="3" {% if step2_data.actividad == "3" %}selected{% endif %}>Independiente</option>
+                                    </select>
+                                </div>
+
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-search"></i> Enviar a Preselecta
+                                    </button>
+                                </div>
+                                <div class="text-center mt-2">
+                                    <small class="text-muted">
+                                        <i class="bi bi-lock"></i> Datos protegidos y encriptados
+                                    </small>
+                                </div>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- RESULTADOS -->
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h2 class="card-title h5">
+                                        <i class="bi bi-bar-chart-line"></i> Resultado de la Consulta
+                                    </h2>
+                                    <p class="card-subtitle">
+                                        Información del buró y motor de decisión
+                                    </p>
+                                </div>
+                                {% if response_json %}
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge-status badge-success">
+                                            <i class="bi bi-check-circle"></i> Completada
+                                        </span>
+                                        <button type="button"
+                                                class="btn btn-outline-secondary btn-sm d-print-none"
+                                                onclick="window.print()">
+                                            <i class="bi bi-download"></i> Descargar PDF
+                                        </button>
+                                    </div>
+                                {% else %}
+                                    <span class="badge-status badge-pending">
+                                        <i class="bi bi-clock"></i> Pendiente
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            {% if not response_json and not error_message %}
+                                <div class="empty-state">
+                                    <i class="bi bi-inbox"></i>
+                                    <p class="mb-1">No hay resultados disponibles</p>
+                                    <p class="small text-muted">
+                                        Complete el formulario para realizar una consulta
+                                    </p>
+                                </div>
+                            {% endif %}
+
+                            {% if response_json %}
+                                <!-- TABS DE RESULTADOS -->
+                                <ul class="nav nav-tabs mb-3 d-print-none" id="resultadoTabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link active" id="resumen-tab" data-bs-toggle="tab"
+                                                data-bs-target="#resumen" type="button" role="tab">
+                                            <i class="bi bi-file-text"></i> Resumen
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="persona-tab" data-bs-toggle="tab"
+                                                data-bs-target="#persona" type="button" role="tab">
+                                            <i class="bi bi-person"></i> Persona
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="score-tab" data-bs-toggle="tab"
+                                                data-bs-target="#score" type="button" role="tab">
+                                            <i class="bi bi-graph-up"></i> Score
+                                        </button>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <button class="nav-link" id="motor-tab" data-bs-toggle="tab"
+                                                data-bs-target="#motor" type="button" role="tab">
+                                            <i class="bi bi-gear"></i> Motor
+                                        </button>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content">
+                                    <!-- TAB RESUMEN -->
+                                    <div class="tab-pane fade show active" id="resumen" role="tabpanel">
+                                        <div class="print-summary">
+                                            <div class="mb-2 text-uppercase text-muted small fw-semibold">
+                                                Resumen de la consulta
+                                            </div>
+
+                                            <div class="row g-2">
+                                                <div class="col-md-6">
+                                                    <div class="data-item">
+                                                        <div class="data-label">Nombres y Apellidos</div>
+                                                        <div class="data-value">
+                                                            {{ response_json.nationalPerson.fullName|default:response_json.nationalPerson.names|default:'-' }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <div class="data-item">
+                                                        <div class="data-label">Decisión</div>
+                                                        <div class="data-value">
+                                                            {% for item in response_json.engineResponse %}
+                                                                {% if item.key|lower == 'decision' %}
+                                                                    {{ item.value }}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <div class="data-item">
+                                                        <div class="data-label">Puntaje (Score)</div>
+                                                        <div class="data-value">
+                                                            {{ response_json.score.rating|default:'-' }}
+                                                            {% if response_json.score.classification %}
+                                                                <span class="text-muted">({{ response_json.score.classification }})</span>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6">
+                                                    <div class="data-item">
+                                                        <div class="data-label">Fecha de Consulta</div>
+                                                        <div class="data-value">{{ response_json.inquiryDate|default:'-' }}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {% if response_json.engineResponse %}
+                                            <div class="mt-3">
+                                                {% for item in response_json.engineResponse %}
+                                                    {% if item.key|lower == 'decision' and item.value|lower == 'aprobado' %}
+                                                        <a href="http://192.168.15.17:8088/Congente360/servlet/com.link2knowgx16.scoring.pscoringww" class="btn btn-success" target="_blank">
+                                                            <i class="bi bi-wallet-fill"></i> Consultar Historial de Pago
+                                                        </a>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- TAB PERSONA -->
+                                    <div class="tab-pane fade" id="persona" role="tabpanel">
+                                        {% with person=response_json.nationalPerson %}
+                                            {% if person.fullName or person.names or person.identification.number %}
+                                                <div class="data-item">
+                                                    <div class="data-label">Nombre completo</div>
+                                                    <div class="data-value">{{ person.fullName|default:'-' }}</div>
+                                                </div>
+                                                <div class="data-item">
+                                                    <div class="data-label">Documento de identidad</div>
+                                                    <div class="data-value">
+                                                        {{ person.identification.number|default:'-' }}
+                                                        <span class="text-muted">({{ person.identification.type|default:'-' }})</span>
+                                                    </div>
+                                                </div>
+                                                <div class="data-item">
+                                                    <div class="data-label">Estado del documento</div>
+                                                    <div class="data-value">{{ person.identification.status|default:'-' }}</div>
+                                                </div>
+                                                <div class="data-item">
+                                                    <div class="data-label">Ubicación</div>
+                                                    <div class="data-value">
+                                                        {{ person.identification.city|default:'-' }}{% if person.identification.department %} / {{ person.identification.department }}{% endif %}
+                                                    </div>
+                                                </div>
+                                                <div class="data-item">
+                                                    <div class="data-label">Fecha de expedición</div>
+                                                    <div class="data-value">{{ person.identification.issueDate|default:'-' }}</div>
+                                                </div>
+                                                <div class="data-item">
+                                                    <div class="data-label">Estado civil</div>
+                                                    <div class="data-value">{{ person.maritalStatus|default:'-' }}</div>
+                                                </div>
+                                                <div class="data-item">
+                                                    <div class="data-label">Edad</div>
+                                                    <div class="data-value">{{ person.age.min|default:'-' }}</div>
+                                                </div>
+                                                <div class="data-item">
+                                                    <div class="data-label">Género</div>
+                                                    <div class="data-value">{{ person.gender|default:'-' }}</div>
+                                                </div>
+                                            {% else %}
+                                                <div class="empty-state">
+                                                    <i class="bi bi-person-x"></i>
+                                                    <p class="text-muted mb-0">No se recibieron datos de persona</p>
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </div>
+
+                                    <!-- TAB SCORE -->
+                                    <div class="tab-pane fade" id="score" role="tabpanel">
+                                        {% with score=response_json.score %}
+                                            {% if score.name or score.rating or score.classification or score.reasonCodes %}
+                                                <div class="data-item">
+                                                    <div class="data-label">Nombre del score</div>
+                                                    <div class="data-value">{{ score.name|default:'-' }}</div>
+                                                </div>
+                                                <div class="data-item">
+                                                    <div class="data-label">Calificación numérica</div>
+                                                    <div class="data-value">{{ score.rating|default:'-' }}</div>
+                                                </div>
+                                                <div class="data-item">
+                                                    <div class="data-label">Clasificación</div>
+                                                    <div class="data-value">{{ score.classification|default:'-' }}</div>
+                                                </div>
+                                                {% if score.reasonCodes %}
+                                                    <div class="data-item">
+                                                        <div class="data-label mb-2">Razones del score</div>
+                                                        <ul class="mb-0">
+                                                            {% for reason in score.reasonCodes %}
+                                                                <li>{{ reason }}</li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    </div>
+                                                {% endif %}
+                                            {% else %}
+                                                <div class="empty-state">
+                                                    <i class="bi bi-graph-down"></i>
+                                                    <p class="text-muted mb-0">No se recibieron datos de score</p>
+                                                </div>
+                                            {% endif %}
+                                        {% endwith %}
+                                    </div>
+
+                                    <!-- TAB MOTOR -->
+                                    <div class="tab-pane fade" id="motor" role="tabpanel">
+                                        <div class="table-responsive">
+                                            <table class="table align-middle mb-3">
+                                                <tbody>
+                                                    <tr class="table-light">
+                                                        <th colspan="2" class="text-uppercase text-muted small">Resultados y variables PRECREDITO_CONGENTE</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <th style="width:40%;">Fecha consulta</th>
+                                                        <td>{{ response_json.inquiryDate|default:'-' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Estrategia</th>
+                                                        <td>{{ response_json.strategyId|default:'-' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Motor ID</th>
+                                                        <td>{{ response_json.engineId|default:'-' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Programa</th>
+                                                        <td>{{ response_json.programId|default:'-' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Decisión</th>
+                                                        <td>
+                                                            {% with eng=response_json.engineResponse %}
+                                                                {% if eng %}
+                                                                    {% for item in eng %}
+                                                                        {% if item.key|lower == 'decision' %}
+                                                                            {{ item.value|default:'-' }}
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                {% else %}
+                                                                    {{ response_json.typeResponse|default:'-' }}
+                                                                {% endif %}
+                                                            {% endwith %}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Puntaje</th>
+                                                        <td>{{ response_json.score.rating|default:'-' }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Scores</th>
+                                                        <td>
+                                                            {% if response_json.score.name or response_json.score.reasonCodes %}
+                                                                <div>{{ response_json.score.name|default:'-' }}</div>
+                                                                {% if response_json.score.reasonCodes %}
+                                                                    <ul class="mb-0">
+                                                                        {% for reason in response_json.score.reasonCodes %}
+                                                                            <li>{{ reason }}</li>
+                                                                        {% endfor %}
+                                                                    </ul>
+                                                                {% endif %}
+                                                            {% else %}
+                                                                -
+                                                            {% endif %}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        {% if response_json.engineResponse %}
+                                            <div class="table-responsive">
+                                                <table class="table table-hover align-middle mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th style="width:40%;">Respuesta personalizada</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for item in response_json.engineResponse %}
+                                                            <tr>
+                                                                <td><strong>{{ item.key }}</strong></td>
+                                                                <td>{{ item.value }}</td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        {% else %}
+                                            <div class="empty-state">
+                                                <i class="bi bi-gear-wide"></i>
+                                                <p class="text-muted mb-0">No se recibió respuesta del motor</p>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <i class="bi bi-code-square footer-icon"></i>
+                    <span>Sistema de Consultas Preselecta</span>
+                </div>
+                <div class="footer-info">
+                    <div class="footer-company">
+                        <i class="bi bi-building"></i> Desarrollado por Congente
+                    </div>
+                    <div class="footer-team">
+                        <i class="bi bi-people"></i> Gerencia TI - Equipo de Desarrollo
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        (function () {
+            'use strict';
+            const forms = document.querySelectorAll('.needs-validation');
+            Array.prototype.slice.call(forms).forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+    </script>
+</body>
+</html>
