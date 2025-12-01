@@ -43,12 +43,10 @@ class ConsultaView(View):
         id_number = (request.POST.get('id_number') or "").strip()
         id_type = (request.POST.get('id_type') or "").strip()
         first_last_name = (request.POST.get('first_last_name') or "").strip()
-        full_name = (request.POST.get('full_name') or "").strip()
         step1_data = {
             "idNumber": id_number,
             "idType": id_type,
             "firstLastName": first_last_name,
-            "fullName": full_name,
         }
 
         # Paso 1: solo valida y muestra el siguiente paso, sin llamar al proveedor
@@ -142,7 +140,7 @@ class ConsultaView(View):
             remote_addr=remote_addr,
             user_agent=request.META.get("HTTP_USER_AGENT", ""),
             consulted_id_number=id_number,
-            consulted_name=response_name or full_name or first_last_name,
+            consulted_name=response_name or first_last_name,
             response_full_name=response_name or "",
         )
 
