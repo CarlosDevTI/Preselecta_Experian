@@ -5,7 +5,10 @@ class AccessLog(models.Model):
     """Registro de cada consulta con metadatos del dispositivo."""
 
     ip_address = models.GenericIPAddressField(null=True, blank=True)
+    forwarded_for = models.TextField(blank=True, help_text="Cabecera X-Forwarded-For completa")
     user_agent = models.TextField(blank=True)
+    consulted_id_number = models.CharField(max_length=50, blank=True)
+    consulted_name = models.CharField(max_length=200, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

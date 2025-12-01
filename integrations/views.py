@@ -78,9 +78,13 @@ class ConsultaView(View):
             })
 
         # Registro de acceso con metadatos del dispositivo
+        x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
         AccessLog.objects.create(
             ip_address=self._get_client_ip(request) or None,
+            forwarded_for=x_forwarded_for,
             user_agent=request.META.get("HTTP_USER_AGENT", ""),
+            consulted_id_number=id_number,
+            consulted_name=first_last_name,
         )
 
         # Construye la carga útil final para PRECREDITO_CONGENTE
