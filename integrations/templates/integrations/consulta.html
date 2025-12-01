@@ -479,9 +479,19 @@
                                         <i class="bi bi-person"></i> Primer Apellido
                                     </label>
                                     <input type="text" class="form-control" id="first_last_name" name="first_last_name"
-                                           value="{{ step1_data.firstLastName|default:'' }}" placeholder="Requerido por la estrategia" required>
+                                            value="{{ step1_data.firstLastName|default:'' }}" placeholder="Requerido por la estrategia" required>
                                     <div class="form-text">
                                         <i class="bi bi-info-circle"></i> Requerido por Preselecta para continuar
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="full_name" class="form-label">
+                                        <i class="bi bi-person-lines-fill"></i> Nombre completo (solo auditoría)
+                                    </label>
+                                    <input type="text" class="form-control" id="full_name" name="full_name"
+                                           value="{{ step1_data.fullName|default:'' }}" placeholder="Ej: Juan Pablo Pérez Gómez">
+                                    <div class="form-text">
+                                        <i class="bi bi-shield-lock"></i> Solo para registro interno, no se envía al proveedor.
                                     </div>
                                 </div>
                                 <div class="d-grid">
@@ -523,6 +533,7 @@
                                 <input type="hidden" name="id_number" value="{{ step1_data.idNumber }}">
                                 <input type="hidden" name="id_type" value="{{ step1_data.idType }}">
                                 <input type="hidden" name="first_last_name" value="{{ step1_data.firstLastName }}">
+                                <input type="hidden" name="full_name" value="{{ step1_data.fullName }}">
 
                                 <div class="mb-2">
                                     <label class="form-label" for="linea_credito">

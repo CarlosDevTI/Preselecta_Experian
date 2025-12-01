@@ -17,6 +17,17 @@ class ConsultaView(View):
             return x_forwarded_for.split(",")[0].strip()
         return request.META.get("REMOTE_ADDR")
 
+    @staticmethod
+    def _extract_response_name(response_data):
+        """Intenta leer el nombre completo que venga en la respuesta del proveedor."""
+        if not isinstance(response_data, dict):
+            return ""
+        for key in ("fullName", "nombreCompleto", "name", "customerName", "razonSocial"):
+            value = response_data.get(key)
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+        return ""
+
     def get(self, request, *args, **kwargs):
         # Paso 1 inicial
         return render(
@@ -32,10 +43,12 @@ class ConsultaView(View):
         id_number = (request.POST.get('id_number') or "").strip()
         id_type = (request.POST.get('id_type') or "").strip()
         first_last_name = (request.POST.get('first_last_name') or "").strip()
+        full_name = (request.POST.get('full_name') or "").strip()
         step1_data = {
             "idNumber": id_number,
             "idType": id_type,
             "firstLastName": first_last_name,
+            "fullName": full_name,
         }
 
         # Paso 1: solo valida y muestra el siguiente paso, sin llamar al proveedor
@@ -79,13 +92,8 @@ class ConsultaView(View):
 
         # Registro de acceso con metadatos del dispositivo
         x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
-        AccessLog.objects.create(
-            ip_address=self._get_client_ip(request) or None,
-            forwarded_for=x_forwarded_for,
-            user_agent=request.META.get("HTTP_USER_AGENT", ""),
-            consulted_id_number=id_number,
-            consulted_name=first_last_name,
-        )
+        remote_addr = request.META.get("REMOTE_ADDR")
+        real_ip = request.META.get("HTTP_X_REAL_IP")
 
         # Construye la carga útil final para PRECREDITO_CONGENTE
         payload = {
@@ -111,12 +119,14 @@ class ConsultaView(View):
         response_data = {}
         response_pretty = None
         error_message = None
+        response_name = ""
         try:
             response = requests.post(api_url, json=payload)
             response.raise_for_status()
             response_data = response.json()
             if response_data:
                 response_pretty = json.dumps(response_data, indent=4, ensure_ascii=False)
+                response_name = self._extract_response_name(response_data)
         except requests.exceptions.RequestException as e:
             error_message = f"Error calling API: {e}"
             if e.response:
@@ -124,6 +134,17 @@ class ConsultaView(View):
                     error_message += f" - {e.response.text}"
                 except Exception:
                     pass
+
+        AccessLog.objects.create(
+            ip_address=self._get_client_ip(request) or None,
+            forwarded_for=x_forwarded_for,
+            real_ip=real_ip,
+            remote_addr=remote_addr,
+            user_agent=request.META.get("HTTP_USER_AGENT", ""),
+            consulted_id_number=id_number,
+            consulted_name=response_name or full_name or first_last_name,
+            response_full_name=response_name or "",
+        )
 
         print("DEBUG >> response_data =", response_data)
         return render(request, self.template_name, {
