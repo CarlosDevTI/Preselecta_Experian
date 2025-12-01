@@ -62,8 +62,6 @@ class PreselectaClient:
                 "scope": self.scope,
             }
         else:
-            #* PEDIR CONTRASEÑAS DE USUARIO
-            #* PENSANDO EN PONER OKTA_GRANT_TYPE="client_credentials" SI SIGUE SIN FUNCIONAR
             data = {
                 "grant_type": "password",
                 "username": self.username,
@@ -71,35 +69,13 @@ class PreselectaClient:
                 "scope": self.scope,
             }
 
-        # --- INICIO DE LOG PARA PROVEEDOR ---
-        print("--- REQUEST ---")
-        print(f"URL: POST {self.token_url}")
-        print(f"HEADERS: {headers}")
-        print(f"BODY: {data}")
-        print("---------------")
-
         try:
             resp = requests.post(
                 self.token_url, headers=headers, data=data, timeout=15, verify=self.verify_ssl
             )
-            print("--- RESPONSE ---")
-            print(f"STATUS_CODE: {resp.status_code}")
-            print(f"HEADERS: {resp.headers}")
-            print(f"BODY: {resp.text}")
-            print("----------------")
-            # --- FIN DE LOG PARA PROVEEDOR ---
             resp.raise_for_status()
             body = resp.json()
         except requests.exceptions.RequestException as e:
-            print("--- RESPONSE (ERROR) ---")
-            if e.response is not None:
-                print(f"STATUS_CODE: {e.response.status_code}")
-                print(f"HEADERS: {e.response.headers}")
-                print(f"BODY: {e.response.text}")
-            else:
-                print(f"Exception: {e}")
-            print("------------------------")
-            # --- FIN DE LOG PARA PROVEEDOR ---
             raise e
         token = body.get("access_token")
         if not token:

@@ -24,7 +24,7 @@ class DecisionView(APIView):
 
         client = PreselectaClient()
         try:
-            print(f"--- DecisionView: Llamando a call_decision con: {ser.validated_data} ---")
+            # print(f"--- DecisionView: Llamando a call_decision con: {ser.validated_data} ---")
             #? Llama al proveedor con el payload validado
             data = client.call_decision(ser.validated_data)
             print("--- DecisionView: Llamada a call_decision exitosa ---")
