@@ -6,9 +6,9 @@ from django.core.cache import cache
 
 class PreselectaClient:
     """
-    Encapsulates:
-      - Retrieving and caching the access_token from Okta.
-      - Calling the business service using that token.
+    Encapsula:
+    - La obtención y cacheo del access_token desde Okta.
+    - La llamada al servicio de negocio usando ese token.
     """
 
     def __init__(self):
@@ -25,7 +25,7 @@ class PreselectaClient:
         self.scope = os.environ["OKTA_SCOPE"]
         self.service_url = os.environ["SERVICE_URL"]
 
-        #* COMO ENVIAR EL TOKEN AL SERVICIO: "access_token" (custom header) o "bearer"
+        #* COMO SE DEBE ENVIAR EL TOKEN AL SERVICIO: "access_token" (custom header) o "bearer"
         self.auth_style = os.environ.get("PRESELECTA_AUTH_STYLE", "access_token").lower()
 
         #* OKTA GRANT TYPE: "PASSWORD" (POR DEFECTO) O "CLIENT_CREDENTIALS"
@@ -40,9 +40,10 @@ class PreselectaClient:
 
     def get_access_token(self) -> str:
         """
-        1) Return cached token if present
-        2) Otherwise request a new one from Okta
-        3) Cache it for expires_in - 60 seconds
+        1 - Returna el access_token cacheado si existe
+        2 - Si no existe, solicita uno nuevo a Okta
+        3 - Lo cachea por expires_in - 60 segundos
+        ---
         """
         cache_key = f"preselecta_access_token_{self.client_id}_{self.grant_type}"
         cached = cache.get(cache_key)
@@ -104,4 +105,6 @@ class PreselectaClient:
             self.service_url, headers=headers, json=payload, timeout=20, verify=self.verify_ssl
         )
         resp.raise_for_status()
-        return resp.json()
+        response_data = resp.json()
+        print("--- PreselectaClient: Respuesta recibida del servicio ---", response_data)
+        return response_data

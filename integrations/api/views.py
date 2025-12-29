@@ -11,12 +11,13 @@ logger = logging.getLogger(__name__)
 class DecisionView(APIView):
     """
     Orquesta el flujo:
-        1) Valida el payload de entrada con DRF Serializer
-        2) Obtiene token (cacheado) y llama al servicio externo
-        3) Devuelve al cliente la respuesta tal cual (o un error controlado)
+        1 - Valida el payload de entrada con DRF Serializer
+        2 - Obtiene token (cacheado) y llama al servicio externo
+        3 - Devuelve al cliente la respuesta tal cual (o un error controlado)
     """
     def post(self, request):
         print("--- DecisionView: Petición POST recibida ---")
+        print("--- DecisionView: Datos del request recibido ---", request.data)
         #? Validación de entrada (lanza 400 con detalle si falla)
         ser = DecisionPayloadSerializer(data=request.data)
         ser.is_valid(raise_exception=True)

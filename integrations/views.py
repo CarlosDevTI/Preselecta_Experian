@@ -10,7 +10,7 @@ class ConsultaView(View):
     template_name = 'integrations/consulta.html'  # Ruta de la plantilla
 
     @staticmethod
-    def _get_client_ip(request):
+    def _get_client_ip(request): #! Optenemos la ip para auditoria
         """Devuelve la IP del cliente respetando X-Forwarded-For si existe."""
         x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
         if x_forwarded_for:
@@ -18,7 +18,7 @@ class ConsultaView(View):
         return request.META.get("REMOTE_ADDR")
 
     def get(self, request, *args, **kwargs):
-        # Paso 1 inicial
+        #! Paso 1 inicial
         return render(
             request,
             self.template_name,
@@ -28,7 +28,7 @@ class ConsultaView(View):
     def post(self, request, *args, **kwargs):
         step = request.POST.get("step", "1")
 
-        # Datos capturados en el paso 1
+        #! Datos capturados en el paso 1
         id_number = (request.POST.get('id_number') or "").strip()
         id_type = (request.POST.get('id_type') or "").strip()
         first_last_name = (request.POST.get('first_last_name') or "").strip()
@@ -38,7 +38,7 @@ class ConsultaView(View):
             "firstLastName": first_last_name,
         }
 
-        # Paso 1: solo valida y muestra el siguiente paso, sin llamar al proveedor
+        #! Paso 1: solo valida y muestra el siguiente paso, sin llamar a DATACREDITO
         if step == "1":
             if not id_number or not id_type or not first_last_name:
                 return render(request, self.template_name, {
@@ -55,7 +55,7 @@ class ConsultaView(View):
                 "step2_data": {},
             })
 
-        # Paso 2: variables adicionales de la estrategia
+        #? Paso 2: variables adicionales de la estrategia
         linea_credito = (request.POST.get('linea_credito') or "").strip()
         tipo_asociado = (request.POST.get('tipo_asociado') or "").strip()
         medio_pago = (request.POST.get('medio_pago') or "").strip()
@@ -67,7 +67,7 @@ class ConsultaView(View):
             "actividad": actividad,
         }
 
-        # Si falta algo del paso 2, no se llama al proveedor
+        #? Si falta algo del paso 2, no se llama al proveedor
         if not all(step2_data.values()):
             return render(request, self.template_name, {
                 "step": "2",
@@ -77,10 +77,10 @@ class ConsultaView(View):
                 "step2_data": step2_data,
             })
 
-        # Registro de acceso con metadatos del dispositivo
+        #? Registro de acceso con metadatos del dispositivo
         x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
 
-        # Construye la carga útil final para PRECREDITO_CONGENTE
+        #? Construye la carga útil final para PRECREDITO_CONGENTE
         payload = {
             "idNumber": id_number,
             "idType": id_type,
@@ -99,7 +99,7 @@ class ConsultaView(View):
             ]
         }
 
-        # Llama a la API interna y maneja la respuesta
+        #? Llama a la API interna y maneja la respuesta
         api_url = request.build_absolute_uri('/api/decision/')
         response_data = {}
         response_pretty = None
@@ -125,8 +125,8 @@ class ConsultaView(View):
             consulted_id_number=id_number,
             consulted_name=first_last_name,
         )
-
-        print("DEBUG >> response_data =", response_data)
+        #? Depuración
+        # print("DEBUG >> response_data =", response_data)
         return render(request, self.template_name, {
             'response_json': response_data if response_data else None,
             'response_pretty': response_pretty,
