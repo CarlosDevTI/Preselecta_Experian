@@ -112,7 +112,13 @@ class ConsultaView(View):
                 response_pretty = json.dumps(response_data, indent=4, ensure_ascii=False)
         except requests.exceptions.RequestException as e:
             error_message = f"Error calling API: {e}"
-            if e.response:
+            if e.response is not None:
+                try:
+                    error_body = e.response.json()
+                    response_pretty = json.dumps(error_body, indent=4, ensure_ascii=False)
+                except Exception:
+                    error_body = e.response.text
+                    response_pretty = error_body
                 try:
                     error_message += f" - {e.response.text}"
                 except Exception:

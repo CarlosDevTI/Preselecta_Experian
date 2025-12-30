@@ -11,6 +11,7 @@ services:
     environment:
       DB_HOST: db
       DB_PORT: 5432
+      NO_PROXY: 127.0.0.1,localhost,192.168.15.215
     depends_on:
       db:
         condition: service_healthy

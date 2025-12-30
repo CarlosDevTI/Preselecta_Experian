@@ -9,6 +9,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 class DecisionView(APIView):
+    authentication_classes = []
+    permission_classes = []
     """
     Orquesta el flujo:
         1 - Valida el payload de entrada con DRF Serializer
