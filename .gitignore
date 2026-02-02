@@ -38,6 +38,11 @@ certs/
 historial*.pdf
 historial*.xml
 *_test_*.pdf
+
+# Credentials / provider files
+CLAVE_PRODUCCION.txt
+CONGENTE_CLAVE_WS_REST_PRESELECTA_25674_DEMO.txt
+PRESELECTA_congente_PRODUCCION.postman_collection.json
 PRESELECTA_congente_PRODUCCION.postman_collection.json
 create_template.py
 CONGENTE_CLAVE_WS_REST_PRESELECTA_25674_DEMO.txt

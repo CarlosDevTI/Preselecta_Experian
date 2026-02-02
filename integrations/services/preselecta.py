@@ -105,6 +105,4 @@ class PreselectaClient:
             self.service_url, headers=headers, json=payload, timeout=20, verify=self.verify_ssl
         )
         resp.raise_for_status()
-        response_data = resp.json()
-        print("--- PreselectaClient: Respuesta recibida del servicio ---", response_data)
-        return response_data
+        return resp.json()

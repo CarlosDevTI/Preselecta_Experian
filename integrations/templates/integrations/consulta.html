@@ -325,6 +325,19 @@
             margin-bottom: 1rem;
             opacity: 0.5;
         }
+        .page-loader {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.88);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 0.75rem;
+            font-size: 0.95rem;
+            color: var(--secondary-color);
+        }
         @media print {
             body {
                 background: white;
@@ -395,6 +408,10 @@
     </style>
 </head>
 <body>
+    <div class="page-loader" id="pageLoader">
+        <div class="spinner-border text-warning" role="status"></div>
+        <div>Consultando Preselecta…</div>
+    </div>
     <header class="main-header">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
@@ -441,12 +458,17 @@
                             </p>
                         </div>
                         <div class="card-body card-body--compact">
+                            {% if form_error_message %}
+                                <div class="alert alert-danger">
+                                    {{ form_error_message }}
+                                </div>
+                            {% endif %}
                             {# Paso 1 solo se muestra cuando aún no hay paso 2 #}
                             {% if not show_step2 %}
                             <div class="step-indicator">
                                 Paso <span>1</span> de 2 · Identificación
                             </div>
-                            <form method="post" class="needs-validation compact-form" novalidate>
+                            <form method="post" class="needs-validation compact-form" novalidate data-loader="true">
                                 {% csrf_token %}
                                 <input type="hidden" name="step" value="1">
                                 <div class="mb-2">
@@ -517,7 +539,7 @@
                             </div>
 
                             <!-- Paso 2: variables de la estrategia -->
-                            <form method="post" class="needs-validation compact-form" novalidate>
+                            <form method="post" class="needs-validation compact-form" novalidate data-loader="true">
                                 {% csrf_token %}
                                 <input type="hidden" name="step" value="2">
                                 <input type="hidden" name="id_number" value="{{ step1_data.idNumber }}">
@@ -569,6 +591,29 @@
                                         <option value="1" {% if step2_data.actividad == "1" %}selected{% endif %}>Empleado</option>
                                         <option value="2" {% if step2_data.actividad == "2" %}selected{% endif %}>Pensionado</option>
                                         <option value="3" {% if step2_data.actividad == "3" %}selected{% endif %}>Independiente</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="place">
+                                        Agencia / Municipio <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-select" id="place" name="place" required>
+                                        <option value="" {% if not step2_data.place %}selected{% endif %} disabled>Selecciona...</option>
+                                        <optgroup label="Agencias - Villavicencio">
+                                            {% for opt in agencias_villavicencio %}
+                                                <option value="{{ opt }}" {% if step2_data.place == opt %}selected{% endif %}>{{ opt }}</option>
+                                            {% endfor %}
+                                        </optgroup>
+                                        <optgroup label="Agencias - Municipios">
+                                            {% for opt in agencias_municipios %}
+                                                <option value="{{ opt }}" {% if step2_data.place == opt %}selected{% endif %}>{{ opt }}</option>
+                                            {% endfor %}
+                                        </optgroup>
+                                        <optgroup label="Corresponsales">
+                                            {% for opt in corresponsales %}
+                                                <option value="{{ opt }}" {% if step2_data.place == opt %}selected{% endif %}>{{ opt }}</option>
+                                            {% endfor %}
+                                        </optgroup>
                                     </select>
                                 </div>
 
@@ -711,15 +756,11 @@
                                             </div>
                                         </div>
 
-                                        {% if response_json.engineResponse %}
+                                        {% if otp_allowed %}
                                             <div class="mt-3">
-                                                {% for item in response_json.engineResponse %}
-                                                    {% if item.key|lower == 'decision' and item.value|lower == 'aprobado' %}
-                                                        <a href="http://192.168.15.17:8088/Congente360/servlet/com.link2knowgx16.scoring.pscoringww" class="btn btn-success" target="_blank">
-                                                            <i class="bi bi-wallet-fill"></i> Consultar Historial de Pago
-                                                        </a>
-                                                    {% endif %}
-                                                {% endfor %}
+                                                <button class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#otpModal">
+                                                    <i class="bi bi-shield-check"></i> Consultar Historial de Pago
+                                                </button>
                                             </div>
                                         {% endif %}
                                     </div>
@@ -942,5 +983,97 @@
             });
         })();
     </script>
+    <script>
+        (function () {
+            const loader = document.getElementById("pageLoader");
+            if (!loader) return;
+            document.querySelectorAll("form[data-loader='true']").forEach((form) => {
+                form.addEventListener("submit", () => {
+                    loader.style.display = "flex";
+                });
+            });
+        })();
+    </script>
+    {% if otp_allowed %}
+    <div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="otpModalLabel">Autorizacion con OTP</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    {% if form_error_message and otp_stage %}
+                        <div class="alert alert-danger">
+                            {{ form_error_message }}
+                        </div>
+                    {% endif %}
+                    {% if otp_stage != "verify" %}
+                    <p class="small text-muted">Se enviara un OTP al celular del asociado.</p>
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <input type="hidden" name="step" value="otp_send">
+                        <div class="mb-3">
+                            <label class="form-label" for="phone_number_modal">Celular <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" id="phone_number_modal" name="phone_number"
+                                   placeholder="3XXXXXXXXX" required>
+                            <div class="form-text">
+                                <i class="bi bi-info-circle"></i> Se agrega +57 automaticamente
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send"></i> Enviar OTP
+                            </button>
+                        </div>
+                    </form>
+                    {% elif otp_stage == "success" %}
+                    <div class="alert alert-success mb-0">
+                        {{ otp_success_message|default:"OTP validado exitosamente." }}
+                    </div>
+                    {% elif otp_stage == "verify" %}
+                    <p class="small text-muted">Codigo enviado a {{ masked_phone|default:"tu celular" }}</p>
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <input type="hidden" name="step" value="otp_verify">
+                        <div class="mb-3">
+                            <label class="form-label" for="otp_code_modal">Codigo OTP <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="otp_code_modal" name="otp_code"
+                                   placeholder="Ej: 123456" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-shield-check"></i> Validar OTP
+                            </button>
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function() {
+            const autoshow = "{{ otp_autoshow|default:'' }}";
+            if (autoshow === "True" || autoshow === "true" || autoshow === "1") {
+                const modalEl = document.getElementById("otpModal");
+                if (modalEl) {
+                    const modal = new bootstrap.Modal(modalEl);
+                    modal.show();
+                }
+            }
+        })();
+    </script>
+    <script>
+        (function () {
+            const stage = "{{ otp_stage|default:'' }}";
+            if (stage === "success") {
+                setTimeout(() => {
+                    window.location.href = "{% url 'integrations:historial_pago' %}";
+                }, 1200);
+            }
+        })();
+    </script>
+    {% endif %}
 </body>
 </html>

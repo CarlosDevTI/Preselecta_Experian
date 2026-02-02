@@ -1,0 +1,242 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONGENTE - Historial de Pago</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #D7620C;
+            --secondary-color: #315675;
+            --accent-color: #00a3e0;
+            --bg-light: #f8f9fa;
+            --border-color: #e1e4e8;
+        }
+        body {
+            background: #f5f7fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        .header {
+            background: #fff;
+            padding: 1rem 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1.5rem;
+        }
+        .logo-image {
+            height: 65px;
+            width: auto;
+        }
+        .experian-logo {
+            height: 65px;
+            width: auto;
+        }
+        .main-container {
+            max-width: 980px;
+            margin: 0 auto 2rem;
+            padding: 0 1rem;
+        }
+        .title-section {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .icon-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .consultation-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        .type-option {
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            background: white;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 0.75rem;
+        }
+        .type-option.active {
+            border-color: var(--primary-color);
+            background: #fff7f0;
+        }
+        .btn-consult {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.4rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        .form-group {
+            margin-bottom: 0.9rem;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <a href="{% url 'integrations:consulta' %}" class="d-inline-block">
+                        <img src="{% static 'img/LogoHD.png' %}" alt="Congente Logo" class="logo-image">
+                    </a>
+                </div>
+                <div class="col-md-4 text-end">
+                    <img src="{% static 'img/Experian.png' %}" alt="Experian Logo" class="experian-logo">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        {% if messages %}
+            <div class="mb-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} mb-2 d-flex align-items-center gap-2">
+                        <i class="bi bi-check-circle-fill"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="title-section">
+            <div class="icon-circle"><i class="bi bi-search"></i></div>
+            <div>
+                <h2 class="m-0">Historial de Pago</h2>
+                <p class="text-muted m-0">Seleccione el tipo de consulta y complete los datos requeridos.</p>
+            </div>
+            <div class="ms-auto">
+                <a href="{% url 'integrations:consulta' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Volver a Preselecta
+                </a>
+            </div>
+        </div>
+
+        <div class="consultation-card">
+            <div class="type-selection">
+                <button class="type-option active" id="btnNatural" onclick="selectType('natural')">
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-person-fill text-primary"></i>
+                        <div>
+                            <div class="fw-semibold">Persona Natural</div>
+                            <small class="text-muted">Consulta de historial crediticio individual</small>
+                        </div>
+                    </div>
+                </button>
+                <button class="type-option" id="btnJuridica" onclick="selectType('juridica')" {% if not is_juridica %}disabled{% endif %}>
+                    <div class="d-flex align-items-center gap-3">
+                        <i class="bi bi-briefcase-fill text-primary"></i>
+                        <div>
+                            <div class="fw-semibold">Persona Juridica</div>
+                            <small class="text-muted">Consulta de historial crediticio empresarial</small>
+                        </div>
+                    </div>
+                </button>
+            </div>
+            {% if not is_juridica %}
+                <div class="alert alert-warning mt-2">
+                    Esta consulta corresponde a Persona Natural. La opción jurídica está deshabilitada.
+                </div>
+            {% endif %}
+
+            <div class="form-section" id="formNatural">
+                <form method="post" action="{% url 'integrations:historial_pago' %}" target="_blank">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Documento <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" value="{{ historial_id_type_label|default:'-' }}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Numero de Documento <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" value="{{ historial_data.person_id_number|default:'-' }}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Primer Apellido <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" value="{{ historial_data.person_last_name|default:'-' }}" style="text-transform: uppercase;" readonly>
+                    </div>
+                    <button type="submit" class="btn-consult">
+                        <i class="bi bi-search"></i>
+                        Consultar Historial
+                    </button>
+                </form>
+            </div>
+
+            <div class="form-section hidden" id="formJuridica">
+                <form method="post" action="{% url 'integrations:historial_pago' %}" target="_blank">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Documento <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" value="{{ historial_id_type_label|default:'-' }}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Numero de Documento <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" value="{{ historial_data.person_id_number|default:'-' }}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Razon Social <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" value="{{ historial_data.full_name|default:'-' }}" style="text-transform: uppercase;" readonly>
+                    </div>
+                    <button type="submit" class="btn-consult">
+                        <i class="bi bi-search"></i>
+                        Consultar Historial
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function selectType(type) {
+            const btnNatural = document.getElementById('btnNatural');
+            const btnJuridica = document.getElementById('btnJuridica');
+            const formNatural = document.getElementById('formNatural');
+            const formJuridica = document.getElementById('formJuridica');
+            const isJuridica = "{{ is_juridica|yesno:'1,0' }}";
+
+            if (type === 'natural') {
+                btnNatural.classList.add('active');
+                btnJuridica.classList.remove('active');
+                formNatural.classList.remove('hidden');
+                formJuridica.classList.add('hidden');
+            } else {
+                if (isJuridica !== "1") {
+                    return;
+                }
+                btnJuridica.classList.add('active');
+                btnNatural.classList.remove('active');
+                formJuridica.classList.remove('hidden');
+                formNatural.classList.add('hidden');
+            }
+        }
+        (function () {
+            const isJuridica = "{{ is_juridica|yesno:'1,0' }}";
+            if (isJuridica === "1") {
+                selectType('juridica');
+            }
+        })();
+    </script>
+</body>
+</html>

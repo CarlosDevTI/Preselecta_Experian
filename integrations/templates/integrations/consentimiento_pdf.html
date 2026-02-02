@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8">
+    <title>Autorizacion de consulta</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 12px;
+        color: #222;
+        line-height: 1.5;
+      }
+      h1 {
+        font-size: 16px;
+        text-align: center;
+        margin-bottom: 16px;
+      }
+      .section {
+        margin-bottom: 14px;
+      }
+      .label {
+        font-weight: bold;
+      }
+      .signature {
+        margin-top: 32px;
+      }
+      .signature-line {
+        margin-top: 32px;
+        border-top: 1px solid #222;
+        width: 60%;
+      }
+      .footer {
+        margin-top: 24px;
+        font-size: 10px;
+        color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Autorizacion de consulta a centrales de riesgo</h1>
+
+    <div class="section">
+      Yo, <span class="label">{{ full_name }}</span>, identificado(a) con
+      <span class="label">{{ id_type }}</span> No.
+      <span class="label">{{ id_number }}</span>, autorizo a la COOPERATIVA
+      DE AHORRO Y CREDITO CONGENTE a consultar y tratar mi informacion en las
+      centrales de riesgo, conforme a la normatividad vigente.
+    </div>
+
+    <div class="section">
+      <span class="label">Telefono:</span> {{ phone_number }}
+    </div>
+
+    <div class="section">
+      <span class="label">Lugar y fecha:</span> {{ place }}, {{ date_str }} {{ time_str }}
+    </div>
+
+    <div class="signature">
+      <div class="signature-line"></div>
+      <div class="label">Firma del titular</div>
+    </div>
+
+    <div class="footer">
+      Documento generado automaticamente por el sistema de autorizaciones.
+    </div>
+  </body>
+</html>
