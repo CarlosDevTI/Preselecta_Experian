@@ -15,6 +15,7 @@ venv/
 
 # Django collected static
 staticfiles/
+media/
 
 # IDE / OS
 .vscode/
@@ -31,3 +32,14 @@ Thumbs.db
 
 # JetBrains
 .idea/
+
+# Local artifacts / tests
+certs/
+historial*.pdf
+historial*.xml
+*_test_*.pdf
+PRESELECTA_congente_PRODUCCION.postman_collection.json
+create_template.py
+CONGENTE_CLAVE_WS_REST_PRESELECTA_25674_DEMO.txt
+CLAVE_PRODUCCION.txt
+1123038155-114655-130.pdf
