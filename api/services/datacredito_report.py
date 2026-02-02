@@ -46,6 +46,98 @@ def _format_number(value: str | None) -> str:
     return f"{num:,.2f}".replace(",", "X").replace(".", ",").replace("X", ".")
 
 
+CALIFICACION_MAP = {
+    "1": "A",
+    "2": "B",
+    "3": "C",
+    "4": "D",
+    "5": "E",
+    "6": "AA",
+    "7": "BB",
+    "8": "CC",
+    "9": "K",
+    "-": "-",
+    "": "-",
+    None: "-",
+}
+
+
+
+SITUACION_TITULAR_MAP = {
+    "0": "Normal",
+    "1": "Concordato",
+    "2": "Liquidacion Forzosa",
+    "3": "Liquidacion Voluntaria",
+    "4": "Proceso de Reorganizacion",
+    "5": "Ley 550",
+    "6": "Ley 1116",
+    "7": "Otra",
+    "8": "Liquidacion Patrimonial",
+    "": "-",
+    None: "-",
+}
+
+
+
+GARANTE_MAP = {
+    "00": "Deudor Principal",
+    "01": "Codeudor",
+    "02": "Codeudor",
+    "03": "Codeudor",
+    "04": "Avalista",
+    "05": "Deudor solidario",
+    "06": "Coarrendatario",
+    "07": "Otros Garantes",
+    "08": "Fiador",
+    "96": "Cotitular",
+    "97": "Comunal",
+}
+
+
+def _map_garante(value: str) -> str:
+    raw = str(value or "").strip()
+    if raw in ("", "-", "--", "N", "NN", "N/A"):
+        return "-"
+    if raw.isdigit():
+        num = int(raw)
+        if 9 <= num <= 95 or 98 <= num <= 99:
+            return "No Aplica"
+    return GARANTE_MAP.get(raw, raw)
+def _map_situacion_titular(value: str) -> str:
+    raw = str(value or "").strip()
+    return SITUACION_TITULAR_MAP.get(raw, raw or "-")
+
+
+TIPO_CUENTA_LABELS = {
+    "CAB": "CARTERA BANCARIA",
+    "TDC": "TARJETAS DE CREDITO",
+    "CON": "CREDITOS DE CONSUMO",
+    "MCR": "CARTERA MICROCREDITO",
+    "CTC": "CARTERA TELEFONIA CELULAR",
+    "CAC": "CART. COOP DE AHORRO Y CREDITO",
+    "AHO": "CUENTAS DE AHORRO BANCARIA",
+    "CDC": "CARTERA DE COMUNICACIONES",
+    "COM": "CARTERA DE EQUIPOS",
+    "CBR": "CARTERA BANCARIA ROTATIVA",
+    "CBF": "FIDUCIARIA",
+    "CBD": "CARTERA BANCARIA DIGITAL",
+    "CFE": "CARTERA FONDOS DE EMPLEADOS",
+    "CCB": "CUENTA CORRIENTE BANCARIA",
+    "CCD": "CUENTA CORRIENTE DIGITAL",
+    "CDT": "CDT",
+    "APD": "ALMACEN POR DEPARTAMENTOS",
+    "ADP": "ALMACEN POR DEPARTAMENTOS",
+    "CVE": "CARTERA VESTUARIO",
+}
+
+
+def _map_tipo_cuenta(value: str) -> str:
+    raw = str(value or "").strip()
+    return TIPO_CUENTA_LABELS.get(raw, raw or "-")
+def _map_calificacion(value: str) -> str:
+    raw = str(value or "").strip()
+    return CALIFICACION_MAP.get(raw, raw or "-")
+
 def _parse_number(value: str | None) -> float:
     if value is None:
         return 0.0
@@ -71,6 +163,29 @@ def _format_month_label(date_str: str) -> str:
     }
     return f"{month_map.get(month, month)} {year}"
 
+
+def _format_date_compact(date_str: str | None) -> str:
+    if not date_str:
+        return ""
+    text = str(date_str).strip()
+    if text in ("-", "--", "N", "NN", "N/A"):
+        return text
+    # Expecting YYYY-MM-DD
+    parts = text.split("-")
+    if len(parts) == 3 and all(parts):
+        return f"{parts[0]}{parts[1]}{parts[2]}"
+    return text
+
+
+
+def _wrap_behavior(value: str | None, width: int = 18) -> str:
+    if value is None:
+        return "-"
+    raw = str(value).strip()
+    if raw in ("", "-", "--", "N", "NN", "N/A"):
+        return raw
+    parts = [raw[i:i+width] for i in range(0, len(raw), width)]
+    return "<br>".join(parts)
 
 def _attr(elem: ET.Element | None, key: str, default: str = "") -> str:
     if elem is None:
@@ -181,34 +296,13 @@ def _parse_xml(xml_str: str) -> dict:
         endeudamiento = resumen.find("EndeudamientoActual")
         if endeudamiento is not None:
             sector_names = {"1": "Financiero", "2": "Cooperativo", "3": "Real", "4": "Telcos"}
-            tipo_cuenta_labels = {
-                "CAB": "CARTERA BANCARIA",
-                "TDC": "TARJETAS DE CRÉDITO",
-                "CON": "CRÉDITOS DE CONSUMO",
-                "MCR": "CARTERA MICROCREDITO",
-                "CTC": "CARTERA TELEFONÍA CELULAR",
-                "CAC": "CART. COOP DE AHORRO Y CRÉDITO",
-                "AHO": "CUENTAS DE AHORRO BANCARIA",
-                "CDC": "CARTERA DE COMUNICACIONES",
-                "COM": "CARTERA DE EQUIPOS",
-                "CBR": "CARTERA BANCARIA ROTATIVA",
-                "CBF": "FIDUCIARIA",
-                "CBD": "CARTERA BANCARIA DIGITAL",
-                "CFE": "CARTERA FONDOS DE EMPLEADOS",
-                "CCB": "CUENTA CORRIENTE BANCARIA",
-                "CCD": "CUENTA CORRIENTE DIGITAL",
-                "CDT": "CDT",
-                "APD": "ALMACEN POR DEPARTAMENTOS",
-                "ADP": "ALMACEN POR DEPARTAMENTOS",
-                "CVE": "CARTERA VESTUARIO",
-            }
             for sector in endeudamiento.findall("Sector"):
                 sector_name = sector_names.get(_attr(sector, "codSector"), _attr(sector, "codSector"))
                 sector_rows = []
                 sector_totals = {"valorInicial": 0.0, "saldoActual": 0.0, "saldoMora": 0.0, "cuotaMes": 0.0}
                 for tipo_cuenta in sector.findall("TipoCuenta"):
                     tipo = _attr(tipo_cuenta, "tipoCuenta")
-                    tipo_label = tipo_cuenta_labels.get(tipo, tipo)
+                    tipo_label = _map_tipo_cuenta(tipo)
                     for usuario in tipo_cuenta.findall("Usuario"):
                         tipo_usuario = _attr(usuario, "tipoUsuario")
                         for cuenta in usuario.findall("Cuenta"):
@@ -231,7 +325,7 @@ def _parse_xml(xml_str: str) -> dict:
                                 "tipoCuentaLabel": tipo_label,
                                 "tipoUsuario": tipo_usuario,
                                 "estadoActual": _attr(cuenta, "estadoActual"),
-                                "calificacion": _attr(cuenta, "calificacion"),
+                                "calificacion": _map_calificacion(_attr(cuenta, "calificacion")),
                                 "valorInicial": _format_number(valor_inicial_raw),
                                 "saldoActual": _format_number(saldo_actual_raw),
                                 "saldoMora": _format_number(saldo_mora_raw),
@@ -272,6 +366,156 @@ def _parse_xml(xml_str: str) -> dict:
                     tendencia_matrix["series"].append({"label": label, "values": values})
 
     analisis_vectores = {"sectors": []}
+
+    info_agregada = informe.find("InfoAgregada")
+    cheques = []
+    composicion_portafolio = []
+    resumen_endeudamiento = []
+    historico_saldos = {"dates": [], "rows": [], "totals": []}
+    evolucion_deuda_agregada = {"rows": [], "promedio": {}}
+    evolucion_deuda_micro = {"sectors": []}
+
+    if info_agregada is not None:
+        cheques_node = info_agregada.find("Cheques")
+        if cheques_node is not None:
+            for tri in cheques_node.findall("Trimestre"):
+                cheques.append(
+                    {
+                        "fecha": _attr(tri, "fecha"),
+                        "cantidadDevueltos": _format_number(_attr(tri, "cantidadDevueltos")),
+                        "valorDevueltos": _format_number(_attr(tri, "valorDevueltos")),
+                        "cantidadPagados": _format_number(_attr(tri, "cantidadPagados")),
+                        "valorPagados": _format_number(_attr(tri, "valorPagados")),
+                    }
+                )
+
+        comp = info_agregada.find("ComposicionPortafolio")
+        if comp is not None:
+            for tc in comp.findall("TipoCuenta"):
+                composicion_portafolio.append(
+                    {
+                        "tipoCuenta": _map_tipo_cuenta(_attr(tc, "tipo")),
+                        "calidadDeudor": _attr(tc, "calidadDeudor"),
+                        "porcentaje": _format_number(_attr(tc, "porcentaje")),
+                        "cantidad": _format_number(_attr(tc, "cantidad")),
+                    }
+                )
+
+        resumen_end = info_agregada.find("ResumenEndeudamiento")
+        if resumen_end is not None:
+            for tri in resumen_end.findall("Trimestre"):
+                sectors = []
+                for sec in tri.findall("Sector"):
+                    carteras = []
+                    for cart in sec.findall("Cartera"):
+                        carteras.append(
+                            {
+                                "tipo": _attr(cart, "tipo"),
+                                "numeroCuentas": _format_number(_attr(cart, "numeroCuentas")),
+                                "valor": _format_number(_attr(cart, "valor")),
+                            }
+                        )
+                    sectors.append(
+                        {
+                            "sector": _attr(sec, "sector"),
+                            "garantiaAdmisible": _format_number(_attr(sec, "garantiaAdmisible")),
+                            "garantiaOtro": _format_number(_attr(sec, "garantiaOtro")),
+                            "carteras": carteras,
+                        }
+                    )
+                resumen_endeudamiento.append(
+                    {
+                        "fecha": _attr(tri, "fecha"),
+                        "sectors": sectors,
+                    }
+                )
+
+        hist = info_agregada.find("HistoricoSaldos")
+        if hist is not None:
+            totals = []
+            dates = []
+            for tot in hist.findall("Totales"):
+                fecha = _attr(tot, "fecha")
+                dates.append(fecha)
+                totals.append(
+                    {
+                        "fecha": fecha,
+                        "totalCuentas": _format_number(_attr(tot, "totalCuentas")),
+                        "cuentasConsideradas": _format_number(_attr(tot, "cuentasConsideradas")),
+                        "saldo": _format_number(_attr(tot, "saldo")),
+                    }
+                )
+            historico_saldos["dates"] = [_format_month_label(d) for d in dates if d]
+            historico_saldos["totals"] = totals
+
+            for tc in hist.findall("TipoCuenta"):
+                tipo = _map_tipo_cuenta(_attr(tc, "tipo"))
+                values_map = {}
+                for tri in tc.findall("Trimestre"):
+                    values_map[_attr(tri, "fecha")] = _format_number(_attr(tri, "saldo"))
+                values = [values_map.get(d, "-") for d in dates]
+                historico_saldos["rows"].append({"label": tipo, "values": values})
+
+        evo = info_agregada.find("EvolucionDeuda")
+        if evo is not None:
+            for tri in evo.findall("Trimestre"):
+                evolucion_deuda_agregada["rows"].append(
+                    {
+                        "fecha": _attr(tri, "fecha"),
+                        "cupoTotal": _format_number(_attr(tri, "cupoTotal")),
+                        "saldo": _format_number(_attr(tri, "saldo")),
+                        "cuota": _format_number(_attr(tri, "cuota")),
+                        "porcentajeUso": _format_number(_attr(tri, "porcentajeUso")),
+                        "calificacion": _map_calificacion(_attr(tri, "calificacion")),
+                        "moraMaxima": _attr(tri, "moraMaxima"),
+                        "mesesMoraMaxima": _format_number(_attr(tri, "mesesMoraMaxima")),
+                        "totalAbiertas": _format_number(_attr(tri, "totalAbiertas")),
+                        "totalCerradas": _format_number(_attr(tri, "totalCerradas")),
+                    }
+                )
+            prom = evo.find("AnalisisPromedio")
+            if prom is not None:
+                evolucion_deuda_agregada["promedio"] = {
+                    "cupoTotal": _format_number(_attr(prom, "cupoTotal")),
+                    "saldo": _format_number(_attr(prom, "saldo")),
+                    "cuota": _format_number(_attr(prom, "cuota")),
+                    "porcentajeUso": _format_number(_attr(prom, "porcentajeUso")),
+                    "calificacion": _map_calificacion(_attr(prom, "calificacion")),
+                    "moraMaxima": _attr(prom, "moraMaxima"),
+                }
+
+    info_micro = informe.find("InfoAgregadaMicrocredito")
+    if info_micro is not None:
+        evo_micro = info_micro.find("EvolucionDeuda")
+        if evo_micro is not None:
+            for sector in evo_micro.findall("EvolucionDeudaSector"):
+                sector_name = _attr(sector, "nombreSector") or _attr(sector, "codSector")
+                tipo_rows = []
+                sector_dates = []
+                for tipo in sector.findall("EvolucionDeudaTipoCuenta"):
+                    tris = tipo.findall("Trimestre")
+                    if not tris:
+                        continue
+                    if not sector_dates:
+                        sector_dates = [t.attrib.get("fecha", "") for t in tris]
+                    values = []
+                    for t in tris:
+                        values.append(_format_number(_attr(t, "saldo")))
+                    tipo_rows.append(
+                        {
+                            "tipoCuenta": _map_tipo_cuenta(_attr(tipo, "tipoCuenta")),
+                            "values": values,
+                        }
+                    )
+                if tipo_rows:
+                    evolucion_deuda_micro["sectors"].append(
+                        {
+                            "sector": sector_name,
+                            "dates": [_format_month_label(d) for d in sector_dates if d],
+                            "rows": tipo_rows,
+                        }
+                    )
+
     analisis = informe.find("AnalisisVectores")
     if analisis is not None:
         for sector in analisis.findall("Sector"):
@@ -340,9 +584,10 @@ def _parse_xml(xml_str: str) -> dict:
             {
                 "entidad": _attr(cuenta, "entidad"),
                 "numero": _attr(cuenta, "numero"),
-                "fechaApertura": _attr(cuenta, "fechaApertura"),
+                "fechaApertura": _format_date_compact(_attr(cuenta, "fechaApertura")),
                 "estado": _attr(cuenta, "estado"),
-                "calificacion": _attr(cuenta, "calificacion"),
+                "calificacion": _map_calificacion(_attr(cuenta, "calificacion")),
+                "situacionTitular": _map_situacion_titular(_attr(cuenta, "situacionTitular")),
                 "ciudad": _attr(cuenta, "ciudad"),
                 "saldoActual": _format_number(_attr(valor, "saldoActual")),
                 "saldoMora": _format_number(_attr(valor, "saldoMora")),
@@ -352,15 +597,17 @@ def _parse_xml(xml_str: str) -> dict:
     tarjetas = []
     for cuenta in informe.findall("TarjetaCredito"):
         valor = cuenta.find("Valores/Valor")
-        comportamiento = _attr(cuenta, "comportamiento")
+        comportamiento = _wrap_behavior(_attr(cuenta, "comportamiento"))
         tarjetas.append(
             {
                 "entidad": _attr(cuenta, "entidad"),
                 "numero": _attr(cuenta, "numero"),
-                "fechaApertura": _attr(cuenta, "fechaApertura"),
-                "fechaVencimiento": _attr(cuenta, "fechaVencimiento"),
+                "fechaApertura": _format_date_compact(_attr(cuenta, "fechaApertura")),
+                "fechaVencimiento": _format_date_compact(_attr(cuenta, "fechaVencimiento")),
                 "estado": _attr(cuenta, "estado"),
-                "calificacion": _attr(cuenta, "calificacion"),
+                "calificacion": _map_calificacion(_attr(cuenta, "calificacion")),
+                "situacionTitular": _map_situacion_titular(_attr(cuenta, "situacionTitular")),
+                "garante": _map_garante(_attr(cuenta.find("Caracteristicas"), "codigoAmparada")),
                 "comportamiento": comportamiento,
                 "saldoActual": _format_number(_attr(valor, "saldoActual")),
                 "saldoMora": _format_number(_attr(valor, "saldoMora")),
@@ -371,15 +618,17 @@ def _parse_xml(xml_str: str) -> dict:
     carteras = []
     for cuenta in informe.findall("CuentaCartera"):
         valor = cuenta.find("Valores/Valor")
-        comportamiento = _attr(cuenta, "comportamiento")
+        comportamiento = _wrap_behavior(_attr(cuenta, "comportamiento"))
         carteras.append(
             {
                 "entidad": _attr(cuenta, "entidad"),
                 "numero": _attr(cuenta, "numero"),
-                "fechaApertura": _attr(cuenta, "fechaApertura"),
-                "fechaVencimiento": _attr(cuenta, "fechaVencimiento"),
+                "fechaApertura": _format_date_compact(_attr(cuenta, "fechaApertura")),
+                "fechaVencimiento": _format_date_compact(_attr(cuenta, "fechaVencimiento")),
                 "tipoCuenta": _attr(cuenta.find("Caracteristicas"), "tipoCuenta"),
-                "calificacion": _attr(cuenta, "calificacion"),
+                "calificacion": _map_calificacion(_attr(cuenta, "calificacion")),
+                "garante": _map_garante(_attr(cuenta.find("Caracteristicas"), "calidadDeudor")),
+                "situacionTitular": _map_situacion_titular(_attr(cuenta, "situacionTitular")),
                 "comportamiento": comportamiento,
                 "saldoActual": _format_number(_attr(valor, "saldoActual")),
                 "saldoMora": _format_number(_attr(valor, "saldoMora")),
@@ -445,6 +694,13 @@ def _parse_xml(xml_str: str) -> dict:
         },
         "tendencia_matrix": tendencia_matrix,
         "analisis_vectores": analisis_vectores,
+
+        "cheques": cheques,
+        "composicion_portafolio": composicion_portafolio,
+        "resumen_endeudamiento": resumen_endeudamiento,
+        "historico_saldos": historico_saldos,
+        "evolucion_deuda_agregada": evolucion_deuda_agregada,
+        "evolucion_deuda_micro": evolucion_deuda_micro,
         "cuentas_ahorro": cuentas_ahorro,
         "tarjetas": tarjetas,
         "carteras": carteras,

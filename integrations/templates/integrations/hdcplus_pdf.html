@@ -20,12 +20,13 @@
             font-family: "Helvetica", Arial, sans-serif;
             color: var(--text);
             margin: 0;
-            padding: 6px;
+            padding: 4px;
             background: #fff;
             font-size: 10px;
+            font-weight: 400;
         }
         @page {
-            margin: 8mm;
+            margin: 6mm;
         }
         .header {
             display: flex;
@@ -55,6 +56,7 @@
             margin: 2px 0 0;
             color: var(--muted);
             font-size: 10px;
+            font-weight: 400;
         }
         .meta {
             margin: 10px 0 16px;
@@ -91,22 +93,52 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 8px;
+            font-weight: 400;
         }
         th, td {
             border: 1px solid var(--border);
-            padding: 4px 5px;
-            vertical-align: top;
+            padding: 3px 4px;
+            vertical-align: middle;
             text-align: center;
         }
         .entity-col {
-    width: 18%;
+    width: 16%;
+}
+.col-narrow {
+    width: 6%;
+}
+.col-mini {
+    width: 5%;
+}
+.col-number {
+    width: 7%;
+}
+.col-date {
+    width: 7%;
+}
+.col-saldo {
+    width: 8%;
+}
+.num-cell {
+    font-size: 7.6px;
+    white-space: normal;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+}
+.date-cell {
+    font-size: 7.6px;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 .entity-cell {
-    font-size: 8.6px;
+    max-width: 120px;
+    font-size: 7.6px;
     line-height: 1.2;
     white-space: normal;
     word-break: break-word;
     overflow-wrap: anywhere;
+    text-align: center;
 }
 .table-fixed {
             table-layout: fixed;
@@ -114,36 +146,57 @@
         }
         .behavior-col,
         .behavior-cell {
-            width: 26%;
+            width: 16%;
+            text-align: center;
         }
         .behavior-cell {
-            font-size: 7.2px;
+            font-size: 5.8px;
             line-height: 1.2;
             white-space: normal;
             word-break: break-all;
             overflow-wrap: anywhere;
         }
-        .behavior-text {
+        
+.behavior-text {
             display: block;
             white-space: normal;
             word-break: break-all;
             overflow-wrap: anywhere;
+            text-align: center;
         }
         th {
             background: #eef2f7;
             color: var(--secondary);
-            font-size: 9px;
+            font-size: 7.6px;
             text-transform: none;
             letter-spacing: 0.3px;
+            font-weight: 600 !important;
         }
         td {
-            font-size: 9px;
+            font-size: 7.6px;
+            font-weight: 400 !important;
+        }
+        tbody th {
+            font-weight: 400 !important;
+        }
+        .section-row {
+            font-weight: 400;
+            background: #e9f0f8;
+            text-align: left;
+        }
+        .total-row {
+            font-weight: 600 !important;
+        }
+        .cell-center {
+            text-align: center;
+            vertical-align: middle;
         }
         .muted {
             color: var(--muted);
         }
         .small {
             font-size: 10px;
+            font-weight: 400;
         }
         .grid-two {
             display: grid;
@@ -154,13 +207,13 @@
             background: var(--secondary);
             color: #fff;
             padding: 2px 6px;
-            font-size: 9px;
+            font-size: 7.6px;
             border-radius: 3px;
             display: inline-block;
         }
         .footer {
             margin-top: 24px;
-            font-size: 9px;
+            font-size: 7.6px;
             color: var(--muted);
             text-align: center;
         }
@@ -184,35 +237,31 @@
     </div>
 
     <div class="section">
-        <h2>Información básica
-            <span class="small muted">👤</span>
-        </h2>
+        <h2>Información básica 📋</h2>
         <table>
             <tr>
                 <th>Nombre completo</th>
-                <td>{{ natural.nombreCompleto }}</td>
+                <td class="cell-center">{{ natural.nombreCompleto }}</td>
                 <th>Documento</th>
-                <td>{{ meta.tipoIdDigitado }} - {{ meta.identificacionDigitada }}</td>
+                <td class="cell-center">{{ meta.tipoIdDigitado }} - {{ meta.identificacionDigitada }}</td>
             </tr>
             <tr>
                 <th>Lugar expedición</th>
-                <td>{{ natural.ciudad }} ({{ natural.departamento }})</td>
+                <td class="cell-center">{{ natural.ciudad }} ({{ natural.departamento }})</td>
                 <th>Fecha expedición</th>
-                <td>{{ natural.fechaExpedicion }}</td>
+                <td class="cell-center">{{ natural.fechaExpedicion }}</td>
             </tr>
             <tr>
                 <th>Edad</th>
-                <td>{{ natural.edadMin }} - {{ natural.edadMax }}</td>
+                <td class="cell-center">{{ natural.edadMin }} - {{ natural.edadMax }}</td>
                 <th>Género</th>
-                <td>{{ natural.genero }}</td>
+                <td class="cell-center">{{ natural.genero }}</td>
             </tr>
         </table>
     </div>
 
     <div class="section">
-        <h2>Scores
-            <span class="small muted">📊</span>
-        </h2>
+        <h2>Scores 📊</h2>
         <table>
             <thead>
                 <tr>
@@ -226,11 +275,11 @@
             <tbody>
                 {% for score in scores %}
                 <tr>
-                    <td>{{ score.tipo }}</td>
-                    <td>{{ score.puntaje }}</td>
-                    <td>{{ score.fecha }}</td>
-                    <td>{{ score.poblacion }}</td>
-                    <td>{{ score.razones }}</td>
+                    <td class="cell-center">{{ score.tipo }}</td>
+                    <td class="cell-center">{{ score.puntaje }}</td>
+                    <td class="cell-center">{{ score.fecha }}</td>
+                    <td class="cell-center">{{ score.poblacion }}</td>
+                    <td class="cell-center">{{ score.razones }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -238,9 +287,7 @@
     </div>
 
     <div class="section">
-        <h2>Resumen - Perfil general
-            <span class="small muted">📋</span>
-        </h2>
+        <h2>Resumen - Perfil general 📝</h2>
         <table>
             <thead>
                 <tr>
@@ -256,13 +303,13 @@
             <tbody>
                 {% for row in perfil_general %}
                 <tr>
-                    <td>{{ row.label }}</td>
-                    <td>{{ row.sectorFinanciero }}</td>
-                    <td>{{ row.sectorCooperativo }}</td>
-                    <td>{{ row.sectorReal }}</td>
-                    <td>{{ row.sectorTelcos }}</td>
-                    <td>{{ row.totalComoPrincipal }}</td>
-                    <td>{{ row.totalComoCodeudorYOtros }}</td>
+                    <td class="cell-center">{{ row.label }}</td>
+                    <td class="cell-center">{{ row.sectorFinanciero }}</td>
+                    <td class="cell-center">{{ row.sectorCooperativo }}</td>
+                    <td class="cell-center">{{ row.sectorReal }}</td>
+                    <td class="cell-center">{{ row.sectorTelcos }}</td>
+                    <td class="cell-center">{{ row.totalComoPrincipal }}</td>
+                    <td class="cell-center">{{ row.totalComoCodeudorYOtros }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -270,9 +317,7 @@
     </div>
 
     <div class="section">
-        <h2>Saldos y moras (últimos meses)
-            <span class="small muted">📈</span>
-        </h2>
+        <h2>Saldos y moras (últimos meses) 💰</h2>
         <table>
             <thead>
                 <tr>
@@ -287,7 +332,7 @@
                 <tr>
                     <th>{{ row.label }}</th>
                     {% for value in row.values %}
-                        <td>{{ value }}</td>
+                        <td class="cell-center">{{ value }}</td>
                     {% endfor %}
                 </tr>
                 {% endfor %}
@@ -296,9 +341,7 @@
     </div>
 
     <div class="section">
-        <h2>Endeudamiento actual
-            <span class="small muted">💳</span>
-        </h2>
+        <h2>Endeudamiento actual 💳</h2>
         <table>
             <thead>
                 <tr>
@@ -308,7 +351,7 @@
                     <th>Estado actual</th>
                     <th>Calif</th>
                     <th>Vlr o cupo inicial</th>
-                    <th>Saldo actual</th>
+                    <th class="col-saldo">Saldo actual</th>
                     <th>Saldo en mora</th>
                     <th>Valor cuota</th>
                     <th>Total deuda</th>
@@ -317,46 +360,46 @@
             <tbody>
                 {% for group in endeudamiento_grouped %}
                 <tr>
-                    <th colspan="10" style="text-align:left;background:#e9f0f8;">Sector {{ group.sector }}</th>
+                    <th colspan="10" class="section-row">Sector {{ group.sector }}</th>
                 </tr>
                     {% for row in group.rows %}
                     <tr>
-                        <td>{{ row.tipoCuentaLabel }}</td>
-                        <td>{{ row.tipoUsuario }}</td>
-                        <td>1</td>
-                        <td>{{ row.estadoActual }}</td>
-                        <td>{{ row.calificacion }}</td>
-                        <td>{{ row.valorInicial }}</td>
-                        <td>{{ row.saldoActual }}</td>
-                        <td>{{ row.saldoMora }}</td>
-                        <td>{{ row.cuotaMes }}</td>
-                        <td>{{ row.totalDeudaCarteras }}</td>
+                        <td class="cell-center">{{ row.tipoCuentaLabel }}</td>
+                        <td class="cell-center">{{ row.tipoUsuario }}</td>
+                        <td class="cell-center">1</td>
+                        <td class="cell-center">{{ row.estadoActual }}</td>
+                        <td class="cell-center">{{ row.calificacion }}</td>
+                        <td class="cell-center">{{ row.valorInicial }}</td>
+                        <td class="cell-center">{{ row.saldoActual }}</td>
+                        <td class="cell-center">{{ row.saldoMora }}</td>
+                        <td class="cell-center">{{ row.cuotaMes }}</td>
+                        <td class="cell-center">{{ row.totalDeudaCarteras }}</td>
                     </tr>
                     {% endfor %}
                     <tr>
-                        <th>Total Sector {{ group.sector }}</th>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>{{ group.totals.valorInicial }}</td>
-                        <td>{{ group.totals.saldoActual }}</td>
-                        <td>{{ group.totals.saldoMora }}</td>
-                        <td>{{ group.totals.cuotaMes }}</td>
-                        <td></td>
+                        <th class="total-row">Total Sector {{ group.sector }}</th>
+                        <td class="cell-center"></td>
+                        <td class="cell-center"></td>
+                        <td class="cell-center"></td>
+                        <td class="cell-center"></td>
+                        <td class="cell-center">{{ group.totals.valorInicial }}</td>
+                        <td class="cell-center">{{ group.totals.saldoActual }}</td>
+                        <td class="cell-center">{{ group.totals.saldoMora }}</td>
+                        <td class="cell-center">{{ group.totals.cuotaMes }}</td>
+                        <td class="cell-center"></td>
                     </tr>
                 {% endfor %}
                 <tr>
-                    <th>TOTAL</th>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>{{ endeudamiento_totals.valorInicial }}</td>
-                    <td>{{ endeudamiento_totals.saldoActual }}</td>
-                    <td>{{ endeudamiento_totals.saldoMora }}</td>
-                    <td>{{ endeudamiento_totals.cuotaMes }}</td>
-                    <td></td>
+                    <th class="total-row">TOTAL</th>
+                    <td class="cell-center"></td>
+                    <td class="cell-center"></td>
+                    <td class="cell-center"></td>
+                    <td class="cell-center"></td>
+                    <td class="cell-center">{{ endeudamiento_totals.valorInicial }}</td>
+                    <td class="cell-center">{{ endeudamiento_totals.saldoActual }}</td>
+                    <td class="cell-center">{{ endeudamiento_totals.saldoMora }}</td>
+                    <td class="cell-center">{{ endeudamiento_totals.cuotaMes }}</td>
+                    <td class="cell-center"></td>
                 </tr>
             </tbody>
         </table>
@@ -364,9 +407,7 @@
 
     {% if tendencia_matrix.dates %}
     <div class="section">
-        <h2>Tendencia de endeudamiento
-            <span class="small muted">📉</span>
-        </h2>
+        <h2>Tendencia de endeudamiento 📈</h2>
         <table>
             <thead>
                 <tr>
@@ -381,7 +422,7 @@
                 <tr>
                     <th>{{ serie.label }}</th>
                     {% for value in serie.values %}
-                        <td>{{ value }}</td>
+                        <td class="cell-center">{{ value }}</td>
                     {% endfor %}
                 </tr>
                 {% endfor %}
@@ -392,14 +433,12 @@
 
     {% if analisis_vectores.sectors %}
     <div class="section">
-        <h2>Análisis de vectores
-            <span class="small muted">🧾</span>
-        </h2>
+        <h2>Análisis de vectores 🔍</h2>
         {% for sector in analisis_vectores.sectors %}
             <table>
                 <thead>
                     <tr>
-                        <th colspan="{{ sector.dates|length|add:'4' }}" style="text-align:left;background:#e9f0f8;">
+                        <th colspan="{{ sector.dates|length|add:'4' }}" class="section-row">
                             {{ sector.sector }}
                         </th>
                     </tr>
@@ -416,16 +455,16 @@
                 <tbody>
                     {% for row in sector.rows %}
                     <tr>
-                        <td {% if row.is_total %}colspan="4" style="text-align:left;font-weight:600;background:#f3f6fb;"{% endif %}>
+                        <td {% if row.is_total %}colspan="4" class="total-row" style="text-align:left;background:#f3f6fb;"{% endif %}>
                             {{ row.entidad }}
                         </td>
                         {% if not row.is_total %}
-                            <td>{{ row.numeroCuenta }}</td>
-                            <td>{{ row.tipoCuenta }}</td>
-                            <td>{{ row.estado }}</td>
+                            <td class="cell-center">{{ row.numeroCuenta }}</td>
+                            <td class="cell-center">{{ row.tipoCuenta }}</td>
+                            <td class="cell-center">{{ row.estado }}</td>
                         {% endif %}
                         {% for value in row.values %}
-                            <td>{{ value }}</td>
+                            <td class="cell-center">{{ value }}</td>
                         {% endfor %}
                     </tr>
                     {% endfor %}
@@ -436,31 +475,31 @@
     {% endif %}
 
     <div class="section">
-        <h2>Cuentas de ahorro
-            <span class="small muted">🏦</span>
-        </h2>
+        <h2>Cuentas de ahorro 🏦</h2>
         <table class="table-fixed">
             <thead>
                 <tr>
                     <th class="entity-col">Entidad</th>
-                    <th>Número</th>
-                    <th>Fecha apertura</th>
+                    <th class="col-number">Numero</th>
+                    <th class="col-date">F. Apertura</th>
                     <th>Ciudad</th>
-                    <th>Calif.</th>
-                    <th>Saldo actual</th>
-                    <th>Saldo mora</th>
+                    <th class="col-mini">Calif.</th>
+                      <th class="col-narrow">Titular</th>
+                      <th class="col-saldo">Saldo actual</th>
+                    <th class="col-saldo">Saldo mora</th>
                 </tr>
             </thead>
             <tbody>
                 {% for row in cuentas_ahorro %}
                 <tr>
                     <td class="entity-cell">{{ row.entidad }}</td>
-                    <td>{{ row.numero }}</td>
-                    <td>{{ row.fechaApertura }}</td>
-                    <td>{{ row.ciudad }}</td>
-                    <td>{{ row.calificacion }}</td>
-                    <td>{{ row.saldoActual }}</td>
-                    <td>{{ row.saldoMora }}</td>
+                    <td class="cell-center">{{ row.numero }}</td>
+                    <td class="cell-center">{{ row.fechaApertura }}</td>
+                    <td class="cell-center">{{ row.ciudad }}</td>
+                    <td class="cell-center">{{ row.calificacion }}</td>
+                    <td class="cell-center">{{ row.situacionTitular|default:"-" }}</td>
+                    <td class="cell-center">{{ row.saldoActual }}</td>
+                    <td class="cell-center">{{ row.saldoMora }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -468,37 +507,39 @@
     </div>
 
     <div class="section">
-        <h2>Tarjetas de crédito
-            <span class="small muted">💳</span>
-        </h2>
-        <table>
+        <h2>Tarjetas de crédito 💳</h2>
+        <table class="table-fixed">
             <thead>
                 <tr>
-                    <th>Entidad</th>
-                    <th>Número</th>
-                    <th>Fecha apertura</th>
-                    <th>Vencimiento</th>
-                    <th>Calif.</th>
+                    <th class="entity-col">Entidad</th>
+                    <th class="col-number">Numero</th>
+                    <th class="col-date">F. Apertura</th>
+                    <th class="col-date">F. Venc</th>
+                    <th class="col-mini">Calif.</th>
+                    <th class="col-narrow">Titular</th>
+                    <th class="col-narrow">Garante</th>
                     <th class="behavior-col">Comportamiento</th>
-                    <th>Saldo actual</th>
-                    <th>Saldo mora</th>
-                    <th>Cuota</th>
+                    <th class="col-saldo">Saldo actual</th>
+                    <th class="col-saldo">Saldo mora</th>
+                    <th class="col-saldo">Cuota</th>
                 </tr>
             </thead>
             <tbody>
                 {% for row in tarjetas %}
                 <tr>
                     <td class="entity-cell">{{ row.entidad }}</td>
-                    <td>{{ row.numero }}</td>
-                    <td>{{ row.fechaApertura }}</td>
-                    <td>{{ row.fechaVencimiento }}</td>
-                    <td>{{ row.calificacion }}</td>
+                    <td class="num-cell">{{ row.numero }}</td>
+                    <td class="date-cell">{{ row.fechaApertura }}</td>
+                    <td class="date-cell">{{ row.fechaVencimiento }}</td>
+                    <td class="cell-center">{{ row.calificacion }}</td>
+                    <td class="cell-center">{{ row.situacionTitular|default:"-" }}</td>
+                    <td class="cell-center">{{ row.garante|default:"-" }}</td>
                     <td class="behavior-cell">
-                        <span class="behavior-text">{{ row.comportamiento }}</span>
+                        <span class="behavior-text">{{ row.comportamiento|safe }}</span>
                     </td>
-                    <td>{{ row.saldoActual }}</td>
-                    <td>{{ row.saldoMora }}</td>
-                    <td>{{ row.cuota }}</td>
+                    <td class="cell-center">{{ row.saldoActual }}</td>
+                    <td class="cell-center">{{ row.saldoMora }}</td>
+                    <td class="cell-center">{{ row.cuota }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -506,39 +547,41 @@
     </div>
 
     <div class="section">
-        <h2>Cuentas cartera
-            <span class="small muted">🧾</span>
-        </h2>
+        <h2>Cuentas cartera 📋</h2>
         <table class="table-fixed">
             <thead>
                 <tr>
-                    <th>Entidad</th>
-                    <th>Número</th>
-                    <th>Tipo cuenta</th>
-                    <th>Fecha apertura</th>
-                    <th>Vencimiento</th>
-                    <th>Calif.</th>
+                    <th class="entity-col">Entidad</th>
+                    <th class="col-number">Numero</th>
+                    <th class="col-narrow">Tipo cuenta</th>
+                    <th class="col-date">F. Apertura</th>
+                    <th class="col-date">F. Venc</th>
+                    <th class="col-mini">Calif.</th>
+                    <th class="col-narrow">Titular</th>
+                    <th class="col-narrow">Garante</th>
                     <th class="behavior-col">Comportamiento</th>
-                    <th>Saldo actual</th>
-                    <th>Saldo mora</th>
-                    <th>Cuota</th>
+                    <th class="col-saldo">Saldo actual</th>
+                    <th class="col-saldo">Saldo mora</th>
+                    <th class="col-saldo">Cuota</th>
                 </tr>
             </thead>
             <tbody>
                 {% for row in carteras %}
                 <tr>
-                    <td>{{ row.entidad }}</td>
-                    <td>{{ row.numero }}</td>
-                    <td>{{ row.tipoCuenta }}</td>
-                    <td>{{ row.fechaApertura }}</td>
-                    <td>{{ row.fechaVencimiento }}</td>
-                    <td>{{ row.calificacion }}</td>
+                    <td class="entity-cell">{{ row.entidad }}</td>
+                    <td class="num-cell">{{ row.numero }}</td>
+                    <td class="cell-center">{{ row.tipoCuenta }}</td>
+                    <td class="date-cell">{{ row.fechaApertura }}</td>
+                    <td class="date-cell">{{ row.fechaVencimiento }}</td>
+                    <td class="cell-center">{{ row.calificacion }}</td>
+                    <td class="cell-center">{{ row.situacionTitular|default:"-" }}</td>
+                    <td class="cell-center">{{ row.garante|default:"-" }}</td>
                     <td class="behavior-cell">
-                        <span class="behavior-text">{{ row.comportamiento }}</span>
+                        <span class="behavior-text">{{ row.comportamiento|safe }}</span>
                     </td>
-                    <td>{{ row.saldoActual }}</td>
-                    <td>{{ row.saldoMora }}</td>
-                    <td>{{ row.cuota }}</td>
+                    <td class="cell-center">{{ row.saldoActual }}</td>
+                    <td class="cell-center">{{ row.saldoMora }}</td>
+                    <td class="cell-center">{{ row.cuota }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -546,15 +589,13 @@
     </div>
 
     <div class="section">
-        <h2>Histórico de consultas
-            <span class="small muted">🕒</span>
-        </h2>
+        <h2>Histórico de consultas 🔎</h2>
         <table>
             <thead>
                 <tr>
                     <th>Fecha</th>
                     <th>Entidad</th>
-                    <th>Tipo cuenta</th>
+                    <th class="col-narrow">Tipo cuenta</th>
                     <th>Razón</th>
                     <th>Cantidad</th>
                     <th>NIT suscriptor</th>
@@ -563,19 +604,239 @@
             <tbody>
                 {% for row in consultas %}
                 <tr>
-                    <td>{{ row.fecha }}</td>
-                    <td>{{ row.entidad }}</td>
-                    <td>{{ row.tipoCuenta }}</td>
-                    <td>{{ row.razon }}</td>
-                    <td>{{ row.cantidad }}</td>
-                    <td>{{ row.nitSuscriptor }}</td>
+                    <td class="cell-center">{{ row.fecha }}</td>
+                    <td class="entity-cell">{{ row.entidad }}</td>
+                    <td class="cell-center">{{ row.tipoCuenta }}</td>
+                    <td class="cell-center">{{ row.razon }}</td>
+                    <td class="cell-center">{{ row.cantidad }}</td>
+                    <td class="cell-center">{{ row.nitSuscriptor }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
-    <div class="note" style="text-align:center;">
+    
+      {% if cheques %}
+      <div class="section">
+          <h2>Cheques 💵</h2>
+          <table class="table-fixed">
+              <thead>
+                  <tr>
+                      <th class="col-date">Trimestre</th>
+                      <th>Devueltos (Cant.)</th>
+                      <th>Devueltos (Valor)</th>
+                      <th>Pagados (Cant.)</th>
+                      <th>Pagados (Valor)</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for row in cheques %}
+                  <tr>
+                      <td class="date-cell">{{ row.fecha }}</td>
+                      <td class="cell-center">{{ row.cantidadDevueltos }}</td>
+                      <td class="cell-center">{{ row.valorDevueltos }}</td>
+                      <td class="cell-center">{{ row.cantidadPagados }}</td>
+                      <td class="cell-center">{{ row.valorPagados }}</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+      </div>
+      {% endif %}
+
+      {% if composicion_portafolio %}
+      <div class="section">
+          <h2>Composición Portafolio 📊</h2>
+          <table class="table-fixed">
+              <thead>
+                  <tr>
+                      <th>Tipo cuenta</th>
+                      <th>Calidad deudor</th>
+                      <th>Porcentaje</th>
+                      <th>Cantidad</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for row in composicion_portafolio %}
+                  <tr>
+                      <td class="cell-center">{{ row.tipoCuenta }}</td>
+                      <td class="cell-center">{{ row.calidadDeudor }}</td>
+                      <td class="cell-center">{{ row.porcentaje }}</td>
+                      <td class="cell-center">{{ row.cantidad }}</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+      </div>
+      {% endif %}
+
+      {% if resumen_endeudamiento %}
+      <div class="section">
+          <h2>Resumen Endeudamiento 📝</h2>
+          {% for tri in resumen_endeudamiento %}
+          <div class="small muted" style="margin:6px 0 4px;">Trimestre {{ tri.fecha }}</div>
+          <table class="table-fixed">
+              <thead>
+                  <tr>
+                      <th>Sector</th>
+                      <th>Tipo cartera</th>
+                      <th>No. cuentas</th>
+                      <th>Valor</th>
+                      <th>Garantia admisible</th>
+                      <th>Garantia otro</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for sec in tri.sectors %}
+                      {% for cart in sec.carteras %}
+                      <tr>
+                          <td class="cell-center">{{ sec.sector }}</td>
+                          <td class="cell-center">{{ cart.tipo }}</td>
+                          <td class="cell-center">{{ cart.numeroCuentas }}</td>
+                          <td class="cell-center">{{ cart.valor }}</td>
+                          <td class="cell-center">{{ sec.garantiaAdmisible }}</td>
+                          <td class="cell-center">{{ sec.garantiaOtro }}</td>
+                      </tr>
+                      {% endfor %}
+                  {% endfor %}
+              </tbody>
+          </table>
+          {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if historico_saldos.dates %}
+      <div class="section">
+          <h2>Histórico de Saldos 📈</h2>
+          <table class="table-fixed">
+              <thead>
+                  <tr>
+                      <th>Tipo cuenta</th>
+                      {% for d in historico_saldos.dates %}
+                      <th>{{ d }}</th>
+                      {% endfor %}
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for row in historico_saldos.rows %}
+                  <tr>
+                      <th>{{ row.label }}</th>
+                      {% for v in row.values %}
+                      <td class="cell-center">{{ v }}</td>
+                      {% endfor %}
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+
+          {% if historico_saldos.totals %}
+          <table class="table-fixed" style="margin-top:6px;">
+              <thead>
+                  <tr>
+                      <th class="col-date">Fecha</th>
+                      <th>Total cuentas</th>
+                      <th>Cuentas consideradas</th>
+                      <th>Saldo total</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for row in historico_saldos.totals %}
+                  <tr>
+                      <td class="date-cell">{{ row.fecha }}</td>
+                      <td class="cell-center">{{ row.totalCuentas }}</td>
+                      <td class="cell-center">{{ row.cuentasConsideradas }}</td>
+                      <td class="cell-center">{{ row.saldo }}</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+          {% endif %}
+      </div>
+      {% endif %}
+
+      {% if evolucion_deuda_agregada.rows %}
+      <div class="section">
+          <h2>Evolución de la Deuda (Agregada) 📊</h2>
+          <table class="table-fixed">
+              <thead>
+                  <tr>
+                      <th class="col-date">Trimestre</th>
+                      <th>Cupo total</th>
+                      <th>Saldo</th>
+                      <th class="col-saldo">Cuota</th>
+                      <th>% Uso</th>
+                      <th>Calif.</th>
+                      <th>Mora maxima</th>
+                      <th>Meses mora</th>
+                      <th>Abiertas</th>
+                      <th>Cerradas</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for row in evolucion_deuda_agregada.rows %}
+                  <tr>
+                      <td class="date-cell">{{ row.fecha }}</td>
+                      <td class="cell-center">{{ row.cupoTotal }}</td>
+                      <td class="cell-center">{{ row.saldo }}</td>
+                      <td class="cell-center">{{ row.cuota }}</td>
+                      <td class="cell-center">{{ row.porcentajeUso }}</td>
+                      <td class="cell-center">{{ row.calificacion }}</td>
+                      <td class="cell-center">{{ row.moraMaxima }}</td>
+                      <td class="cell-center">{{ row.mesesMoraMaxima }}</td>
+                      <td class="cell-center">{{ row.totalAbiertas }}</td>
+                      <td class="cell-center">{{ row.totalCerradas }}</td>
+                  </tr>
+                  {% endfor %}
+                  {% if evolucion_deuda_agregada.promedio.cupoTotal %}
+                  <tr>
+                      <th class="total-row">Promedio</th>
+                      <td class="cell-center">{{ evolucion_deuda_agregada.promedio.cupoTotal }}</td>
+                      <td class="cell-center">{{ evolucion_deuda_agregada.promedio.saldo }}</td>
+                      <td class="cell-center">{{ evolucion_deuda_agregada.promedio.cuota }}</td>
+                      <td class="cell-center">{{ evolucion_deuda_agregada.promedio.porcentajeUso }}</td>
+                      <td class="cell-center">{{ evolucion_deuda_agregada.promedio.calificacion }}</td>
+                      <td class="cell-center">{{ evolucion_deuda_agregada.promedio.moraMaxima }}</td>
+                      <td class="cell-center">-</td>
+                      <td class="cell-center">-</td>
+                      <td class="cell-center">-</td>
+                  </tr>
+                  {% endif %}
+              </tbody>
+          </table>
+      </div>
+      {% endif %}
+
+      {% if evolucion_deuda_micro.sectors %}
+      <div class="section">
+          <h2>Evolución de la Deuda (Microcrédito) 📊</h2>
+          {% for sec in evolucion_deuda_micro.sectors %}
+          <div class="small muted" style="margin:6px 0 4px;">Sector {{ sec.sector }}</div>
+          <table class="table-fixed">
+              <thead>
+                  <tr>
+                      <th>Tipo cuenta</th>
+                      {% for d in sec.dates %}
+                      <th>{{ d }}</th>
+                      {% endfor %}
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for row in sec.rows %}
+                  <tr>
+                      <th>{{ row.tipoCuenta }}</th>
+                      {% for v in row.values %}
+                      <td class="cell-center">{{ v }}</td>
+                      {% endfor %}
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+          {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="note" style="text-align:center;">
         Respuesta entregada por el proveedor. Documento desarrollado por Gerencia TI.
     </div>
 

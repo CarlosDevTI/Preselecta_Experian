@@ -2,6 +2,7 @@ from django.core.files.base import ContentFile
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.views import View
+from django.urls import reverse
 from django.utils import timezone
 from django.http import HttpResponse
 from django.utils import timezone as dj_timezone
@@ -775,7 +776,7 @@ class AdminAuditoriaListView(View):
         user = getattr(request, "user", None)
         if not user or not user.is_authenticated or not user.is_staff:
             messages.error(request, "Acceso restringido. Inicia sesión con usuario administrador.")
-            return redirect("/admin/login/?next=/admin-auditoria/")
+            return redirect(f"/admin/login/?next={reverse('integrations:admin_auditoria_list')}")
 
         consents = list(
             ConsentOTP.objects.select_related("preselecta_query").order_by("-created_at")[:200]
@@ -825,7 +826,7 @@ class AdminAuditoriaDetailView(View):
         user = getattr(request, "user", None)
         if not user or not user.is_authenticated or not user.is_staff:
             messages.error(request, "Acceso restringido. Inicia sesión con usuario administrador.")
-            return redirect(f"/admin/login/?next=/admin-auditoria/{consent_id}/")
+            return redirect(f"/admin/login/?next={reverse('integrations:admin_auditoria_detail', args=[consent_id])}")
 
         consent = ConsentOTP.objects.select_related("preselecta_query").filter(id=consent_id).first()
         if not consent:

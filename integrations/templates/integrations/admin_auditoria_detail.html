@@ -236,7 +236,7 @@
             </a>
             <form method="post" action="{% url 'admin:logout' %}" class="d-inline">
                 {% csrf_token %}
-                <input type="hidden" name="next" value="/admin/login/?next=/admin-auditoria/">
+                <input type="hidden" name="next" value="{% url 'integrations:admin_auditoria_list' %}">
                 <button type="submit" class="btn btn-logout btn-sm">
                     <i class="bi bi-box-arrow-right me-1"></i>Cerrar sesion
                 </button>
