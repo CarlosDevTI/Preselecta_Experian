@@ -90,15 +90,25 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
         th, td {
             border: 1px solid var(--border);
-            padding: 5px 6px;
+            padding: 4px 5px;
             vertical-align: top;
             text-align: center;
         }
-        .table-fixed {
+        .entity-col {
+    width: 18%;
+}
+.entity-cell {
+    font-size: 8.6px;
+    line-height: 1.2;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+.table-fixed {
             table-layout: fixed;
             width: 100%;
         }
@@ -107,7 +117,7 @@
             width: 26%;
         }
         .behavior-cell {
-            font-size: 7.8px;
+            font-size: 7.2px;
             line-height: 1.2;
             white-space: normal;
             word-break: break-all;
@@ -122,12 +132,12 @@
         th {
             background: #eef2f7;
             color: var(--secondary);
-            font-size: 9.5px;
+            font-size: 9px;
             text-transform: none;
             letter-spacing: 0.3px;
         }
         td {
-            font-size: 9.5px;
+            font-size: 9px;
         }
         .muted {
             color: var(--muted);
@@ -394,7 +404,7 @@
                         </th>
                     </tr>
                     <tr>
-                        <th>Entidad</th>
+                        <th class="entity-col">Entidad</th>
                         <th>Num Cta</th>
                         <th>Tipo</th>
                         <th>Estado</th>
@@ -432,7 +442,7 @@
         <table class="table-fixed">
             <thead>
                 <tr>
-                    <th>Entidad</th>
+                    <th class="entity-col">Entidad</th>
                     <th>Número</th>
                     <th>Fecha apertura</th>
                     <th>Ciudad</th>
@@ -444,7 +454,7 @@
             <tbody>
                 {% for row in cuentas_ahorro %}
                 <tr>
-                    <td>{{ row.entidad }}</td>
+                    <td class="entity-cell">{{ row.entidad }}</td>
                     <td>{{ row.numero }}</td>
                     <td>{{ row.fechaApertura }}</td>
                     <td>{{ row.ciudad }}</td>
@@ -478,7 +488,7 @@
             <tbody>
                 {% for row in tarjetas %}
                 <tr>
-                    <td>{{ row.entidad }}</td>
+                    <td class="entity-cell">{{ row.entidad }}</td>
                     <td>{{ row.numero }}</td>
                     <td>{{ row.fechaApertura }}</td>
                     <td>{{ row.fechaVencimiento }}</td>
