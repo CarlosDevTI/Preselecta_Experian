@@ -35,7 +35,6 @@ Thumbs.db
 .idea/
 
 # Local artifacts / tests
-certs/
 historial*.pdf
 historial*.xml
 *_test_*.pdf
@@ -49,3 +48,5 @@ create_template.py
 CONGENTE_CLAVE_WS_REST_PRESELECTA_25674_DEMO.txt
 CLAVE_PRODUCCION.txt
 1123038155-114655-130.pdf
+CLAVE WSS PRUEBAS CONGENTE HPN.txt
+CLAVE WSS PROD COOPERATIVA DE AHORRO Y CREDITO CONGENTE.txt
