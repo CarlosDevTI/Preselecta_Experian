@@ -4,6 +4,7 @@ __pycache__/
 *.sqlite3
 db.sqlite3*
 *.log
+preselecta_mirror.git/
 
 # Envs & secrets
 .env
@@ -38,6 +39,7 @@ Thumbs.db
 historial*.pdf
 historial*.xml
 *_test_*.pdf
+certs/
 
 # Credentials / provider files
 CLAVE_PRODUCCION.txt
