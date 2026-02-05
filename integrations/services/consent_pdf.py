@@ -62,7 +62,7 @@ def build_consent_data(full_name: str, id_number: str, id_type: str, phone_numbe
         id_number=id_number,
         id_type=id_type,
         phone_number=phone_number,
-        place=place,
+        place=(place or "").strip().upper() or "VILLAVICENCIO",
         issued_at=issued_str,
         day=day,
         month_name=month_name,
@@ -113,6 +113,19 @@ def fill_consent_pdf(data: ConsentPdfData) -> bytes:
 
     for page in writer.pages:
         writer.update_page_form_field_values(page, fields)
+        # Force checkbox appearance values for PDF viewers
+        for annot in page.get("/Annots", []) or []:
+            field = annot.get_object()
+            if field.get("/T") == "Check Box10":
+                field.update({
+                    NameObject("/V"): NameObject(f"/{checkbox_on}"),
+                    NameObject("/AS"): NameObject(f"/{checkbox_on}"),
+                })
+            elif field.get("/T") == "Check Box11":
+                field.update({
+                    NameObject("/V"): NameObject("/Off"),
+                    NameObject("/AS"): NameObject("/Off"),
+                })
 
     output_io = io.BytesIO()
     writer.write(output_io)

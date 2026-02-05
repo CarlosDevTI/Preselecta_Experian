@@ -116,6 +116,16 @@ class ConsultaView(View):
             return "*" * len(phone)
         return f"{'*' * (len(phone) - 4)}{phone[-4:]}"
 
+    @classmethod
+    def _normalize_place(cls, place: str) -> str:
+        cleaned = (place or "").strip()
+        if not cleaned:
+            return ""
+        cleaned_upper = cleaned.upper()
+        if cleaned_upper in cls.AGENCIAS_VILLAVICENCIO:
+            return "VILLAVICENCIO"
+        return cleaned
+
     @staticmethod
     def _normalize_phone(phone_number: str) -> str:
         phone = (phone_number or "").strip().replace(" ", "")
@@ -224,7 +234,7 @@ class ConsultaView(View):
         tipo_asociado = (request.POST.get("tipo_asociado") or "").strip()
         medio_pago = (request.POST.get("medio_pago") or "").strip()
         actividad = (request.POST.get("actividad") or "").strip()
-        place = (request.POST.get("place") or "").strip()
+        place = self._normalize_place(request.POST.get("place") or "")
         step2_data = {
             "linea_credito": linea_credito,
             "tipo_asociado": tipo_asociado,
