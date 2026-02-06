@@ -21,7 +21,14 @@ class TwilioVerifyClient:
             params["template_sid"] = template_sid
         if ttl_seconds:
             params["ttl"] = int(ttl_seconds)
-        return self.client.verify.v2.services(self.verify_sid).verifications.create(**params)
+        try:
+            return self.client.verify.v2.services(self.verify_sid).verifications.create(**params)
+        except TypeError as exc:
+            # Some Twilio SDK versions don't accept ttl in the method signature.
+            if "ttl" in str(exc):
+                params.pop("ttl", None)
+                return self.client.verify.v2.services(self.verify_sid).verifications.create(**params)
+            raise
 
     def check_verification(self, to_number: str, code: str):
         return (
