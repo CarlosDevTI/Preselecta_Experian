@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.http import HttpResponse
 from django.utils import timezone as dj_timezone
+from django.db import models
 import json
 import logging
 import os
@@ -146,6 +147,39 @@ class ConsultaView(View):
         return phone.lstrip("0")
 
     @staticmethod
+    def _otp_settings() -> tuple[int, int, int]:
+        ttl = int(os.environ.get("TWILIO_VERIFY_TTL_SECONDS", "900"))
+        cooldown = int(os.environ.get("TWILIO_VERIFY_RESEND_COOLDOWN", "60"))
+        max_resends = int(os.environ.get("TWILIO_VERIFY_RESEND_MAX", "3"))
+        return ttl, cooldown, max_resends
+
+    @staticmethod
+    def _otp_seconds_left(consent: ConsentOTP | None, ttl_seconds: int) -> int:
+        if not consent or not consent.last_sent_at:
+            return ttl_seconds
+        elapsed = (timezone.now() - consent.last_sent_at).total_seconds()
+        return max(0, ttl_seconds - int(elapsed))
+
+    @staticmethod
+    def _otp_resend_state(
+        consent: ConsentOTP | None,
+        ttl_seconds: int,
+        cooldown_seconds: int,
+        max_resends: int,
+    ) -> tuple[bool, int, int]:
+        if not consent:
+            return False, 0, max_resends
+        remaining = max(0, max_resends - int(consent.resend_count))
+        if remaining <= 0:
+            return False, 0, 0
+        if consent.last_sent_at:
+            elapsed = (timezone.now() - consent.last_sent_at).total_seconds()
+            wait = cooldown_seconds - int(elapsed)
+            if wait > 0:
+                return False, wait, remaining
+        return True, 0, remaining
+
+    @staticmethod
     def _build_payload(id_number, id_type, first_last_name, linea_credito, tipo_asociado, medio_pago, actividad):
         return {
             "idNumber": id_number,
@@ -283,6 +317,19 @@ class ConsultaView(View):
                 response_data = {}
                 response_pretty = None
                 response_error = str(exc)
+            else:
+                if isinstance(response_data, dict) and "Fault" in response_data:
+                    fault = response_data.get("Fault") or {}
+                    runtime = (fault.get("detail") or {}).get("runtime") or {}
+                    fault_message = (
+                        fault.get("faultstring")
+                        or runtime.get("error-message")
+                        or fault.get("faultcode")
+                        or "Error en Preselecta"
+                    )
+                    response_error = str(fault_message)
+                    response_data = {}
+                    response_pretty = None
 
             x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
             AccessLog.objects.create(
@@ -330,7 +377,7 @@ class ConsultaView(View):
                 "form_error_message": None,
                 "response_json": response_data if response_data else None,
                 "response_pretty": response_pretty,
-                "error_message": None,
+                "error_message": response_error or None,
                 "submitted_data": payload,
                 "step1_data": step1_data,
                 "step2_data": step2_data,
@@ -392,6 +439,7 @@ class ConsultaView(View):
             x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
             channel = os.environ.get("TWILIO_VERIFY_CHANNEL", "sms")
             template_sid = os.environ.get("TWILIO_VERIFY_TEMPLATE_SID", "").strip()
+            otp_ttl_seconds, otp_resend_cooldown, otp_resend_max = self._otp_settings()
 
             try:
                 verify_client = TwilioVerifyClient()
@@ -399,6 +447,7 @@ class ConsultaView(View):
                     phone_number,
                     channel=channel,
                     template_sid=template_sid or None,
+                    ttl_seconds=otp_ttl_seconds,
                 )
             except Exception as e:
                 ConsentOTP.objects.create(
@@ -454,6 +503,8 @@ class ConsultaView(View):
                 ip_address=self._get_client_ip(request) or None,
                 forwarded_for=x_forwarded_for,
                 user_agent=request.META.get("HTTP_USER_AGENT", ""),
+                last_sent_at=timezone.now(),
+                resend_count=0,
             )
             logger.info(
                 "OTP enviado exitosamente a %s para id_number=%s",
@@ -475,6 +526,159 @@ class ConsultaView(View):
                 "otp_allowed": True,
                 "otp_stage": "verify",
                 "masked_phone": self._mask_phone(phone_number),
+                "otp_expires_in": otp_ttl_seconds,
+                "otp_can_resend": True,
+                "otp_resend_wait": 0,
+                "otp_resend_remaining": otp_resend_max,
+                "otp_autoshow": True,
+                "agencias_villavicencio": self.AGENCIAS_VILLAVICENCIO,
+                "agencias_municipios": self.AGENCIAS_MUNICIPIOS,
+                "corresponsales": self.CORRESPONSALES,
+            })
+
+        if step == "otp_resend":
+            consent_id = request.session.get("otp_consent_id")
+            phone_number = request.session.get("otp_phone")
+            payload = request.session.get("otp_payload")
+            preselecta_query_id = request.session.get("preselecta_query_id")
+            step1_data = request.session.get("otp_step1") or step1_data
+            step2_data = request.session.get("otp_step2") or step2_data
+            full_name = request.session.get("otp_full_name") or ""
+            place = request.session.get("otp_place") or place
+            decision_value = request.session.get("otp_decision", "")
+            risk_value = request.session.get("otp_risk", "")
+            response_data = request.session.get("otp_response", {})
+
+            if not consent_id or not payload or not phone_number:
+                form_error_message = "La sesion expiro. Inicia la consulta nuevamente."
+                return render(request, self.template_name, {
+                    "step": "1",
+                    "show_step2": False,
+                    "show_step3": False,
+                    "form_error_message": form_error_message,
+                    "step1_data": {},
+                    "step2_data": {},
+                    "phone_number": "",
+                    "agencias_villavicencio": self.AGENCIAS_VILLAVICENCIO,
+                    "agencias_municipios": self.AGENCIAS_MUNICIPIOS,
+                    "corresponsales": self.CORRESPONSALES,
+                })
+
+            consent = ConsentOTP.objects.filter(id=consent_id).first()
+            otp_ttl_seconds, otp_resend_cooldown, otp_resend_max = self._otp_settings()
+            can_resend, wait_seconds, remaining = self._otp_resend_state(
+                consent,
+                otp_ttl_seconds,
+                otp_resend_cooldown,
+                otp_resend_max,
+            )
+            if not can_resend:
+                form_error_message = (
+                    f"Espera {wait_seconds}s para reenviar el OTP."
+                    if wait_seconds > 0
+                    else "Alcanzaste el maximo de reenvios permitidos."
+                )
+                return render(request, self.template_name, {
+                    "step": "2",
+                    "show_step2": True,
+                    "show_step3": False,
+                    "form_error_message": form_error_message,
+                    "step1_data": step1_data,
+                    "step2_data": step2_data,
+                    "response_json": response_data if response_data else None,
+                    "otp_allowed": True,
+                    "otp_stage": "verify",
+                    "masked_phone": self._mask_phone(phone_number),
+                    "otp_expires_in": self._otp_seconds_left(consent, otp_ttl_seconds),
+                    "otp_can_resend": False,
+                    "otp_resend_wait": wait_seconds,
+                    "otp_resend_remaining": remaining,
+                    "otp_autoshow": True,
+                    "agencias_villavicencio": self.AGENCIAS_VILLAVICENCIO,
+                    "agencias_municipios": self.AGENCIAS_MUNICIPIOS,
+                    "corresponsales": self.CORRESPONSALES,
+                })
+
+            x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
+            channel = os.environ.get("TWILIO_VERIFY_CHANNEL", "sms")
+            template_sid = os.environ.get("TWILIO_VERIFY_TEMPLATE_SID", "").strip()
+            try:
+                verify_client = TwilioVerifyClient()
+                verification = verify_client.start_verification(
+                    phone_number,
+                    channel=channel,
+                    template_sid=template_sid or None,
+                    ttl_seconds=otp_ttl_seconds,
+                )
+            except Exception as e:
+                ConsentOTP.objects.filter(id=consent_id).update(
+                    status="error",
+                    last_error=str(e),
+                )
+                form_error_message = "No se pudo reenviar el codigo OTP. Intenta de nuevo."
+                return render(request, self.template_name, {
+                    "step": "2",
+                    "show_step2": True,
+                    "show_step3": False,
+                    "form_error_message": form_error_message,
+                    "step1_data": step1_data,
+                    "step2_data": step2_data,
+                    "response_json": response_data if response_data else None,
+                    "otp_allowed": True,
+                    "otp_stage": "verify",
+                    "masked_phone": self._mask_phone(phone_number),
+                    "otp_expires_in": self._otp_seconds_left(consent, otp_ttl_seconds),
+                    "otp_can_resend": False,
+                    "otp_resend_wait": 0,
+                    "otp_resend_remaining": remaining,
+                    "otp_autoshow": True,
+                    "agencias_villavicencio": self.AGENCIAS_VILLAVICENCIO,
+                    "agencias_municipios": self.AGENCIAS_MUNICIPIOS,
+                    "corresponsales": self.CORRESPONSALES,
+                })
+
+            ConsentOTP.objects.filter(id=consent_id).update(
+                status=verification.status,
+                verification_sid=verification.sid,
+                verify_service_sid=verify_client.verify_sid,
+                last_sent_at=timezone.now(),
+                resend_count=models.F("resend_count") + 1,
+                last_error="",
+                ip_address=self._get_client_ip(request) or None,
+                forwarded_for=x_forwarded_for,
+                user_agent=request.META.get("HTTP_USER_AGENT", ""),
+                decision=decision_value,
+                risk_level=risk_value,
+                preselecta_query_id=preselecta_query_id,
+                request_payload=payload,
+                full_name=full_name,
+                id_number=step1_data.get("idNumber", ""),
+                id_type=step1_data.get("idType", ""),
+                first_last_name=step1_data.get("firstLastName", ""),
+                place=place,
+            )
+            consent = ConsentOTP.objects.filter(id=consent_id).first()
+            can_resend, wait_seconds, remaining = self._otp_resend_state(
+                consent,
+                otp_ttl_seconds,
+                otp_resend_cooldown,
+                otp_resend_max,
+            )
+            return render(request, self.template_name, {
+                "step": "2",
+                "show_step2": True,
+                "show_step3": False,
+                "form_error_message": None,
+                "step1_data": step1_data,
+                "step2_data": step2_data,
+                "response_json": response_data if response_data else None,
+                "otp_allowed": True,
+                "otp_stage": "verify",
+                "masked_phone": self._mask_phone(phone_number),
+                "otp_expires_in": self._otp_seconds_left(consent, otp_ttl_seconds),
+                "otp_can_resend": can_resend,
+                "otp_resend_wait": wait_seconds,
+                "otp_resend_remaining": remaining,
                 "otp_autoshow": True,
                 "agencias_villavicencio": self.AGENCIAS_VILLAVICENCIO,
                 "agencias_municipios": self.AGENCIAS_MUNICIPIOS,
@@ -512,6 +716,14 @@ class ConsultaView(View):
 
             if not otp_code:
                 form_error_message = "Ingresa el codigo OTP enviado por SMS."
+                consent = ConsentOTP.objects.filter(id=consent_id).first()
+                otp_ttl_seconds, otp_resend_cooldown, otp_resend_max = self._otp_settings()
+                can_resend, wait_seconds, remaining = self._otp_resend_state(
+                    consent,
+                    otp_ttl_seconds,
+                    otp_resend_cooldown,
+                    otp_resend_max,
+                )
                 return render(request, self.template_name, {
                     "step": "2",
                     "show_step2": True,
@@ -523,6 +735,10 @@ class ConsultaView(View):
                     "otp_allowed": True,
                     "otp_stage": "verify",
                     "masked_phone": self._mask_phone(phone_number),
+                    "otp_expires_in": self._otp_seconds_left(consent, otp_ttl_seconds),
+                    "otp_can_resend": can_resend,
+                    "otp_resend_wait": wait_seconds,
+                    "otp_resend_remaining": remaining,
                     "otp_autoshow": True,
                     "agencias_villavicencio": self.AGENCIAS_VILLAVICENCIO,
                     "agencias_municipios": self.AGENCIAS_MUNICIPIOS,
@@ -538,6 +754,14 @@ class ConsultaView(View):
                     last_error=str(e),
                 )
                 form_error_message = "No se pudo validar el codigo. Intenta de nuevo."
+                consent = ConsentOTP.objects.filter(id=consent_id).first()
+                otp_ttl_seconds, otp_resend_cooldown, otp_resend_max = self._otp_settings()
+                can_resend, wait_seconds, remaining = self._otp_resend_state(
+                    consent,
+                    otp_ttl_seconds,
+                    otp_resend_cooldown,
+                    otp_resend_max,
+                )
                 return render(request, self.template_name, {
                     "step": "2",
                     "show_step2": True,
@@ -549,6 +773,10 @@ class ConsultaView(View):
                     "otp_allowed": True,
                     "otp_stage": "verify",
                     "masked_phone": self._mask_phone(phone_number),
+                    "otp_expires_in": self._otp_seconds_left(consent, otp_ttl_seconds),
+                    "otp_can_resend": can_resend,
+                    "otp_resend_wait": wait_seconds,
+                    "otp_resend_remaining": remaining,
                     "otp_autoshow": True,
                     "agencias_villavicencio": self.AGENCIAS_VILLAVICENCIO,
                     "agencias_municipios": self.AGENCIAS_MUNICIPIOS,
@@ -562,6 +790,14 @@ class ConsultaView(View):
                     last_error="OTP no aprobado",
                 )
                 form_error_message = "Codigo OTP invalido o expirado."
+                consent = ConsentOTP.objects.filter(id=consent_id).first()
+                otp_ttl_seconds, otp_resend_cooldown, otp_resend_max = self._otp_settings()
+                can_resend, wait_seconds, remaining = self._otp_resend_state(
+                    consent,
+                    otp_ttl_seconds,
+                    otp_resend_cooldown,
+                    otp_resend_max,
+                )
                 return render(request, self.template_name, {
                     "step": "2",
                     "show_step2": True,
@@ -573,6 +809,10 @@ class ConsultaView(View):
                     "otp_allowed": True,
                     "otp_stage": "verify",
                     "masked_phone": self._mask_phone(phone_number),
+                    "otp_expires_in": self._otp_seconds_left(consent, otp_ttl_seconds),
+                    "otp_can_resend": can_resend,
+                    "otp_resend_wait": wait_seconds,
+                    "otp_resend_remaining": remaining,
                     "otp_autoshow": True,
                     "agencias_villavicencio": self.AGENCIAS_VILLAVICENCIO,
                     "agencias_municipios": self.AGENCIAS_MUNICIPIOS,

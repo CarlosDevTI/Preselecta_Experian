@@ -105,6 +105,8 @@ class ConsentOTP(models.Model):
     user_agent = models.TextField(blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
+    last_sent_at = models.DateTimeField(null=True, blank=True)
+    resend_count = models.PositiveSmallIntegerField(default=0)
     verified_at = models.DateTimeField(null=True, blank=True)
     last_error = models.TextField(blank=True)
 

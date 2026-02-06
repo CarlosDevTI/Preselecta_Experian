@@ -1033,6 +1033,20 @@
                     </div>
                     {% elif otp_stage == "verify" %}
                     <p class="small text-muted">Codigo enviado a {{ masked_phone|default:"tu celular" }}</p>
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <div class="small text-muted">
+                            Expira en <strong id="otpCountdown">--:--</strong>
+                        </div>
+                        {% if otp_can_resend %}
+                        <form method="post" class="ms-2">
+                            {% csrf_token %}
+                            <input type="hidden" name="step" value="otp_resend">
+                            <button type="submit" class="btn btn-link btn-sm p-0">Reenviar OTP</button>
+                        </form>
+                        {% else %}
+                        <span class="small text-muted ms-2">Reenvio en {{ otp_resend_wait|default:"0" }}s</span>
+                        {% endif %}
+                    </div>
                     <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
                         <input type="hidden" name="step" value="otp_verify">
@@ -1072,6 +1086,28 @@
                     window.location.href = "{% url 'integrations:historial_pago' %}";
                 }, 1200);
             }
+        })();
+    </script>
+    <script>
+        (function () {
+            const stage = "{{ otp_stage|default:'' }}";
+            if (stage !== "verify") return;
+            let secondsLeft = parseInt("{{ otp_expires_in|default:'' }}", 10);
+            if (Number.isNaN(secondsLeft)) {
+                secondsLeft = 0;
+            }
+            const el = document.getElementById("otpCountdown");
+            if (!el) return;
+            const tick = () => {
+                const mins = Math.floor(secondsLeft / 60);
+                const secs = Math.max(0, secondsLeft % 60);
+                el.textContent = `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+                if (secondsLeft > 0) {
+                    secondsLeft -= 1;
+                }
+            };
+            tick();
+            setInterval(tick, 1000);
         })();
     </script>
     {% endif %}

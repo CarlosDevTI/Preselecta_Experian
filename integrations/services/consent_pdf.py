@@ -1,10 +1,11 @@
-import os
+﻿import os
 import io
 from dataclasses import dataclass
 
 from django.conf import settings
 from pypdf import PdfReader, PdfWriter
 from pypdf.generic import NameObject, BooleanObject, TextStringObject
+from reportlab.pdfgen import canvas
 
 
 @dataclass(frozen=True)
@@ -111,6 +112,19 @@ def fill_consent_pdf(data: ConsentPdfData) -> bytes:
         "Telefono": data.phone_number,
     }
 
+    def _overlay_text(rect, text: str, page_width: float, page_height: float) -> bytes:
+        buf = io.BytesIO()
+        c = canvas.Canvas(buf, pagesize=(page_width, page_height))
+        x0, y0, x1, y1 = rect
+        width = max(x1 - x0, 1)
+        height = max(y1 - y0, 1)
+        font_size = max(6, min(10, height * 0.8))
+        c.setFont("Helvetica-Bold", font_size)
+        c.drawCentredString(x0 + width / 2.0, y0 + (height - font_size) / 2.0, text)
+        c.showPage()
+        c.save()
+        return buf.getvalue()
+
     for page in writer.pages:
         writer.update_page_form_field_values(page, fields)
         # Force checkbox appearance values for PDF viewers
@@ -121,6 +135,16 @@ def fill_consent_pdf(data: ConsentPdfData) -> bytes:
                     NameObject("/V"): NameObject(f"/{checkbox_on}"),
                     NameObject("/AS"): NameObject(f"/{checkbox_on}"),
                 })
+                rect = field.get("/Rect")
+                if rect and len(rect) == 4:
+                    overlay_pdf = _overlay_text(
+                        rect,
+                        "SI",
+                        float(page.mediabox.width),
+                        float(page.mediabox.height),
+                    )
+                    overlay_page = PdfReader(io.BytesIO(overlay_pdf)).pages[0]
+                    page.merge_page(overlay_page)
             elif field.get("/T") == "Check Box11":
                 field.update({
                     NameObject("/V"): NameObject("/Off"),
