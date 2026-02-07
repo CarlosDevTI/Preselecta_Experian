@@ -2,14 +2,61 @@ import base64
 import io
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from html import unescape
 from pathlib import Path
 
 from django.conf import settings
 from django.template.loader import render_to_string
+from lxml import etree as LET
 
 
 class DatacreditoReportError(Exception):
     pass
+
+
+def _coerce_xml_string(xml_input) -> str:
+    if xml_input is None:
+        return ""
+    if isinstance(xml_input, bytes):
+        text = xml_input.decode("utf-8", errors="ignore")
+    else:
+        text = str(xml_input)
+    text = text.replace("\ufeff", "").strip()
+    if not text:
+        return ""
+    if "&lt;" in text and "&gt;" in text:
+        text = unescape(text)
+    # If extra text appears before XML, keep only XML payload.
+    first_lt = text.find("<")
+    if first_lt > 0:
+        text = text[first_lt:]
+    # Favor the payload node if wrapper/noise is present.
+    idx = text.find("<Informes")
+    if idx > 0:
+        text = text[idx:]
+    return text.strip()
+
+
+def _parse_root(xml_input):
+    xml_str = _coerce_xml_string(xml_input)
+    if not xml_str:
+        raise DatacreditoReportError("XML vacio en respuesta del proveedor")
+    try:
+        return ET.fromstring(xml_str)
+    except Exception as strict_exc:
+        # Fallback parser for malformed XML (e.g. bad entities or noise in payload).
+        try:
+            parser = LET.XMLParser(recover=True, huge_tree=True)
+            root = LET.fromstring(xml_str.encode("utf-8", errors="ignore"), parser=parser)
+            if root is None:
+                raise ValueError("LXML recover parser returned no root")
+            recovered_xml = LET.tostring(root, encoding="utf-8")
+            return ET.fromstring(recovered_xml)
+        except Exception as recover_exc:
+            preview = (xml_str[:240] + "...") if len(xml_str) > 240 else xml_str
+            raise DatacreditoReportError(
+                f"XML invalido o no parseable. Inicio recibido: {preview}"
+            ) from recover_exc
 
 
 def _strip_ns(tag: str) -> str:
@@ -194,10 +241,7 @@ def _attr(elem: ET.Element | None, key: str, default: str = "") -> str:
 
 
 def _parse_xml(xml_str: str) -> dict:
-    try:
-        root = ET.fromstring(xml_str)
-    except Exception as exc:
-        raise DatacreditoReportError("XML invalido o no parseable") from exc
+    root = _parse_root(xml_str)
 
     informe = root.find("Informe")
     if informe is None:
@@ -721,10 +765,7 @@ def _fill_dashes(data):
 
 
 def xml_to_rows(xml_str: str) -> list[tuple[str, str]]:
-    try:
-        root = ET.fromstring(xml_str)
-    except Exception as exc:
-        raise DatacreditoReportError("XML invalido o no parseable") from exc
+    root = _parse_root(xml_str)
 
     rows: list[tuple[str, str]] = [("Path", "Value")]
 
