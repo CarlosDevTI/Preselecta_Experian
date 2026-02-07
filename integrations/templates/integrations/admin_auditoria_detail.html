@@ -245,6 +245,17 @@
     </header>
 
     <main class="container">
+        {% if messages %}
+            <div class="mb-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-2" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <div class="section-card">
             <div class="section-header">
                 <div class="section-title">
@@ -264,7 +275,7 @@
 
                 <div class="info-item">
                     <div class="info-label">Documento de Identidad</div>
-                    <div class="info-value">{{ consent.id_number }} ? {{ id_type_label }}</div>
+                    <div class="info-value">{{ consent.id_number }} - {{ id_type_label }}</div>
                 </div>
 
                 <div class="info-item">
@@ -322,6 +333,37 @@
                     </div>
                 </div>
             </div>
+
+            {% if can_edit_admin_observation %}
+                <form method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="info-item">
+                        <div class="info-label">Observacion Administrativa</div>
+                        <textarea
+                            name="admin_observation"
+                            class="form-control"
+                            rows="3"
+                            placeholder="Ejemplo: OTP afectado por retraso del operador, no se pudo confirmar en tiempo."
+                        >{{ consent.admin_observation }}</textarea>
+                    </div>
+                    <div class="mt-2">
+                        <button type="submit" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-save me-1"></i>Guardar observacion
+                        </button>
+                    </div>
+                </form>
+            {% else %}
+                <div class="mt-4">
+                    <div class="info-label">Observacion Administrativa</div>
+                    <div class="info-value">
+                        {% if consent.admin_observation %}
+                            {{ consent.admin_observation }}
+                        {% else %}
+                            <span class="empty">Sin observacion</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
         </div>
 
         <div class="section-card">
@@ -415,6 +457,9 @@
                                 </a>
                             {% else %}
                                 <div class="info-value empty">No disponible</div>
+                                {% if history_reason %}
+                                    <div class="text-muted small mt-2">{{ history_reason }}</div>
+                                {% endif %}
                             {% endif %}
                         </div>
                     </div>
@@ -423,6 +468,9 @@
                 <div class="no-data">
                     <i class="bi bi-inbox" style="font-size: 3rem; color: #dee2e6;"></i>
                     <p>No se ha realizado consulta de historial de pago.</p>
+                    {% if history_reason %}
+                        <p class="text-muted mt-2 mb-0">{{ history_reason }}</p>
+                    {% endif %}
                 </div>
             {% endif %}
         </div>

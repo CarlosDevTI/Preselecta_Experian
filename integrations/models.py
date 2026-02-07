@@ -109,6 +109,7 @@ class ConsentOTP(models.Model):
     resend_count = models.PositiveSmallIntegerField(default=0)
     verified_at = models.DateTimeField(null=True, blank=True)
     last_error = models.TextField(blank=True)
+    admin_observation = models.TextField(blank=True, default="")
 
     class Meta:
         ordering = ["-created_at"]

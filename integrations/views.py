@@ -1,5 +1,6 @@
 from django.core.files.base import ContentFile
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
 from django.views import View
 from django.urls import reverse
@@ -1027,23 +1028,36 @@ class HistorialPagoView(View):
 class AdminAuditoriaListView(View):
     template_name = "integrations/admin_auditoria_list.html"
     ID_TYPE_LABELS = {
-    "1": "Cedula de Ciudadania",
-    "2": "NIT",
-    "3": "NIT de extranjeria",
-    "4": "Cedula de extranjeria",
-    "5": "Pasaporte",
-    "6": "Carne diplomatico",
-}
+        "1": "Cedula de Ciudadania",
+        "2": "NIT",
+        "3": "NIT de extranjeria",
+        "4": "Cedula de extranjeria",
+        "5": "Pasaporte",
+        "6": "Carne diplomatico",
+    }
+
+    @staticmethod
+    def _history_reason(consent: ConsentOTP, report_exists: bool) -> str:
+        if consent.admin_observation:
+            return consent.admin_observation
+        if report_exists:
+            return ""
+        if consent.status != "approved":
+            return "No se consulto historial porque OTP no fue confirmado."
+        if consent.last_error:
+            return consent.last_error
+        return "Sin consulta de historial."
 
     def get(self, request, *args, **kwargs):
         user = getattr(request, "user", None)
         if not user or not user.is_authenticated or not user.is_staff:
-            messages.error(request, "Acceso restringido. Inicia sesión con usuario administrador.")
+            messages.error(request, "Acceso restringido. Inicia sesion con usuario administrador.")
             return redirect(f"/admin/login/?next={reverse('integrations:admin_auditoria_list')}")
 
-        consents = list(
-            ConsentOTP.objects.select_related("preselecta_query").order_by("-created_at")[:200]
-        )
+        consent_qs = ConsentOTP.objects.select_related("preselecta_query").order_by("-created_at")
+        paginator = Paginator(consent_qs, 25)
+        page_obj = paginator.get_page(request.GET.get("page"))
+        consents = list(page_obj.object_list)
         id_numbers = {c.id_number for c in consents if c.id_number}
         reports = CreditReportQuery.objects.filter(
             person_id_number__in=id_numbers, status="SUCCESS"
@@ -1068,6 +1082,7 @@ class AdminAuditoriaListView(View):
                 and report.pdf_file.name
                 and report.pdf_file.storage.exists(report.pdf_file.name)
             )
+            history_reason = self._history_reason(consent, bool(report))
             rows.append(
                 {
                     "consent": consent,
@@ -1075,12 +1090,14 @@ class AdminAuditoriaListView(View):
                     "report": report,
                     "consent_pdf_exists": consent_pdf_exists,
                     "report_pdf_exists": report_pdf_exists,
+                    "history_reason": history_reason,
                     "id_type_label": self.ID_TYPE_LABELS.get(str(consent.id_type), str(consent.id_type or "N/A")),
                 }
             )
 
         return render(request, self.template_name, {
             "rows": rows,
+            "page_obj": page_obj,
             "id_type_labels": self.ID_TYPE_LABELS,
         })
 
@@ -1101,14 +1118,36 @@ class AdminAuditoriaDetailView(View):
     def get(self, request, consent_id: int, *args, **kwargs):
         user = getattr(request, "user", None)
         if not user or not user.is_authenticated or not user.is_staff:
-            messages.error(request, "Acceso restringido. Inicia sesión con usuario administrador.")
+            messages.error(request, "Acceso restringido. Inicia sesion con usuario administrador.")
             return redirect(f"/admin/login/?next={reverse('integrations:admin_auditoria_detail', args=[consent_id])}")
 
         consent = ConsentOTP.objects.select_related("preselecta_query").filter(id=consent_id).first()
         if not consent:
             messages.error(request, "Registro no encontrado.")
-            return redirect("/admin-auditoria/")
+            return redirect("integrations:admin_auditoria_list")
 
+        return self._render_detail(request, consent)
+
+    def post(self, request, consent_id: int, *args, **kwargs):
+        user = getattr(request, "user", None)
+        if not user or not user.is_authenticated or not user.is_staff:
+            messages.error(request, "Acceso restringido. Inicia sesion con usuario administrador.")
+            return redirect(f"/admin/login/?next={reverse('integrations:admin_auditoria_detail', args=[consent_id])}")
+        if not user.is_superuser:
+            messages.error(request, "Solo el superadministrador puede editar observaciones.")
+            return redirect("integrations:admin_auditoria_detail", consent_id=consent_id)
+
+        consent = ConsentOTP.objects.select_related("preselecta_query").filter(id=consent_id).first()
+        if not consent:
+            messages.error(request, "Registro no encontrado.")
+            return redirect("integrations:admin_auditoria_list")
+
+        consent.admin_observation = (request.POST.get("admin_observation") or "").strip()
+        consent.save(update_fields=["admin_observation"])
+        messages.success(request, "Observacion guardada correctamente.")
+        return redirect("integrations:admin_auditoria_detail", consent_id=consent_id)
+
+    def _render_detail(self, request, consent: ConsentOTP):
         report = None
         if consent.id_number:
             report = (
@@ -1134,6 +1173,27 @@ class AdminAuditoriaDetailView(View):
                 "names": (resp.get("nationalPerson") or {}).get("names", ""),
             }
 
+        consent_pdf_exists = bool(
+            consent.consent_pdf
+            and consent.consent_pdf.name
+            and consent.consent_pdf.storage.exists(consent.consent_pdf.name)
+        )
+        report_pdf_exists = bool(
+            report
+            and report.pdf_file
+            and report.pdf_file.name
+            and report.pdf_file.storage.exists(report.pdf_file.name)
+        )
+
+        history_reason = ""
+        if consent.admin_observation:
+            history_reason = consent.admin_observation
+        elif not report:
+            if consent.status != "approved":
+                history_reason = "No se consulto historial porque OTP no fue confirmado."
+            elif consent.last_error:
+                history_reason = consent.last_error
+
         return render(
             request,
             self.template_name,
@@ -1141,19 +1201,13 @@ class AdminAuditoriaDetailView(View):
                 "consent": consent,
                 "preselecta": consent.preselecta_query,
                 "report": report,
-                "consent_pdf_exists": bool(
-                    consent.consent_pdf
-                    and consent.consent_pdf.name
-                    and consent.consent_pdf.storage.exists(consent.consent_pdf.name)
-                ),
-                "report_pdf_exists": bool(
-                    report
-                    and report.pdf_file
-                    and report.pdf_file.name
-                    and report.pdf_file.storage.exists(report.pdf_file.name)
-                ),
+                "consent_pdf_exists": consent_pdf_exists,
+                "report_pdf_exists": report_pdf_exists,
+                "history_reason": history_reason,
                 "preselecta_summary": summary,
                 "id_type_label": self.ID_TYPE_LABELS.get(str(consent.id_type), str(consent.id_type or "N/A")),
                 "id_type_labels": self.ID_TYPE_LABELS,
+                "can_edit_admin_observation": bool(getattr(request.user, "is_superuser", False)),
             },
         )
+

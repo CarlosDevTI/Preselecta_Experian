@@ -201,6 +201,21 @@
             color: #6c757d;
         }
 
+        .history-reason {
+            font-size: 0.72rem;
+            color: #8a4b08;
+            margin-top: 0.25rem;
+            line-height: 1.25;
+            max-width: 220px;
+            white-space: normal;
+        }
+
+        .pagination-wrap {
+            border-top: 1px solid #f0f0f0;
+            padding: 0.9rem 1.2rem;
+            background: #fff;
+        }
+
         .empty-state {
             padding: 3rem;
             text-align: center;
@@ -330,6 +345,9 @@
                                             </div>
                                         {% else %}
                                             <span class="data-secondary">Sin consulta</span>
+                                            {% if row.history_reason %}
+                                                <div class="history-reason">{{ row.history_reason }}</div>
+                                            {% endif %}
                                         {% endif %}
                                     </td>
                                     <td>
@@ -369,6 +387,35 @@
                     </table>
                 </div>
             </div>
+            {% if page_obj and page_obj.paginator.num_pages > 1 %}
+                <div class="pagination-wrap">
+                    <nav aria-label="Paginacion de auditoria">
+                        <ul class="pagination pagination-sm mb-0 justify-content-center">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Anterior</span></li>
+                            {% endif %}
+
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    Pagina {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+            {% endif %}
         </div>
     </main>
 
