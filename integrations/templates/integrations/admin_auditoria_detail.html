@@ -312,7 +312,7 @@
                 <div class="info-item">
                     <div class="info-label">PDF de Consentimiento</div>
                     <div>
-                        {% if consent.consent_pdf %}
+                        {% if consent_pdf_exists %}
                             <a href="{{ consent.consent_pdf.url }}" target="_blank" class="link-pdf">
                                 <i class="bi bi-file-earmark-pdf-fill"></i>Ver Consentimiento
                             </a>
@@ -409,7 +409,7 @@
                     <div class="info-item">
                         <div class="info-label">Reporte PDF</div>
                         <div>
-                            {% if report.pdf_file %}
+                            {% if report_pdf_exists %}
                                 <a href="{{ report.pdf_file.url }}" target="_blank" class="link-pdf">
                                     <i class="bi bi-file-earmark-pdf-fill"></i>Ver Historial de Pago
                                 </a>

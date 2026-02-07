@@ -334,17 +334,17 @@
                                     </td>
                                     <td>
                                         <div class="d-flex flex-column gap-1">
-                                            {% if row.consent.consent_pdf %}
+                                            {% if row.consent_pdf_exists %}
                                                 <a href="{{ row.consent.consent_pdf.url }}" target="_blank" class="link-pdf">
                                                     <i class="bi bi-file-earmark-pdf"></i>Consentimiento
                                                 </a>
                                             {% endif %}
-                                            {% if row.report and row.report.pdf_file %}
+                                            {% if row.report_pdf_exists %}
                                                 <a href="{{ row.report.pdf_file.url }}" target="_blank" class="link-pdf">
                                                     <i class="bi bi-file-earmark-pdf"></i>Historial
                                                 </a>
                                             {% endif %}
-                                            {% if not row.consent.consent_pdf and not row.report.pdf_file %}
+                                            {% if not row.consent_pdf_exists and not row.report_pdf_exists %}
                                                 <span class="data-secondary">-</span>
                                             {% endif %}
                                         </div>

@@ -942,12 +942,25 @@ class HistorialPagoView(View):
         )
         if cached:
             if cached.pdf_file:
-                cached.pdf_file.open("rb")
-                resp = HttpResponse(cached.pdf_file.read(), content_type="application/pdf")
-                resp["Content-Disposition"] = f'inline; filename="{cached.pdf_file.name.split("/")[-1]}"'
-                return resp
-            messages.warning(request, "Consulta reciente encontrada, pero sin PDF asociado.")
-            return redirect("integrations:historial_pago")
+                file_name = cached.pdf_file.name
+                storage = cached.pdf_file.storage
+                try:
+                    if file_name and storage.exists(file_name):
+                        cached.pdf_file.open("rb")
+                        resp = HttpResponse(cached.pdf_file.read(), content_type="application/pdf")
+                        resp["Content-Disposition"] = f'inline; filename="{file_name.split("/")[-1]}"'
+                        return resp
+                except FileNotFoundError:
+                    # Si el registro existe pero el archivo fisico se perdio, regeneramos.
+                    pass
+
+                # Limpia referencia rota para evitar errores recurrentes con cache inconsistente.
+                cached.pdf_file = None
+                cached.save(update_fields=["pdf_file", "updated_at"])
+                messages.warning(
+                    request,
+                    "Se encontro una consulta previa, pero el PDF no existe en disco. Se generara uno nuevo.",
+                )
 
         try:
             client = DatacreditoSoapClient()
@@ -1044,11 +1057,24 @@ class AdminAuditoriaListView(View):
         for consent in consents:
             preselecta = consent.preselecta_query
             report = report_map.get(consent.id_number)
+            consent_pdf_exists = bool(
+                consent.consent_pdf
+                and consent.consent_pdf.name
+                and consent.consent_pdf.storage.exists(consent.consent_pdf.name)
+            )
+            report_pdf_exists = bool(
+                report
+                and report.pdf_file
+                and report.pdf_file.name
+                and report.pdf_file.storage.exists(report.pdf_file.name)
+            )
             rows.append(
                 {
                     "consent": consent,
                     "preselecta": preselecta,
                     "report": report,
+                    "consent_pdf_exists": consent_pdf_exists,
+                    "report_pdf_exists": report_pdf_exists,
                     "id_type_label": self.ID_TYPE_LABELS.get(str(consent.id_type), str(consent.id_type or "N/A")),
                 }
             )
@@ -1115,6 +1141,17 @@ class AdminAuditoriaDetailView(View):
                 "consent": consent,
                 "preselecta": consent.preselecta_query,
                 "report": report,
+                "consent_pdf_exists": bool(
+                    consent.consent_pdf
+                    and consent.consent_pdf.name
+                    and consent.consent_pdf.storage.exists(consent.consent_pdf.name)
+                ),
+                "report_pdf_exists": bool(
+                    report
+                    and report.pdf_file
+                    and report.pdf_file.name
+                    and report.pdf_file.storage.exists(report.pdf_file.name)
+                ),
                 "preselecta_summary": summary,
                 "id_type_label": self.ID_TYPE_LABELS.get(str(consent.id_type), str(consent.id_type or "N/A")),
                 "id_type_labels": self.ID_TYPE_LABELS,
