@@ -1037,15 +1037,28 @@
                         <div class="small text-muted">
                             Expira en <strong id="otpCountdown">--:--</strong>
                         </div>
-                        {% if otp_can_resend %}
-                        <form method="post" class="ms-2">
+                        <form method="post" class="ms-2" id="otpResendForm">
                             {% csrf_token %}
                             <input type="hidden" name="step" value="otp_resend">
-                            <button type="submit" class="btn btn-link btn-sm p-0">Reenviar OTP</button>
+                            <button
+                                type="submit"
+                                class="btn btn-link btn-sm p-0"
+                                id="otpResendButton"
+                                {% if not otp_can_resend %}disabled{% endif %}
+                            >
+                                Reenviar OTP
+                            </button>
                         </form>
-                        {% else %}
-                        <span class="small text-muted ms-2">Reenvio en {{ otp_resend_wait|default:"0" }}s</span>
-                        {% endif %}
+                        <span class="small text-muted ms-2" id="otpResendWaitLabel">
+                            {% if otp_can_resend %}
+                                Reenvio disponible
+                            {% else %}
+                                Reenvio en {{ otp_resend_wait|default:"0" }}s
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="small text-warning mb-2 d-none" id="otpDeliveryHint">
+                        Si el mensaje no llega, por favor validar en spam o mensajes no deseados.
                     </div>
                     <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
@@ -1097,17 +1110,48 @@
                 secondsLeft = 0;
             }
             const el = document.getElementById("otpCountdown");
+            const hintEl = document.getElementById("otpDeliveryHint");
             if (!el) return;
             const tick = () => {
                 const mins = Math.floor(secondsLeft / 60);
                 const secs = Math.max(0, secondsLeft % 60);
                 el.textContent = `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+                if (hintEl && secondsLeft <= 300 && secondsLeft > 0) {
+                    hintEl.classList.remove("d-none");
+                }
                 if (secondsLeft > 0) {
                     secondsLeft -= 1;
                 }
             };
             tick();
             setInterval(tick, 1000);
+        })();
+    </script>
+    <script>
+        (function () {
+            const stage = "{{ otp_stage|default:'' }}";
+            if (stage !== "verify") return;
+
+            let resendWait = parseInt("{{ otp_resend_wait|default:'0' }}", 10);
+            if (Number.isNaN(resendWait) || resendWait < 0) resendWait = 0;
+
+            const resendBtn = document.getElementById("otpResendButton");
+            const resendLabel = document.getElementById("otpResendWaitLabel");
+            if (!resendBtn || !resendLabel) return;
+
+            const updateResendUi = () => {
+                if (resendWait > 0) {
+                    resendBtn.disabled = true;
+                    resendLabel.textContent = `Reenvio en ${resendWait}s`;
+                    resendWait -= 1;
+                } else {
+                    resendBtn.disabled = false;
+                    resendLabel.textContent = "Reenvio disponible";
+                }
+            };
+
+            updateResendUi();
+            setInterval(updateResendUi, 1000);
         })();
     </script>
     {% endif %}

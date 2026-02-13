@@ -16,19 +16,12 @@ class TwilioVerifyClient:
         template_sid: str | None = None,
         ttl_seconds: int | None = None,
     ):
+        # Twilio Verify currently enforces a 10-minute code TTL.
+        # We intentionally do not pass `ttl` to avoid SDK/version incompatibilities.
         params = {"to": to_number, "channel": channel}
         if template_sid:
             params["template_sid"] = template_sid
-        if ttl_seconds:
-            params["ttl"] = int(ttl_seconds)
-        try:
-            return self.client.verify.v2.services(self.verify_sid).verifications.create(**params)
-        except TypeError as exc:
-            # Some Twilio SDK versions don't accept ttl in the method signature.
-            if "ttl" in str(exc):
-                params.pop("ttl", None)
-                return self.client.verify.v2.services(self.verify_sid).verifications.create(**params)
-            raise
+        return self.client.verify.v2.services(self.verify_sid).verifications.create(**params)
 
     def check_verification(self, to_number: str, code: str):
         return (

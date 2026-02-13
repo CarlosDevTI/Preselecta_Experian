@@ -149,10 +149,8 @@ class ConsultaView(View):
 
     @staticmethod
     def _otp_settings() -> tuple[int, int, int]:
-        ttl = int(os.environ.get("TWILIO_VERIFY_TTL_SECONDS", "900"))
-        cooldown = int(os.environ.get("TWILIO_VERIFY_RESEND_COOLDOWN", "60"))
-        max_resends = int(os.environ.get("TWILIO_VERIFY_RESEND_MAX", "3"))
-        return ttl, cooldown, max_resends
+        # Business rule: fixed OTP window and resend policy.
+        return 600, 60, 2
 
     @staticmethod
     def _otp_seconds_left(consent: ConsentOTP | None, ttl_seconds: int) -> int:
@@ -528,8 +526,8 @@ class ConsultaView(View):
                 "otp_stage": "verify",
                 "masked_phone": self._mask_phone(phone_number),
                 "otp_expires_in": otp_ttl_seconds,
-                "otp_can_resend": True,
-                "otp_resend_wait": 0,
+                "otp_can_resend": False,
+                "otp_resend_wait": otp_resend_cooldown,
                 "otp_resend_remaining": otp_resend_max,
                 "otp_autoshow": True,
                 "agencias_villavicencio": self.AGENCIAS_VILLAVICENCIO,
@@ -616,6 +614,13 @@ class ConsultaView(View):
                     status="error",
                     last_error=str(e),
                 )
+                consent = ConsentOTP.objects.filter(id=consent_id).first()
+                can_resend, wait_seconds, remaining = self._otp_resend_state(
+                    consent,
+                    otp_ttl_seconds,
+                    otp_resend_cooldown,
+                    otp_resend_max,
+                )
                 form_error_message = "No se pudo reenviar el codigo OTP. Intenta de nuevo."
                 return render(request, self.template_name, {
                     "step": "2",
@@ -629,8 +634,8 @@ class ConsultaView(View):
                     "otp_stage": "verify",
                     "masked_phone": self._mask_phone(phone_number),
                     "otp_expires_in": self._otp_seconds_left(consent, otp_ttl_seconds),
-                    "otp_can_resend": False,
-                    "otp_resend_wait": 0,
+                    "otp_can_resend": can_resend,
+                    "otp_resend_wait": wait_seconds,
                     "otp_resend_remaining": remaining,
                     "otp_autoshow": True,
                     "agencias_villavicencio": self.AGENCIAS_VILLAVICENCIO,
@@ -1023,7 +1028,6 @@ class HistorialPagoView(View):
         resp = HttpResponse(pdf_bytes, content_type="application/pdf")
         resp["Content-Disposition"] = f'inline; filename="{filename}"'
         return resp
-
 
 class AdminAuditoriaListView(View):
     template_name = "integrations/admin_auditoria_list.html"

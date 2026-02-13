@@ -119,6 +119,9 @@
 .col-saldo {
     width: 8%;
 }
+.col-state {
+    width: 12%;
+}
 .num-cell {
     font-size: 7.6px;
     white-space: normal;
@@ -144,9 +147,9 @@
             table-layout: fixed;
             width: 100%;
         }
-        .behavior-col,
-        .behavior-cell {
-            width: 16%;
+.behavior-col,
+.behavior-cell {
+            width: 14%;
             text-align: center;
         }
         .behavior-cell {
@@ -163,6 +166,33 @@
             word-break: break-all;
             overflow-wrap: anywhere;
             text-align: center;
+        }
+        .state-main {
+            display: block;
+            font-size: 7px;
+            line-height: 1.2;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            text-align: center;
+        }
+        .state-meta {
+            display: block;
+            margin-top: 2px;
+            font-size: 6px;
+            line-height: 1.2;
+            color: #4b5563;
+            text-transform: uppercase;
+            letter-spacing: 0.1px;
+        }
+        .risk-negative {
+            color: #991b1b;
+            font-weight: 600;
+        }
+        .row-closed td {
+            background: #f8fafc;
+        }
+        .row-negative td {
+            background: #fff7ed;
         }
         th {
             background: #eef2f7;
@@ -237,7 +267,7 @@
     </div>
 
     <div class="section">
-        <h2>Información básica 📋</h2>
+        <h2>Información básica [INFO]</h2>
         <table>
             <tr>
                 <th>Nombre completo</th>
@@ -261,7 +291,7 @@
     </div>
 
     <div class="section">
-        <h2>Scores 📊</h2>
+        <h2>Scores [SCORE]</h2>
         <table>
             <thead>
                 <tr>
@@ -287,7 +317,7 @@
     </div>
 
     <div class="section">
-        <h2>Resumen - Perfil general 📝</h2>
+        <h2>Resumen - Perfil general [RESUMEN]</h2>
         <table>
             <thead>
                 <tr>
@@ -317,7 +347,7 @@
     </div>
 
     <div class="section">
-        <h2>Saldos y moras (últimos meses) 💰</h2>
+        <h2>Saldos y moras (últimos meses) [SALDOS]</h2>
         <table>
             <thead>
                 <tr>
@@ -341,7 +371,7 @@
     </div>
 
     <div class="section">
-        <h2>Endeudamiento actual 💳</h2>
+        <h2>Endeudamiento actual [DEUDA]</h2>
         <table>
             <thead>
                 <tr>
@@ -407,7 +437,7 @@
 
     {% if tendencia_matrix.dates %}
     <div class="section">
-        <h2>Tendencia de endeudamiento 📈</h2>
+        <h2>Tendencia de endeudamiento [TENDENCIA]</h2>
         <table>
             <thead>
                 <tr>
@@ -433,7 +463,7 @@
 
     {% if analisis_vectores.sectors %}
     <div class="section">
-        <h2>Análisis de vectores 🔍</h2>
+        <h2>Análisis de vectores [VECTORES]</h2>
         {% for sector in analisis_vectores.sectors %}
             <table>
                 <thead>
@@ -475,7 +505,7 @@
     {% endif %}
 
     <div class="section">
-        <h2>Cuentas de ahorro 🏦</h2>
+        <h2>Cuentas de ahorro [AHORRO]</h2>
         <table class="table-fixed">
             <thead>
                 <tr>
@@ -507,7 +537,7 @@
     </div>
 
     <div class="section">
-        <h2>Tarjetas de crédito 💳</h2>
+        <h2>Tarjetas de crédito [TDC]</h2>
         <table class="table-fixed">
             <thead>
                 <tr>
@@ -516,6 +546,7 @@
                     <th class="col-date">F. Apertura</th>
                     <th class="col-date">F. Venc</th>
                     <th class="col-mini">Calif.</th>
+                    <th class="col-state">Estado</th>
                     <th class="col-narrow">Titular</th>
                     <th class="col-narrow">Garante</th>
                     <th class="behavior-col">Comportamiento</th>
@@ -526,12 +557,28 @@
             </thead>
             <tbody>
                 {% for row in tarjetas %}
-                <tr>
+                <tr class="{% if row.condicion == 'Cerrada' %}row-closed{% endif %}{% if row.esNegativo %} row-negative{% endif %}">
                     <td class="entity-cell">{{ row.entidad }}</td>
                     <td class="num-cell">{{ row.numero }}</td>
                     <td class="date-cell">{{ row.fechaApertura }}</td>
                     <td class="date-cell">{{ row.fechaVencimiento }}</td>
                     <td class="cell-center">{{ row.calificacion }}</td>
+                    <td class="cell-center">
+                        <span class="state-main">{{ row.estadoObligacion|default:"-" }}</span>
+                        {% if row.condicion != "-" or row.esNegativo or row.formaPago != "-" %}
+                        <span class="state-meta">
+                            {% if row.condicion != "-" %}{{ row.condicion }}{% endif %}
+                            {% if row.esNegativo %}
+                                {% if row.condicion != "-" %} | {% endif %}
+                                <span class="risk-negative">NEGATIVO</span>
+                            {% endif %}
+                            {% if row.formaPago != "-" and row.formaPago != "Vigente" %}
+                                {% if row.condicion != "-" or row.esNegativo %} | {% endif %}
+                                FP: {{ row.formaPago }}
+                            {% endif %}
+                        </span>
+                        {% endif %}
+                    </td>
                     <td class="cell-center">{{ row.situacionTitular|default:"-" }}</td>
                     <td class="cell-center">{{ row.garante|default:"-" }}</td>
                     <td class="behavior-cell">
@@ -547,7 +594,7 @@
     </div>
 
     <div class="section">
-        <h2>Cuentas cartera 📋</h2>
+        <h2>Cuentas cartera [CARTERA]</h2>
         <table class="table-fixed">
             <thead>
                 <tr>
@@ -557,6 +604,7 @@
                     <th class="col-date">F. Apertura</th>
                     <th class="col-date">F. Venc</th>
                     <th class="col-mini">Calif.</th>
+                    <th class="col-state">Estado</th>
                     <th class="col-narrow">Titular</th>
                     <th class="col-narrow">Garante</th>
                     <th class="behavior-col">Comportamiento</th>
@@ -567,13 +615,29 @@
             </thead>
             <tbody>
                 {% for row in carteras %}
-                <tr>
+                <tr class="{% if row.condicion == 'Cerrada' %}row-closed{% endif %}{% if row.esNegativo %} row-negative{% endif %}">
                     <td class="entity-cell">{{ row.entidad }}</td>
                     <td class="num-cell">{{ row.numero }}</td>
                     <td class="cell-center">{{ row.tipoCuenta }}</td>
                     <td class="date-cell">{{ row.fechaApertura }}</td>
                     <td class="date-cell">{{ row.fechaVencimiento }}</td>
                     <td class="cell-center">{{ row.calificacion }}</td>
+                    <td class="cell-center">
+                        <span class="state-main">{{ row.estadoObligacion|default:"-" }}</span>
+                        {% if row.condicion != "-" or row.esNegativo or row.formaPago != "-" %}
+                        <span class="state-meta">
+                            {% if row.condicion != "-" %}{{ row.condicion }}{% endif %}
+                            {% if row.esNegativo %}
+                                {% if row.condicion != "-" %} | {% endif %}
+                                <span class="risk-negative">NEGATIVO</span>
+                            {% endif %}
+                            {% if row.formaPago != "-" and row.formaPago != "Vigente" %}
+                                {% if row.condicion != "-" or row.esNegativo %} | {% endif %}
+                                FP: {{ row.formaPago }}
+                            {% endif %}
+                        </span>
+                        {% endif %}
+                    </td>
                     <td class="cell-center">{{ row.situacionTitular|default:"-" }}</td>
                     <td class="cell-center">{{ row.garante|default:"-" }}</td>
                     <td class="behavior-cell">
@@ -589,7 +653,7 @@
     </div>
 
     <div class="section">
-        <h2>Histórico de consultas 🔎</h2>
+        <h2>Histórico de consultas [CONSULTAS]</h2>
         <table>
             <thead>
                 <tr>
@@ -619,7 +683,7 @@
     
       {% if cheques %}
       <div class="section">
-          <h2>Cheques 💵</h2>
+          <h2>Cheques [CHEQUES]</h2>
           <table class="table-fixed">
               <thead>
                   <tr>
@@ -647,7 +711,7 @@
 
       {% if composicion_portafolio %}
       <div class="section">
-          <h2>Composición Portafolio 📊</h2>
+          <h2>Composición Portafolio [PORTAFOLIO]</h2>
           <table class="table-fixed">
               <thead>
                   <tr>
@@ -673,7 +737,7 @@
 
       {% if resumen_endeudamiento %}
       <div class="section">
-          <h2>Resumen Endeudamiento 📝</h2>
+          <h2>Resumen Endeudamiento [RESUMEN]</h2>
           {% for tri in resumen_endeudamiento %}
           <div class="small muted" style="margin:6px 0 4px;">Trimestre {{ tri.fecha }}</div>
           <table class="table-fixed">
@@ -708,7 +772,7 @@
 
       {% if historico_saldos.dates %}
       <div class="section">
-          <h2>Histórico de Saldos 📈</h2>
+          <h2>Histórico de Saldos [HISTÓRICO]</h2>
           <table class="table-fixed">
               <thead>
                   <tr>
@@ -757,7 +821,7 @@
 
       {% if evolucion_deuda_agregada.rows %}
       <div class="section">
-          <h2>Evolución de la Deuda (Agregada) 📊</h2>
+          <h2>Evolución de la Deuda (Agregada) [EVOLUCIÓN]</h2>
           <table class="table-fixed">
               <thead>
                   <tr>
@@ -809,7 +873,7 @@
 
       {% if evolucion_deuda_micro.sectors %}
       <div class="section">
-          <h2>Evolución de la Deuda (Microcrédito) 📊</h2>
+          <h2>Evolución de la Deuda (Microcrédito) [MICROCRÉDITO]</h2>
           {% for sec in evolucion_deuda_micro.sectors %}
           <div class="small muted" style="margin:6px 0 4px;">Sector {{ sec.sector }}</div>
           <table class="table-fixed">

@@ -150,6 +150,297 @@ def _map_garante(value: str) -> str:
         if 9 <= num <= 95 or 98 <= num <= 99:
             return "No Aplica"
     return GARANTE_MAP.get(raw, raw)
+
+
+ESTADO_CUENTA_MAP = {
+    "00": "Entidad no reporto",
+    "01": "Al dia",
+    "02": "En mora",
+    "03": "Pago total",
+    "04": "Pago judicial",
+    "05": "Dudoso recaudo",
+    "06": "Castigada",
+    "07": "Dacion en pago",
+    "08": "Cancelada voluntariamente",
+    "09": "Cancelada por mal manejo",
+    "10": "Prescripcion",
+    "11": "Cancelada por la entidad",
+    "12": "Cancelada por reestructuracion/refinanciacion",
+    "13": "Cancelada por venta",
+    "14": "Insoluta",
+    "15": "Cancelada por siniestro",
+    "16": "Cancelada por liquidacion patrimonial",
+    "17": "Cancelada por subrogacion",
+}
+
+
+ESTADO_ORIGEN_MAP = {
+    "0": "Normal",
+    "1": "Reestructurada",
+    "2": "Refinanciada",
+    "3": "Transferida de otro producto",
+    "4": "Comprada",
+    "5": "Normal reestructurada",
+    "6": "Normal refinanciada",
+}
+
+
+ESTADO_PLASTICO_MAP = {
+    "0": "No reportado",
+    "1": "Entregado",
+    "2": "Renovado",
+    "3": "No renovado",
+    "4": "Reexpedido",
+    "5": "Robado",
+    "6": "Extraviado",
+    "7": "No entregado",
+    "8": "Devuelto",
+}
+
+
+ESTADO_PAGO_MAP = {
+    "00": {"nombre": "No disponible", "estado": "N/A"},
+    "01": {"nombre": "Al dia", "estado": "Vigente"},
+    "02": {"nombre": "Tarjeta no entregada", "estado": "Cerrada"},
+    "03": {"nombre": "Cancelada por mal manejo", "estado": "Cerrada"},
+    "04": {"nombre": "Tarjeta robada", "estado": "Cerrada"},
+    "05": {"nombre": "Cancelada voluntaria", "estado": "Cerrada"},
+    "06": {"nombre": "Cancelada MX", "estado": "Cerrada"},
+    "07": {"nombre": "Tarjeta extraviada", "estado": "Cerrada"},
+    "08": {"nombre": "Pago voluntario", "estado": "Cerrada"},
+    "09": {"nombre": "Pago voluntario MX 30", "estado": "Cerrada"},
+    "10": {"nombre": "Pago voluntario MX 60", "estado": "Cerrada"},
+    "11": {"nombre": "Pago voluntario MX 90", "estado": "Cerrada"},
+    "12": {"nombre": "Pago voluntario MX 120", "estado": "Cerrada"},
+    "13": {"nombre": "Al dia mora 30", "estado": "Vigente"},
+    "14": {"nombre": "Al dia mora 60", "estado": "Vigente"},
+    "15": {"nombre": "Al dia mora 90", "estado": "Vigente"},
+    "16": {"nombre": "Al dia mora 120", "estado": "Vigente"},
+    "17": {"nombre": "Esta en mora 30", "estado": "Vigente"},
+    "18": {"nombre": "Esta en mora 60", "estado": "Vigente"},
+    "19": {"nombre": "Esta en mora 90", "estado": "Vigente"},
+    "20": {"nombre": "Esta en mora 120", "estado": "Vigente"},
+    "21": {"nombre": "FM 60 esta M 30", "estado": "Vigente"},
+    "22": {"nombre": "FM 90 esta M 30", "estado": "Vigente"},
+    "23": {"nombre": "FM 90 esta M 60", "estado": "Vigente"},
+    "24": {"nombre": "FM 120 esta M 30", "estado": "Vigente"},
+    "25": {"nombre": "FM 120 esta M 60", "estado": "Vigente"},
+    "26": {"nombre": "FM 120 esta M 90", "estado": "Vigente"},
+    "27": {"nombre": "RM 30 esta M 60", "estado": "Vigente"},
+    "28": {"nombre": "RM 30 esta M 90", "estado": "Vigente"},
+    "29": {"nombre": "RM 30 esta M 120", "estado": "Vigente"},
+    "30": {"nombre": "RM 60 esta M 30", "estado": "Vigente"},
+    "31": {"nombre": "RM 60 esta M 60", "estado": "Vigente"},
+    "32": {"nombre": "RM 60 esta M 90", "estado": "Vigente"},
+    "33": {"nombre": "RM 60 esta M 120", "estado": "Vigente"},
+    "34": {"nombre": "RM 90 esta M 30", "estado": "Vigente"},
+    "35": {"nombre": "RM 90 esta M 60", "estado": "Vigente"},
+    "36": {"nombre": "RM 90 esta M 90", "estado": "Vigente"},
+    "37": {"nombre": "RM 90 esta M 120", "estado": "Vigente"},
+    "38": {"nombre": "RM 120 esta M 30", "estado": "Vigente"},
+    "39": {"nombre": "RM 120 esta M 60", "estado": "Vigente"},
+    "40": {"nombre": "RM 120 esta M 90", "estado": "Vigente"},
+    "41": {"nombre": "RM 120 esta M 120", "estado": "Vigente"},
+    "45": {"nombre": "Cartera castigada", "estado": "Vigente"},
+    "46": {"nombre": "Cartera recuperada", "estado": "Cerrada"},
+    "47": {"nombre": "Dudoso recaudo", "estado": "Vigente"},
+    "49": {"nombre": "Tarjeta renovada", "estado": "Cerrada"},
+    "60": {"nombre": "En reclamacion", "estado": "Vigente"},
+}
+
+
+FORMA_PAGO_MAP = {
+    "0": "Vigente",
+    "1": "Pago voluntario",
+    "2": "Proceso ejecutivo",
+    "3": "Mandamiento de pago",
+    "4": "Reestructuracion",
+    "5": "Dacion en pago",
+    "6": "Cesion",
+    "7": "Donacion",
+    "8": "Insoluta",
+    "9": "Prescrita",
+}
+
+
+NEGATIVE_ESTADO_PAGO_CODES = {
+    "03",
+    "06",
+    "17",
+    "18",
+    "19",
+    "20",
+    "21",
+    "22",
+    "23",
+    "24",
+    "25",
+    "26",
+    "27",
+    "28",
+    "29",
+    "30",
+    "31",
+    "32",
+    "33",
+    "34",
+    "35",
+    "36",
+    "37",
+    "38",
+    "39",
+    "40",
+    "41",
+    "45",
+    "47",
+}
+
+
+NEGATIVE_ESTADO_CUENTA_CODES = {"02", "05", "06", "09", "14", "15", "16"}
+
+
+ESTADO_CUENTA_CERRADA_CODES = {"03", "04", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17"}
+
+
+def _map_estado_cuenta(value: str) -> str:
+    raw = str(value or "").strip()
+    if not raw:
+        return "-"
+    return ESTADO_CUENTA_MAP.get(raw, raw)
+
+
+def _map_estado_origen(value: str) -> str:
+    raw = str(value or "").strip()
+    if not raw:
+        return "-"
+    return ESTADO_ORIGEN_MAP.get(raw, raw)
+
+
+def _map_estado_plastico(value: str) -> str:
+    raw = str(value or "").strip()
+    if not raw:
+        return "-"
+    return ESTADO_PLASTICO_MAP.get(raw, raw)
+
+
+def _map_estado_pago(value: str) -> str:
+    raw = str(value or "").strip()
+    if not raw:
+        return "-"
+    item = ESTADO_PAGO_MAP.get(raw)
+    if item:
+        return item["nombre"]
+    return raw
+
+
+def _estado_pago_categoria(value: str) -> str:
+    raw = str(value or "").strip()
+    if not raw:
+        return "-"
+    item = ESTADO_PAGO_MAP.get(raw)
+    if item:
+        return item["estado"]
+    return "-"
+
+
+def _map_forma_pago(value: str) -> str:
+    raw = str(value or "").strip()
+    if not raw:
+        return "-"
+    return FORMA_PAGO_MAP.get(raw, raw)
+
+
+def _is_estado_negativo(estado_pago_codigo: str, estado_cuenta_codigo: str) -> bool:
+    pago_raw = str(estado_pago_codigo or "").strip()
+    cuenta_raw = str(estado_cuenta_codigo or "").strip()
+    return pago_raw in NEGATIVE_ESTADO_PAGO_CODES or cuenta_raw in NEGATIVE_ESTADO_CUENTA_CODES
+
+
+def _infer_condicion(estado_pago_codigo: str, estado_cuenta_codigo: str) -> str:
+    categoria = _estado_pago_categoria(estado_pago_codigo)
+    if categoria in ("Vigente", "Cerrada"):
+        return categoria
+    cuenta_raw = str(estado_cuenta_codigo or "").strip()
+    if cuenta_raw in ESTADO_CUENTA_CERRADA_CODES:
+        return "Cerrada"
+    if cuenta_raw:
+        return "Vigente"
+    return "-"
+
+
+def _build_estado_resumen(estado_cuenta_codigo: str, estado_origen_codigo: str, estado_plastico_codigo: str = "") -> str:
+    parts = []
+    estado_cuenta = _map_estado_cuenta(estado_cuenta_codigo)
+    if estado_cuenta != "-":
+        parts.append(estado_cuenta)
+
+    # 0 is the default "Normal" origin, so we keep output concise.
+    estado_origen_raw = str(estado_origen_codigo or "").strip()
+    if estado_origen_raw and estado_origen_raw != "0":
+        parts.append(f"Origen: {_map_estado_origen(estado_origen_raw)}")
+
+    estado_plastico_raw = str(estado_plastico_codigo or "").strip()
+    # Table 40: 0/empty => no reportado
+    if estado_plastico_raw and estado_plastico_raw != "0":
+        parts.append(f"Plastico: {_map_estado_plastico(estado_plastico_raw)}")
+
+    if not parts:
+        return "-"
+    return " | ".join(parts)
+
+
+def _build_estado_obligacion(
+    estado_pago_codigo: str,
+    forma_pago_codigo: str,
+    estado_cuenta_codigo: str,
+    estado_origen_codigo: str,
+    estado_plastico_codigo: str = "",
+) -> str:
+    estado_cuenta_raw = str(estado_cuenta_codigo or "").strip()
+    estado_pago_raw = str(estado_pago_codigo or "").strip()
+    estado_origen_raw = str(estado_origen_codigo or "").strip()
+    estado_plastico_raw = str(estado_plastico_codigo or "").strip()
+    forma_pago_raw = str(forma_pago_codigo or "").strip()
+
+    parts = []
+
+    # Reglas de negocio documentadas para estados de cierre explicitos.
+    if estado_cuenta_raw in {"10", "13", "14", "15", "16"}:
+        parts.append(_map_estado_cuenta(estado_cuenta_raw))
+        if estado_origen_raw and estado_origen_raw != "0":
+            parts.append(f"Origen: {_map_estado_origen(estado_origen_raw)}")
+        if estado_plastico_raw and estado_plastico_raw != "0":
+            parts.append(f"Plastico: {_map_estado_plastico(estado_plastico_raw)}")
+        return " | ".join(parts)
+
+    if estado_pago_raw == "46":
+        if forma_pago_raw == "3":
+            parts.append("Pago judicial")
+        else:
+            parts.append("Pago voluntario")
+        if estado_origen_raw and estado_origen_raw != "0":
+            parts.append(f"Origen: {_map_estado_origen(estado_origen_raw)}")
+        return " | ".join(parts)
+
+    if estado_plastico_raw and estado_plastico_raw != "0":
+        parts.append(_map_estado_plastico(estado_plastico_raw))
+
+    if estado_pago_raw:
+        parts.append(_map_estado_pago(estado_pago_raw))
+    elif estado_cuenta_raw:
+        parts.append(_map_estado_cuenta(estado_cuenta_raw))
+
+    if estado_origen_raw and estado_origen_raw != "0":
+        parts.append(f"Origen: {_map_estado_origen(estado_origen_raw)}")
+
+    if not parts:
+        return "-"
+
+    unique_parts = []
+    for part in parts:
+        if part and part not in unique_parts:
+            unique_parts.append(part)
+    return " | ".join(unique_parts)
 def _map_situacion_titular(value: str) -> str:
     raw = str(value or "").strip()
     return SITUACION_TITULAR_MAP.get(raw, raw or "-")
@@ -222,6 +513,15 @@ def _format_date_compact(date_str: str | None) -> str:
     if len(parts) == 3 and all(parts):
         return f"{parts[0]}{parts[1]}{parts[2]}"
     return text
+
+
+def _latest_valor(elem: ET.Element | None) -> ET.Element | None:
+    if elem is None:
+        return None
+    valores = elem.findall("Valores/Valor")
+    if valores:
+        return valores[-1]
+    return elem.find("Valores/Valor")
 
 
 
@@ -623,7 +923,7 @@ def _parse_xml(xml_str: str) -> dict:
 
     cuentas_ahorro = []
     for cuenta in informe.findall("CuentaAhorro"):
-        valor = cuenta.find("Valores/Valor")
+        valor = _latest_valor(cuenta)
         cuentas_ahorro.append(
             {
                 "entidad": _attr(cuenta, "entidad"),
@@ -640,8 +940,23 @@ def _parse_xml(xml_str: str) -> dict:
 
     tarjetas = []
     for cuenta in informe.findall("TarjetaCredito"):
-        valor = cuenta.find("Valores/Valor")
+        valor = _latest_valor(cuenta)
+        estados = cuenta.find("Estados")
+        estado_cuenta_codigo = _attr(estados.find("EstadoCuenta") if estados is not None else None, "codigo")
+        estado_origen_codigo = _attr(estados.find("EstadoOrigen") if estados is not None else None, "codigo")
+        estado_plastico_codigo = _attr(estados.find("EstadoPlastico") if estados is not None else None, "codigo")
+        estado_pago_codigo = _attr(estados.find("EstadoPago") if estados is not None else None, "codigo")
+        forma_pago_codigo = _attr(cuenta, "formaPago")
         comportamiento = _wrap_behavior(_attr(cuenta, "comportamiento"))
+        estado_obligacion = _build_estado_obligacion(
+            estado_pago_codigo=estado_pago_codigo,
+            forma_pago_codigo=forma_pago_codigo,
+            estado_cuenta_codigo=estado_cuenta_codigo,
+            estado_origen_codigo=estado_origen_codigo,
+            estado_plastico_codigo=estado_plastico_codigo,
+        )
+        condicion = _infer_condicion(estado_pago_codigo, estado_cuenta_codigo)
+        es_negativo = _is_estado_negativo(estado_pago_codigo, estado_cuenta_codigo)
         tarjetas.append(
             {
                 "entidad": _attr(cuenta, "entidad"),
@@ -649,6 +964,17 @@ def _parse_xml(xml_str: str) -> dict:
                 "fechaApertura": _format_date_compact(_attr(cuenta, "fechaApertura")),
                 "fechaVencimiento": _format_date_compact(_attr(cuenta, "fechaVencimiento")),
                 "estado": _attr(cuenta, "estado"),
+                "estadoCuentaCodigo": estado_cuenta_codigo,
+                "estadoOrigenCodigo": estado_origen_codigo,
+                "estadoPlasticoCodigo": estado_plastico_codigo,
+                "estadoPagoCodigo": estado_pago_codigo,
+                "formaPagoCodigo": forma_pago_codigo,
+                "estadoPago": _map_estado_pago(estado_pago_codigo),
+                "formaPago": _map_forma_pago(forma_pago_codigo),
+                "condicion": condicion,
+                "esNegativo": es_negativo,
+                "estadoObligacion": estado_obligacion,
+                "estadoResumen": estado_obligacion,
                 "calificacion": _map_calificacion(_attr(cuenta, "calificacion")),
                 "situacionTitular": _map_situacion_titular(_attr(cuenta, "situacionTitular")),
                 "garante": _map_garante(_attr(cuenta.find("Caracteristicas"), "codigoAmparada")),
@@ -661,8 +987,21 @@ def _parse_xml(xml_str: str) -> dict:
 
     carteras = []
     for cuenta in informe.findall("CuentaCartera"):
-        valor = cuenta.find("Valores/Valor")
+        valor = _latest_valor(cuenta)
+        estados = cuenta.find("Estados")
+        estado_cuenta_codigo = _attr(estados.find("EstadoCuenta") if estados is not None else None, "codigo")
+        estado_origen_codigo = _attr(estados.find("EstadoOrigen") if estados is not None else None, "codigo")
+        estado_pago_codigo = _attr(estados.find("EstadoPago") if estados is not None else None, "codigo")
+        forma_pago_codigo = _attr(cuenta, "formaPago")
         comportamiento = _wrap_behavior(_attr(cuenta, "comportamiento"))
+        estado_obligacion = _build_estado_obligacion(
+            estado_pago_codigo=estado_pago_codigo,
+            forma_pago_codigo=forma_pago_codigo,
+            estado_cuenta_codigo=estado_cuenta_codigo,
+            estado_origen_codigo=estado_origen_codigo,
+        )
+        condicion = _infer_condicion(estado_pago_codigo, estado_cuenta_codigo)
+        es_negativo = _is_estado_negativo(estado_pago_codigo, estado_cuenta_codigo)
         carteras.append(
             {
                 "entidad": _attr(cuenta, "entidad"),
@@ -670,6 +1009,16 @@ def _parse_xml(xml_str: str) -> dict:
                 "fechaApertura": _format_date_compact(_attr(cuenta, "fechaApertura")),
                 "fechaVencimiento": _format_date_compact(_attr(cuenta, "fechaVencimiento")),
                 "tipoCuenta": _attr(cuenta.find("Caracteristicas"), "tipoCuenta"),
+                "estadoCuentaCodigo": estado_cuenta_codigo,
+                "estadoOrigenCodigo": estado_origen_codigo,
+                "estadoPagoCodigo": estado_pago_codigo,
+                "formaPagoCodigo": forma_pago_codigo,
+                "estadoPago": _map_estado_pago(estado_pago_codigo),
+                "formaPago": _map_forma_pago(forma_pago_codigo),
+                "condicion": condicion,
+                "esNegativo": es_negativo,
+                "estadoObligacion": estado_obligacion,
+                "estadoResumen": estado_obligacion,
                 "calificacion": _map_calificacion(_attr(cuenta, "calificacion")),
                 "garante": _map_garante(_attr(cuenta.find("Caracteristicas"), "calidadDeudor")),
                 "situacionTitular": _map_situacion_titular(_attr(cuenta, "situacionTitular")),
