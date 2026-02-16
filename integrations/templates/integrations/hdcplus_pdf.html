@@ -1,260 +1,249 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8">
     <title>Historia de Crédito+ - Congente</title>
     <style>
         :root {
-            --primary: #D7620C;
+            --primary: #d7620c;
             --secondary: #315675;
-            --accent: #00a3e0;
-            --bg: #f5f7fa;
-            --border: #d6dde5;
+            --border: #cbd5e1;
             --text: #1f2937;
-            --muted: #6b7280;
+            --muted: #64748b;
+            --row-soft: #f8fafc;
         }
-        * {
-            box-sizing: border-box;
-        }
+        @page { margin: 4mm; }
+        * { box-sizing: border-box; }
         body {
-            font-family: "Helvetica", Arial, sans-serif;
-            color: var(--text);
             margin: 0;
-            padding: 4px;
-            background: #fff;
-            font-size: 10px;
-            font-weight: 400;
-        }
-        @page {
-            margin: 6mm;
+            padding: 2px;
+            color: var(--text);
+            font-family: "Helvetica", Arial, sans-serif;
+            font-size: 7.8px;
+            line-height: 1.25;
         }
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid var(--primary);
-            padding-bottom: 12px;
-            margin-bottom: 16px;
+            padding-bottom: 8px;
+            margin-bottom: 10px;
         }
-        .brand {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-        .brand img {
-            height: 64px;
-        }
-        .title {
-            text-align: right;
-        }
+        .header img { height: 56px; }
+        .title { text-align: right; }
         .title h1 {
             margin: 0;
-            font-size: 18px;
+            font-size: 30px;
             color: var(--secondary);
         }
         .title p {
             margin: 2px 0 0;
             color: var(--muted);
-            font-size: 10px;
-            font-weight: 400;
+            font-size: 12px;
         }
         .meta {
-            margin: 10px 0 16px;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 4px;
-            font-size: 10px;
-            color: var(--muted);
+            margin: 4px 0 10px;
+            color: #475569;
+            font-size: 9px;
         }
         .section {
-            margin: 16px 0 20px;
+            margin: 6px 0 8px;
+            page-break-inside: auto;
         }
         .section h2 {
-            margin: 0 0 8px;
-            font-size: 12px;
-            color: var(--secondary);
-            border-left: 4px solid var(--primary);
+            margin: 0 0 6px;
             padding-left: 8px;
+            border-left: 4px solid var(--primary);
+            color: var(--secondary);
+            font-size: 8.5px;
+            letter-spacing: .2px;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            font-family: "Segoe UI Emoji", "Noto Color Emoji", "Apple Color Emoji", "Helvetica", Arial, sans-serif;
         }
-        .note {
-            background: #fff7ed;
-            border: 1px solid #fed7aa;
-            color: #9a3412;
-            padding: 8px 10px;
-            font-size: 10px;
-            margin-top: 8px;
+        .subsection {
+            margin: 8px 0 6px;
+            font-size: 8.5px;
+            color: var(--secondary);
+            text-transform: uppercase;
+            font-weight: 700;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 8px;
-            font-weight: 400;
+            table-layout: fixed;
+            margin-bottom: 6px;
         }
         th, td {
-            border: 1px solid var(--border);
-            padding: 3px 4px;
+            border: 0.7px solid var(--border);
+            padding: 1.8px 2.5px;
+            text-align: center;
             vertical-align: middle;
-            text-align: center;
-        }
-        .entity-col {
-    width: 16%;
-}
-.col-narrow {
-    width: 6%;
-}
-.col-mini {
-    width: 5%;
-}
-.col-number {
-    width: 7%;
-}
-.col-date {
-    width: 7%;
-}
-.col-saldo {
-    width: 8%;
-}
-.col-state {
-    width: 12%;
-}
-.num-cell {
-    font-size: 7.6px;
-    white-space: normal;
-    word-break: break-all;
-    overflow-wrap: anywhere;
-}
-.date-cell {
-    font-size: 7.6px;
-    white-space: normal;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-}
-.entity-cell {
-    max-width: 120px;
-    font-size: 7.6px;
-    line-height: 1.2;
-    white-space: normal;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-    text-align: center;
-}
-.table-fixed {
-            table-layout: fixed;
-            width: 100%;
-        }
-.behavior-col,
-.behavior-cell {
-            width: 14%;
-            text-align: center;
-        }
-        .behavior-cell {
-            font-size: 5.8px;
-            line-height: 1.2;
-            white-space: normal;
-            word-break: break-all;
-            overflow-wrap: anywhere;
-        }
-        
-.behavior-text {
-            display: block;
-            white-space: normal;
-            word-break: break-all;
-            overflow-wrap: anywhere;
-            text-align: center;
-        }
-        .state-main {
-            display: block;
-            font-size: 7px;
-            line-height: 1.2;
             word-break: break-word;
             overflow-wrap: anywhere;
-            text-align: center;
-        }
-        .state-meta {
-            display: block;
-            margin-top: 2px;
-            font-size: 6px;
-            line-height: 1.2;
-            color: #4b5563;
-            text-transform: uppercase;
-            letter-spacing: 0.1px;
-        }
-        .risk-negative {
-            color: #991b1b;
-            font-weight: 600;
-        }
-        .row-closed td {
-            background: #f8fafc;
-        }
-        .row-negative td {
-            background: #fff7ed;
         }
         th {
             background: #eef2f7;
             color: var(--secondary);
-            font-size: 7.6px;
-            text-transform: none;
-            letter-spacing: 0.3px;
-            font-weight: 600 !important;
+            font-weight: 700;
+            font-size: 6.9px;
         }
-        td {
-            font-size: 7.6px;
-            font-weight: 400 !important;
+        td { font-size: 6.9px; }
+        .left { text-align: left; }
+        .entity { font-size: 6.6px; }
+        .soft { background: var(--row-soft); }
+        .state {
+            font-size: 6.5px;
+            line-height: 1.15;
         }
-        tbody th {
-            font-weight: 400 !important;
+        .behavior {
+            font-family: "Courier New", monospace;
+            font-size: 6.1px;
+            line-height: 1.15;
         }
-        .section-row {
-            font-weight: 400;
-            background: #e9f0f8;
+        .nowrap-left {
             text-align: left;
+            white-space: nowrap;
+            word-break: normal;
+            overflow-wrap: normal;
         }
-        .total-row {
-            font-weight: 600 !important;
+        .obligation-table {
+            page-break-inside: auto;
+            margin-bottom: 4px;
         }
-        .cell-center {
+        .obligation-top {
+            margin-bottom: 0;
+        }
+        .obligation-bottom {
+            margin-top: 0;
+            margin-bottom: 6px;
+        }
+        .endeudamiento-table col.cartera-col { width: 20%; }
+        .endeudamiento-table col.calidad-col { width: 8%; }
+        .endeudamiento-table col.num-col { width: 4.5%; }
+        .endeudamiento-table col.estado-col { width: 9.5%; }
+        .endeudamiento-table col.calif-col { width: 4.5%; }
+        .endeudamiento-table col.money-col { width: 8.8%; }
+        .endeudamiento-table col.pct-col { width: 7%; }
+        .endeudamiento-table td.cartera-cell,
+        .endeudamiento-table th.cartera-cell {
+            white-space: nowrap;
+            word-break: normal;
+            overflow-wrap: normal;
+            font-size: 6.3px;
+        }
+        .habit-table th,
+        .habit-table td {
+            font-size: 6.6px;
+            padding: 1.6px 2px;
+        }
+        .habit-table .state {
+            font-size: 6.1px;
+        }
+        .habit-table .behavior {
+            font-size: 5.8px;
+        }
+        .vectors-table {
+            table-layout: fixed;
+        }
+        .vectors-table th,
+        .vectors-table td {
+            font-size: 6px;
+            padding: 1.2px 1.4px;
+            word-break: normal;
+            overflow-wrap: normal;
             text-align: center;
             vertical-align: middle;
         }
-        .muted {
-            color: var(--muted);
+        .vectors-table .entity-head,
+        .vectors-table .entity-cell {
+            width: 19%;
+            white-space: nowrap;
         }
-        .small {
-            font-size: 10px;
+        .vectors-table .entity-cell {
+            text-align: left;
+            font-size: 5.9px;
+        }
+        .vectors-table .num-head,
+        .vectors-table .num-cell {
+            width: 8%;
+            white-space: nowrap;
+        }
+        .vectors-table .tipo-head,
+        .vectors-table .tipo-cell {
+            width: 5%;
+            white-space: nowrap;
+        }
+        .vectors-table .estado-head,
+        .vectors-table .estado-cell {
+            width: 7%;
+            white-space: nowrap;
+        }
+        .vectors-table .month-head,
+        .vectors-table .month-cell {
+            width: 2.55%;
+            font-size: 4.9px;
+            padding-left: 0.4px;
+            padding-right: 0.4px;
+            line-height: 1.05;
+            white-space: nowrap;
+        }
+        .vectors-table .month-head {
+            color: #163d63;
+            font-weight: 700;
+        }
+        .vectors-table .month-cell {
+            color: #1f2937;
             font-weight: 400;
         }
-        .grid-two {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
+        .cell-mini {
+            font-size: 6.0px;
+            white-space: nowrap;
+            word-break: normal;
+            overflow-wrap: normal;
         }
-        .badge {
-            background: var(--secondary);
-            color: #fff;
-            padding: 2px 6px;
-            font-size: 7.6px;
-            border-radius: 3px;
-            display: inline-block;
+        .cell-tiny {
+            font-size: 5.8px;
+        }
+        .sector-title {
+            background: #cbd9ea;
+            color: #143a5f;
+            font-weight: 700;
+            text-align: left;
+            font-size: 8.8px;
+        }
+        .vectors-total td { color: #163d63; font-weight: 700; }
+        .evo-tipo-cell {
+            vertical-align: middle !important;
+            text-align: center !important;
+            font-weight: 700;
+        }
+        .mini-note {
+            color: #6b7280;
+            font-size: 7.5px;
+            margin-top: 2px;
+        }
+        .note {
+            border: 1px solid #fed7aa;
+            background: #fff7ed;
+            color: #9a3412;
+            text-align: center;
+            padding: 6px;
+            margin-top: 10px;
+            font-size: 8px;
         }
         .footer {
-            margin-top: 24px;
-            font-size: 7.6px;
+            margin-top: 8px;
             color: var(--muted);
             text-align: center;
+            font-size: 7px;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="brand">
-            {% if logo_data_uri %}
-                <img src="{{ logo_data_uri }}" alt="Congente">
-            {% endif %}
+        <div>
+            {% if logo_data_uri %}<img src="{{ logo_data_uri }}" alt="Congente">{% endif %}
         </div>
         <div class="title">
             <h1>Historia de Crédito+</h1>
@@ -262,36 +251,82 @@
         </div>
     </div>
 
-    <div class="meta">
-        <div><strong>Fecha consulta:</strong> {{ meta.fechaConsultaFormatted }}</div>
-    </div>
+    <div class="meta"><strong>Fecha consulta:</strong> {{ meta.fechaConsultaFormatted }}</div>
 
     <div class="section">
-        <h2>Información básica [INFO]</h2>
+        <h2>Información Básica 📋</h2>
         <table>
             <tr>
-                <th>Nombre completo</th>
-                <td class="cell-center">{{ natural.nombreCompleto }}</td>
-                <th>Documento</th>
-                <td class="cell-center">{{ meta.tipoIdDigitado }} - {{ meta.identificacionDigitada }}</td>
+                <th>Tipo Documento</th>
+                <td>{{ legacy_info_basica.tipoDocumento }}</td>
+                <th>Número Documento</th>
+                <td>{{ legacy_info_basica.numeroDocumento }}</td>
+                <th>Estado Documento</th>
+                <td>{{ legacy_info_basica.estadoDocumento }}</td>
             </tr>
             <tr>
-                <th>Lugar expedición</th>
-                <td class="cell-center">{{ natural.ciudad }} ({{ natural.departamento }})</td>
-                <th>Fecha expedición</th>
-                <td class="cell-center">{{ natural.fechaExpedicion }}</td>
+                <th>Lugar Expedición</th>
+                <td>{{ legacy_info_basica.lugarExpedicion }}</td>
+                <th>Fecha Expedición</th>
+                <td>{{ legacy_info_basica.fechaExpedicion }}</td>
+                <th>Rango Edad</th>
+                <td>{{ legacy_info_basica.rangoEdad }}</td>
             </tr>
             <tr>
-                <th>Edad</th>
-                <td class="cell-center">{{ natural.edadMin }} - {{ natural.edadMax }}</td>
+                <th>Nombre</th>
+                <td colspan="3">{{ legacy_info_basica.nombre }}</td>
                 <th>Género</th>
-                <td class="cell-center">{{ natural.genero }}</td>
+                <td>{{ legacy_info_basica.genero }}</td>
+            </tr>
+            <tr>
+                <th>Tiene RUT</th>
+                <td>{{ legacy_info_basica.tieneRut }}</td>
+                <th>Actividad Económica</th>
+                <td>{{ legacy_info_basica.actividadEconomica }}</td>
+                <th>Empleador</th>
+                <td>{{ legacy_info_basica.empleador }}</td>
+            </tr>
+            <tr>
+                <th>Tipo de Contrato</th>
+                <td>{{ legacy_info_basica.tipoContrato }}</td>
+                <th>Fecha Contrato</th>
+                <td>{{ legacy_info_basica.fechaContrato }}</td>
+                <th>Operaciones Internacionales</th>
+                <td>{{ legacy_info_basica.operacionesInternacionales }}</td>
             </tr>
         </table>
+
+        {% if legacy_detalle_sociodemografico %}
+        <div class="subsection">Detalle Información Socio Demográfica</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Reportado por</th>
+                    <th>NIT reporta</th>
+                    <th>Fecha reporte</th>
+                    <th>Opera Int.</th>
+                    <th>Lugar expedición</th>
+                    <th>Fecha expedición</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in legacy_detalle_sociodemografico %}
+                <tr>
+                    <td class="left">{{ row.reportadoPor }}</td>
+                    <td>{{ row.nitReporta }}</td>
+                    <td>{{ row.fechaReporte }}</td>
+                    <td>{{ row.operaInternacionales }}</td>
+                    <td>{{ row.lugarExpedicion }}</td>
+                    <td>{{ row.fechaExpedicion }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
     </div>
 
     <div class="section">
-        <h2>Scores [SCORE]</h2>
+        <h2>Scores 📊</h2>
         <table>
             <thead>
                 <tr>
@@ -305,11 +340,11 @@
             <tbody>
                 {% for score in scores %}
                 <tr>
-                    <td class="cell-center">{{ score.tipo }}</td>
-                    <td class="cell-center">{{ score.puntaje }}</td>
-                    <td class="cell-center">{{ score.fecha }}</td>
-                    <td class="cell-center">{{ score.poblacion }}</td>
-                    <td class="cell-center">{{ score.razones }}</td>
+                    <td>{{ score.tipo }}</td>
+                    <td>{{ score.puntaje }}</td>
+                    <td>{{ score.fecha }}</td>
+                    <td>{{ score.poblacion }}</td>
+                    <td>{{ score.razones }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -317,7 +352,7 @@
     </div>
 
     <div class="section">
-        <h2>Resumen - Perfil general [RESUMEN]</h2>
+        <h2>Resumen - Perfil General 📝</h2>
         <table>
             <thead>
                 <tr>
@@ -333,13 +368,13 @@
             <tbody>
                 {% for row in perfil_general %}
                 <tr>
-                    <td class="cell-center">{{ row.label }}</td>
-                    <td class="cell-center">{{ row.sectorFinanciero }}</td>
-                    <td class="cell-center">{{ row.sectorCooperativo }}</td>
-                    <td class="cell-center">{{ row.sectorReal }}</td>
-                    <td class="cell-center">{{ row.sectorTelcos }}</td>
-                    <td class="cell-center">{{ row.totalComoPrincipal }}</td>
-                    <td class="cell-center">{{ row.totalComoCodeudorYOtros }}</td>
+                    <td>{{ row.label }}</td>
+                    <td>{{ row.sectorFinanciero }}</td>
+                    <td>{{ row.sectorCooperativo }}</td>
+                    <td>{{ row.sectorReal }}</td>
+                    <td>{{ row.sectorTelcos }}</td>
+                    <td>{{ row.totalComoPrincipal }}</td>
+                    <td>{{ row.totalComoCodeudorYOtros }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -347,11 +382,15 @@
     </div>
 
     <div class="section">
-        <h2>Saldos y moras (últimos meses) [SALDOS]</h2>
+        <h2>Saldos y Moras (últimos meses) 💰</h2>
         <table>
+            <colgroup>
+                <col style="width: 220px;">
+                {% for label in saldos_moras_matrix.dates %}<col>{% endfor %}
+            </colgroup>
             <thead>
                 <tr>
-                    <th>Saldos y Moras</th>
+                    <th class="nowrap-left">Saldos y Moras</th>
                     {% for label in saldos_moras_matrix.dates %}
                         <th>{{ label }}</th>
                     {% endfor %}
@@ -360,9 +399,9 @@
             <tbody>
                 {% for row in saldos_moras_matrix.rows %}
                 <tr>
-                    <th>{{ row.label }}</th>
+                    <td class="nowrap-left">{{ row.label }}</td>
                     {% for value in row.values %}
-                        <td class="cell-center">{{ value }}</td>
+                        <td>{{ value }}</td>
                     {% endfor %}
                 </tr>
                 {% endfor %}
@@ -371,130 +410,305 @@
     </div>
 
     <div class="section">
-        <h2>Endeudamiento actual [DEUDA]</h2>
-        <table>
+        <h2>Endeudamiento Actual 💳</h2>
+        <table class="endeudamiento-table">
+            <colgroup>
+                <col class="cartera-col">
+                <col class="calidad-col">
+                <col class="num-col">
+                <col class="estado-col">
+                <col class="calif-col">
+                <col class="money-col">
+                <col class="money-col">
+                <col class="money-col">
+                <col class="money-col">
+                <col class="pct-col">
+                <col class="pct-col">
+            </colgroup>
             <thead>
                 <tr>
-                    <th>Carteras</th>
+                    <th class="cartera-cell">Carteras</th>
                     <th>Calidad</th>
                     <th>Núm</th>
                     <th>Estado actual</th>
                     <th>Calif</th>
                     <th>Vlr o cupo inicial</th>
-                    <th class="col-saldo">Saldo actual</th>
+                    <th>Saldo actual</th>
                     <th>Saldo en mora</th>
                     <th>Valor cuota</th>
-                    <th>Total deuda</th>
+                    <th>% Part</th>
+                    <th>% Deuda</th>
                 </tr>
             </thead>
             <tbody>
                 {% for group in endeudamiento_grouped %}
-                <tr>
-                    <th colspan="10" class="section-row">Sector {{ group.sector }}</th>
-                </tr>
+                <tr><td colspan="11" class="sector-title">{{ group.sector }}</td></tr>
                     {% for row in group.rows %}
                     <tr>
-                        <td class="cell-center">{{ row.tipoCuentaLabel }}</td>
-                        <td class="cell-center">{{ row.tipoUsuario }}</td>
-                        <td class="cell-center">1</td>
-                        <td class="cell-center">{{ row.estadoActual }}</td>
-                        <td class="cell-center">{{ row.calificacion }}</td>
-                        <td class="cell-center">{{ row.valorInicial }}</td>
-                        <td class="cell-center">{{ row.saldoActual }}</td>
-                        <td class="cell-center">{{ row.saldoMora }}</td>
-                        <td class="cell-center">{{ row.cuotaMes }}</td>
-                        <td class="cell-center">{{ row.totalDeudaCarteras }}</td>
+                        <td class="cartera-cell">{{ row.tipoCuentaLabel }}</td>
+                        <td>{{ row.tipoUsuario }}</td>
+                        <td>1</td>
+                        <td>{{ row.estadoActual }}</td>
+                        <td>{{ row.calificacion }}</td>
+                        <td>{{ row.valorInicial }}</td>
+                        <td>{{ row.saldoActual }}</td>
+                        <td>{{ row.saldoMora }}</td>
+                        <td>{{ row.cuotaMes }}</td>
+                        <td>{{ row.pctPart }}</td>
+                        <td>{{ row.pctDeuda }}</td>
                     </tr>
                     {% endfor %}
-                    <tr>
-                        <th class="total-row">Total Sector {{ group.sector }}</th>
-                        <td class="cell-center"></td>
-                        <td class="cell-center"></td>
-                        <td class="cell-center"></td>
-                        <td class="cell-center"></td>
-                        <td class="cell-center">{{ group.totals.valorInicial }}</td>
-                        <td class="cell-center">{{ group.totals.saldoActual }}</td>
-                        <td class="cell-center">{{ group.totals.saldoMora }}</td>
-                        <td class="cell-center">{{ group.totals.cuotaMes }}</td>
-                        <td class="cell-center"></td>
-                    </tr>
+                <tr class="soft">
+                    <td class="left"><strong>Total Sector {{ group.sector }}</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><strong>{{ group.totals.valorInicial }}</strong></td>
+                    <td><strong>{{ group.totals.saldoActual }}</strong></td>
+                    <td><strong>{{ group.totals.saldoMora }}</strong></td>
+                    <td><strong>{{ group.totals.cuotaMes }}</strong></td>
+                    <td><strong>{{ group.totals.pctPart }}</strong></td>
+                    <td><strong>{{ group.totals.pctDeuda }}</strong></td>
+                </tr>
                 {% endfor %}
                 <tr>
-                    <th class="total-row">TOTAL</th>
-                    <td class="cell-center"></td>
-                    <td class="cell-center"></td>
-                    <td class="cell-center"></td>
-                    <td class="cell-center"></td>
-                    <td class="cell-center">{{ endeudamiento_totals.valorInicial }}</td>
-                    <td class="cell-center">{{ endeudamiento_totals.saldoActual }}</td>
-                    <td class="cell-center">{{ endeudamiento_totals.saldoMora }}</td>
-                    <td class="cell-center">{{ endeudamiento_totals.cuotaMes }}</td>
-                    <td class="cell-center"></td>
+                    <td class="left"><strong>TOTAL</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td><strong>{{ endeudamiento_totals.valorInicial }}</strong></td>
+                    <td><strong>{{ endeudamiento_totals.saldoActual }}</strong></td>
+                    <td><strong>{{ endeudamiento_totals.saldoMora }}</strong></td>
+                    <td><strong>{{ endeudamiento_totals.cuotaMes }}</strong></td>
+                    <td><strong>{{ endeudamiento_totals.pctPart }}</strong></td>
+                    <td><strong>{{ endeudamiento_totals.pctDeuda }}</strong></td>
                 </tr>
             </tbody>
         </table>
     </div>
 
-    {% if tendencia_matrix.dates %}
     <div class="section">
-        <h2>Tendencia de endeudamiento [TENDENCIA]</h2>
+        <h2>Hábito de Pago de Obligaciones Abiertas / Vigentes 💳</h2>
+        {% for group in legacy_habito_abiertas %}
         <table>
+            <tbody>
+                <tr><td colspan="12" class="sector-title">{{ group.sector }}</td></tr>
+            </tbody>
+        </table>
+        {% for row in group.rows %}
+        <table class="obligation-table habit-table obligation-top">
+            <colgroup>
+                <col style="width:17%">
+                <col style="width:6%">
+                <col style="width:7%">
+                <col style="width:4%">
+                <col style="width:10%">
+                <col style="width:7%">
+                <col style="width:7%">
+                <col style="width:7%">
+                <col style="width:7%">
+                <col style="width:6%">
+                <col style="width:22%">
+            </colgroup>
             <thead>
                 <tr>
-                    <th>Serie</th>
-                    {% for label in tendencia_matrix.dates %}
-                        <th>{{ label }}</th>
-                    {% endfor %}
+                    <th>Entidad Informante</th>
+                    <th>Tipo Cuenta</th>
+                    <th>Num Cta 9 dígitos</th>
+                    <th>Calf</th>
+                    <th>Estado de la Obligación</th>
+                    <th>Fecha Actualización</th>
+                    <th>Adjetivo-fecha</th>
+                    <th>Fecha Apertura</th>
+                    <th>Fecha Venc.</th>
+                    <th>Mora Máx.</th>
+                    <th>47 meses</th>
                 </tr>
             </thead>
             <tbody>
-                {% for serie in tendencia_matrix.series %}
                 <tr>
-                    <th>{{ serie.label }}</th>
-                    {% for value in serie.values %}
-                        <td class="cell-center">{{ value }}</td>
-                    {% endfor %}
+                    <td class="entity">{{ row.entidadInformante }}</td>
+                    <td>{{ row.tipoCuenta }}</td>
+                    <td>{{ row.numeroCuenta }}</td>
+                    <td>{{ row.calificacion }}</td>
+                    <td class="state">{{ row.estadoObligacion|safe }}</td>
+                    <td>{{ row.fechaActualizacion }}</td>
+                    <td>{{ row.adjetivoFecha }}</td>
+                    <td>{{ row.fechaApertura }}</td>
+                    <td>{{ row.fechaVencimiento }}</td>
+                    <td>{{ row.moraMaxima }}</td>
+                    <td class="behavior">{{ row.comportamiento|safe }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <table class="obligation-table habit-table obligation-bottom">
+            <colgroup>
+                <col style="width:7%">
+                <col style="width:6%">
+                <col style="width:6%">
+                <col style="width:6%">
+                <col style="width:6.5%">
+                <col style="width:6.5%">
+                <col style="width:6%">
+                <col style="width:6%">
+                <col style="width:6%">
+                <col style="width:6%">
+                <col style="width:3.5%">
+                <col style="width:5%">
+                <col style="width:7%">
+                <col style="width:3.5%">
+                <col style="width:19%">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Desacuerdo inform.</th>
+                    <th>Estado Titular</th>
+                    <th>Marca/Clase</th>
+                    <th>Tipo Garantía</th>
+                    <th>Vlr o cupo inicial</th>
+                    <th>Saldo Actual (Miles)</th>
+                    <th>Saldo Mora (Miles)</th>
+                    <th>Valor Cuota (Miles)</th>
+                    <th>Fecha Límite Pago</th>
+                    <th>Fecha del Pago</th>
+                    <th>Perm.</th>
+                    <th>No.Cheq Devueltos</th>
+                    <th>Cuotas/M/Vigencia</th>
+                    <th>% deuda</th>
+                    <th>Oficina/Deudor</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="soft">
+                    <td class="cell-mini">{{ row.desacuerdoInformacion }}</td>
+                    <td>{{ row.estadoTitular }}</td>
+                    <td>{{ row.marcaClase }}</td>
+                    <td>{{ row.tipoGarantia }}</td>
+                    <td>{{ row.valorCupoInicial }}</td>
+                    <td>{{ row.saldoActual }}</td>
+                    <td>{{ row.saldoMora }}</td>
+                    <td>{{ row.valorCuota }}</td>
+                    <td>{{ row.fechaLimitePago }}</td>
+                    <td>{{ row.fechaPago }}</td>
+                    <td>{{ row.permanencia }}</td>
+                    <td>{{ row.chequesDevueltos }}</td>
+                    <td>{{ row.cuotasMVigencia }}</td>
+                    <td>{{ row.porcentajeDeuda }}</td>
+                    <td class="left cell-tiny">{{ row.oficinaDeudor }}</td>
+                </tr>
+            </tbody>
+        </table>
+        {% endfor %}
+        {% empty %}
+        <table><tbody><tr><td>Sin obligaciones vigentes</td></tr></tbody></table>
+        {% endfor %}
+    </div>
+
+    <div class="section">
+        <h2>Hábito de Pago de Obligaciones Cerradas / Inactivas 🧾</h2>
+        {% for group in legacy_habito_cerradas %}
+        <table class="obligation-table habit-table">
+            <colgroup>
+                <col style="width:13%">
+                <col style="width:4%">
+                <col style="width:8%">
+                <col style="width:3.5%">
+                <col style="width:4.5%">
+                <col style="width:7%">
+                <col style="width:5.5%">
+                <col style="width:5.5%">
+                <col style="width:6%">
+                <col style="width:5%">
+                <col style="width:12.5%">
+                <col style="width:6.5%">
+                <col style="width:19%">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th colspan="13" class="sector-title">{{ group.sector }}</th>
+                </tr>
+                <tr>
+                    <th>Entidad Informante</th>
+                    <th>Tipo Cuenta</th>
+                    <th>Estado de la Obligación</th>
+                    <th>Calf</th>
+                    <th>Adjetivo-fecha</th>
+                    <th>Num Cta 9 dígitos</th>
+                    <th>Fecha Apertura</th>
+                    <th>Fecha Cierre</th>
+                    <th>Vlr o cupo inicial</th>
+                    <th>Ciudad/Fecha</th>
+                    <th>Oficina/Deudor</th>
+                    <th>Desacuerdo info.</th>
+                    <th>47 meses</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in group.rows %}
+                <tr>
+                    <td class="entity">{{ row.entidadInformante }}</td>
+                    <td>{{ row.tipoCuenta }}</td>
+                    <td class="state">{{ row.estadoObligacion|safe }}</td>
+                    <td>{{ row.calificacion }}</td>
+                    <td>{{ row.adjetivoFecha }}</td>
+                    <td class="cell-mini">{{ row.numeroCuenta }}</td>
+                    <td class="cell-mini">{{ row.fechaApertura }}</td>
+                    <td class="cell-mini">{{ row.fechaCierre }}</td>
+                    <td>{{ row.valorCupoInicial }}</td>
+                    <td class="cell-mini">{{ row.fechaActualizacion }}</td>
+                    <td class="left cell-tiny">{{ row.oficinaDeudor }}</td>
+                    <td class="cell-mini">{{ row.desacuerdoInformacion }}</td>
+                    <td class="behavior">{{ row.comportamiento|safe }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+        {% empty %}
+        <table><tbody><tr><td>Sin obligaciones cerradas/inactivas</td></tr></tbody></table>
+        {% endfor %}
     </div>
-    {% endif %}
 
     {% if analisis_vectores.sectors %}
     <div class="section">
-        <h2>Análisis de vectores [VECTORES]</h2>
+        <h2>Análisis de Vectores 🔍</h2>
         {% for sector in analisis_vectores.sectors %}
-            <table>
+            <table class="vectors-table">
+                <colgroup>
+                    <col class="entity-head">
+                    <col class="num-head">
+                    <col class="tipo-head">
+                    <col class="estado-head">
+                    {% for label in sector.dates %}
+                    <col class="month-head">
+                    {% endfor %}
+                </colgroup>
                 <thead>
+                    <tr><th colspan="{{ sector.dates|length|add:'4' }}" class="sector-title">{{ sector.sector }}</th></tr>
                     <tr>
-                        <th colspan="{{ sector.dates|length|add:'4' }}" class="section-row">
-                            {{ sector.sector }}
-                        </th>
-                    </tr>
-                    <tr>
-                        <th class="entity-col">Entidad</th>
-                        <th>Num Cta</th>
-                        <th>Tipo</th>
-                        <th>Estado</th>
+                        <th class="entity-head">Entidad</th>
+                        <th class="num-head">Num Cta 9 dígitos</th>
+                        <th class="tipo-head">Tipo Cuenta</th>
+                        <th class="estado-head">Estado</th>
                         {% for label in sector.dates %}
-                            <th>{{ label }}</th>
+                            <th class="month-head">{{ label|cut:" " }}</th>
                         {% endfor %}
                     </tr>
                 </thead>
                 <tbody>
                     {% for row in sector.rows %}
-                    <tr>
-                        <td {% if row.is_total %}colspan="4" class="total-row" style="text-align:left;background:#f3f6fb;"{% endif %}>
-                            {{ row.entidad }}
-                        </td>
+                    <tr{% if row.is_total %} class="vectors-total"{% endif %}>
                         {% if not row.is_total %}
-                            <td class="cell-center">{{ row.numeroCuenta }}</td>
-                            <td class="cell-center">{{ row.tipoCuenta }}</td>
-                            <td class="cell-center">{{ row.estado }}</td>
+                            <td class="entity-cell">{{ row.entidad }}</td>
+                            <td class="num-cell">{{ row.numeroCuenta }}</td>
+                            <td class="tipo-cell">{{ row.tipoCuenta }}</td>
+                            <td class="estado-cell">{{ row.estado }}</td>
+                        {% else %}
+                            <td class="entity-cell" colspan="4"><strong>{{ row.entidad }}</strong></td>
                         {% endif %}
                         {% for value in row.values %}
-                            <td class="cell-center">{{ value }}</td>
+                            <td class="month-cell">{{ value }}</td>
                         {% endfor %}
                     </tr>
                     {% endfor %}
@@ -504,162 +718,57 @@
     </div>
     {% endif %}
 
+    {% if evolucion_deuda_sector.sectors %}
     <div class="section">
-        <h2>Cuentas de ahorro [AHORRO]</h2>
-        <table class="table-fixed">
+        <h2>Evolución de la Deuda 💳</h2>
+        {% for sec in evolucion_deuda_sector.sectors %}
+        <table class="obligation-table habit-table">
             <thead>
+                <tr><th colspan="{{ sec.trimestres|length|add:'2' }}" class="sector-title">{{ sec.sector }}</th></tr>
                 <tr>
-                    <th class="entity-col">Entidad</th>
-                    <th class="col-number">Numero</th>
-                    <th class="col-date">F. Apertura</th>
-                    <th>Ciudad</th>
-                    <th class="col-mini">Calif.</th>
-                      <th class="col-narrow">Titular</th>
-                      <th class="col-saldo">Saldo actual</th>
-                    <th class="col-saldo">Saldo mora</th>
+                    <th style="width:20%;">Tipo Cuenta</th>
+                    <th style="width:12%;">Valores</th>
+                    {% for t in sec.trimestres %}
+                    <th>Trimestre {{ t }}</th>
+                    {% endfor %}
                 </tr>
             </thead>
             <tbody>
-                {% for row in cuentas_ahorro %}
-                <tr>
-                    <td class="entity-cell">{{ row.entidad }}</td>
-                    <td class="cell-center">{{ row.numero }}</td>
-                    <td class="cell-center">{{ row.fechaApertura }}</td>
-                    <td class="cell-center">{{ row.ciudad }}</td>
-                    <td class="cell-center">{{ row.calificacion }}</td>
-                    <td class="cell-center">{{ row.situacionTitular|default:"-" }}</td>
-                    <td class="cell-center">{{ row.saldoActual }}</td>
-                    <td class="cell-center">{{ row.saldoMora }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="section">
-        <h2>Tarjetas de crédito [TDC]</h2>
-        <table class="table-fixed">
-            <thead>
-                <tr>
-                    <th class="entity-col">Entidad</th>
-                    <th class="col-number">Numero</th>
-                    <th class="col-date">F. Apertura</th>
-                    <th class="col-date">F. Venc</th>
-                    <th class="col-mini">Calif.</th>
-                    <th class="col-state">Estado</th>
-                    <th class="col-narrow">Titular</th>
-                    <th class="col-narrow">Garante</th>
-                    <th class="behavior-col">Comportamiento</th>
-                    <th class="col-saldo">Saldo actual</th>
-                    <th class="col-saldo">Saldo mora</th>
-                    <th class="col-saldo">Cuota</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in tarjetas %}
-                <tr class="{% if row.condicion == 'Cerrada' %}row-closed{% endif %}{% if row.esNegativo %} row-negative{% endif %}">
-                    <td class="entity-cell">{{ row.entidad }}</td>
-                    <td class="num-cell">{{ row.numero }}</td>
-                    <td class="date-cell">{{ row.fechaApertura }}</td>
-                    <td class="date-cell">{{ row.fechaVencimiento }}</td>
-                    <td class="cell-center">{{ row.calificacion }}</td>
-                    <td class="cell-center">
-                        <span class="state-main">{{ row.estadoObligacion|default:"-" }}</span>
-                        {% if row.condicion != "-" or row.esNegativo or row.formaPago != "-" %}
-                        <span class="state-meta">
-                            {% if row.condicion != "-" %}{{ row.condicion }}{% endif %}
-                            {% if row.esNegativo %}
-                                {% if row.condicion != "-" %} | {% endif %}
-                                <span class="risk-negative">NEGATIVO</span>
-                            {% endif %}
-                            {% if row.formaPago != "-" and row.formaPago != "Vigente" %}
-                                {% if row.condicion != "-" or row.esNegativo %} | {% endif %}
-                                FP: {{ row.formaPago }}
-                            {% endif %}
-                        </span>
+                {% for tipo in sec.tipos %}
+                    {% for metric in tipo.metricRows %}
+                    <tr>
+                        {% if forloop.first %}
+                        <td class="evo-tipo-cell" rowspan="{{ tipo.metricRows|length }}">{{ tipo.tipoCuenta }}</td>
                         {% endif %}
-                    </td>
-                    <td class="cell-center">{{ row.situacionTitular|default:"-" }}</td>
-                    <td class="cell-center">{{ row.garante|default:"-" }}</td>
-                    <td class="behavior-cell">
-                        <span class="behavior-text">{{ row.comportamiento|safe }}</span>
-                    </td>
-                    <td class="cell-center">{{ row.saldoActual }}</td>
-                    <td class="cell-center">{{ row.saldoMora }}</td>
-                    <td class="cell-center">{{ row.cuota }}</td>
-                </tr>
+                        <td class="left">{{ metric.label }}</td>
+                        {% for v in metric.values %}
+                        <td>{{ v }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
                 {% endfor %}
+                {% if sec.totalSaldoValues %}
+                <tr class="soft">
+                    <td class="left" colspan="2"><strong>Total Saldo {{ sec.sector }}</strong></td>
+                    {% for v in sec.totalSaldoValues %}
+                    <td><strong>{{ v }}</strong></td>
+                    {% endfor %}
+                </tr>
+                {% endif %}
             </tbody>
         </table>
+        {% endfor %}
     </div>
+    {% endif %}
 
     <div class="section">
-        <h2>Cuentas cartera [CARTERA]</h2>
-        <table class="table-fixed">
-            <thead>
-                <tr>
-                    <th class="entity-col">Entidad</th>
-                    <th class="col-number">Numero</th>
-                    <th class="col-narrow">Tipo cuenta</th>
-                    <th class="col-date">F. Apertura</th>
-                    <th class="col-date">F. Venc</th>
-                    <th class="col-mini">Calif.</th>
-                    <th class="col-state">Estado</th>
-                    <th class="col-narrow">Titular</th>
-                    <th class="col-narrow">Garante</th>
-                    <th class="behavior-col">Comportamiento</th>
-                    <th class="col-saldo">Saldo actual</th>
-                    <th class="col-saldo">Saldo mora</th>
-                    <th class="col-saldo">Cuota</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in carteras %}
-                <tr class="{% if row.condicion == 'Cerrada' %}row-closed{% endif %}{% if row.esNegativo %} row-negative{% endif %}">
-                    <td class="entity-cell">{{ row.entidad }}</td>
-                    <td class="num-cell">{{ row.numero }}</td>
-                    <td class="cell-center">{{ row.tipoCuenta }}</td>
-                    <td class="date-cell">{{ row.fechaApertura }}</td>
-                    <td class="date-cell">{{ row.fechaVencimiento }}</td>
-                    <td class="cell-center">{{ row.calificacion }}</td>
-                    <td class="cell-center">
-                        <span class="state-main">{{ row.estadoObligacion|default:"-" }}</span>
-                        {% if row.condicion != "-" or row.esNegativo or row.formaPago != "-" %}
-                        <span class="state-meta">
-                            {% if row.condicion != "-" %}{{ row.condicion }}{% endif %}
-                            {% if row.esNegativo %}
-                                {% if row.condicion != "-" %} | {% endif %}
-                                <span class="risk-negative">NEGATIVO</span>
-                            {% endif %}
-                            {% if row.formaPago != "-" and row.formaPago != "Vigente" %}
-                                {% if row.condicion != "-" or row.esNegativo %} | {% endif %}
-                                FP: {{ row.formaPago }}
-                            {% endif %}
-                        </span>
-                        {% endif %}
-                    </td>
-                    <td class="cell-center">{{ row.situacionTitular|default:"-" }}</td>
-                    <td class="cell-center">{{ row.garante|default:"-" }}</td>
-                    <td class="behavior-cell">
-                        <span class="behavior-text">{{ row.comportamiento|safe }}</span>
-                    </td>
-                    <td class="cell-center">{{ row.saldoActual }}</td>
-                    <td class="cell-center">{{ row.saldoMora }}</td>
-                    <td class="cell-center">{{ row.cuota }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <div class="section">
-        <h2>Histórico de consultas [CONSULTAS]</h2>
+        <h2>Histórico de Consultas 🔎</h2>
         <table>
             <thead>
                 <tr>
                     <th>Fecha</th>
                     <th>Entidad</th>
-                    <th class="col-narrow">Tipo cuenta</th>
+                    <th>Tipo cuenta</th>
                     <th>Razón</th>
                     <th>Cantidad</th>
                     <th>NIT suscriptor</th>
@@ -668,244 +777,20 @@
             <tbody>
                 {% for row in consultas %}
                 <tr>
-                    <td class="cell-center">{{ row.fecha }}</td>
-                    <td class="entity-cell">{{ row.entidad }}</td>
-                    <td class="cell-center">{{ row.tipoCuenta }}</td>
-                    <td class="cell-center">{{ row.razon }}</td>
-                    <td class="cell-center">{{ row.cantidad }}</td>
-                    <td class="cell-center">{{ row.nitSuscriptor }}</td>
+                    <td>{{ row.fecha }}</td>
+                    <td class="left">{{ row.entidad }}</td>
+                    <td>{{ row.tipoCuenta }}</td>
+                    <td>{{ row.razon }}</td>
+                    <td>{{ row.cantidad }}</td>
+                    <td>{{ row.nitSuscriptor }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
-    
-      {% if cheques %}
-      <div class="section">
-          <h2>Cheques [CHEQUES]</h2>
-          <table class="table-fixed">
-              <thead>
-                  <tr>
-                      <th class="col-date">Trimestre</th>
-                      <th>Devueltos (Cant.)</th>
-                      <th>Devueltos (Valor)</th>
-                      <th>Pagados (Cant.)</th>
-                      <th>Pagados (Valor)</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {% for row in cheques %}
-                  <tr>
-                      <td class="date-cell">{{ row.fecha }}</td>
-                      <td class="cell-center">{{ row.cantidadDevueltos }}</td>
-                      <td class="cell-center">{{ row.valorDevueltos }}</td>
-                      <td class="cell-center">{{ row.cantidadPagados }}</td>
-                      <td class="cell-center">{{ row.valorPagados }}</td>
-                  </tr>
-                  {% endfor %}
-              </tbody>
-          </table>
-      </div>
-      {% endif %}
-
-      {% if composicion_portafolio %}
-      <div class="section">
-          <h2>Composición Portafolio [PORTAFOLIO]</h2>
-          <table class="table-fixed">
-              <thead>
-                  <tr>
-                      <th>Tipo cuenta</th>
-                      <th>Calidad deudor</th>
-                      <th>Porcentaje</th>
-                      <th>Cantidad</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {% for row in composicion_portafolio %}
-                  <tr>
-                      <td class="cell-center">{{ row.tipoCuenta }}</td>
-                      <td class="cell-center">{{ row.calidadDeudor }}</td>
-                      <td class="cell-center">{{ row.porcentaje }}</td>
-                      <td class="cell-center">{{ row.cantidad }}</td>
-                  </tr>
-                  {% endfor %}
-              </tbody>
-          </table>
-      </div>
-      {% endif %}
-
-      {% if resumen_endeudamiento %}
-      <div class="section">
-          <h2>Resumen Endeudamiento [RESUMEN]</h2>
-          {% for tri in resumen_endeudamiento %}
-          <div class="small muted" style="margin:6px 0 4px;">Trimestre {{ tri.fecha }}</div>
-          <table class="table-fixed">
-              <thead>
-                  <tr>
-                      <th>Sector</th>
-                      <th>Tipo cartera</th>
-                      <th>No. cuentas</th>
-                      <th>Valor</th>
-                      <th>Garantia admisible</th>
-                      <th>Garantia otro</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {% for sec in tri.sectors %}
-                      {% for cart in sec.carteras %}
-                      <tr>
-                          <td class="cell-center">{{ sec.sector }}</td>
-                          <td class="cell-center">{{ cart.tipo }}</td>
-                          <td class="cell-center">{{ cart.numeroCuentas }}</td>
-                          <td class="cell-center">{{ cart.valor }}</td>
-                          <td class="cell-center">{{ sec.garantiaAdmisible }}</td>
-                          <td class="cell-center">{{ sec.garantiaOtro }}</td>
-                      </tr>
-                      {% endfor %}
-                  {% endfor %}
-              </tbody>
-          </table>
-          {% endfor %}
-      </div>
-      {% endif %}
-
-      {% if historico_saldos.dates %}
-      <div class="section">
-          <h2>Histórico de Saldos [HISTÓRICO]</h2>
-          <table class="table-fixed">
-              <thead>
-                  <tr>
-                      <th>Tipo cuenta</th>
-                      {% for d in historico_saldos.dates %}
-                      <th>{{ d }}</th>
-                      {% endfor %}
-                  </tr>
-              </thead>
-              <tbody>
-                  {% for row in historico_saldos.rows %}
-                  <tr>
-                      <th>{{ row.label }}</th>
-                      {% for v in row.values %}
-                      <td class="cell-center">{{ v }}</td>
-                      {% endfor %}
-                  </tr>
-                  {% endfor %}
-              </tbody>
-          </table>
-
-          {% if historico_saldos.totals %}
-          <table class="table-fixed" style="margin-top:6px;">
-              <thead>
-                  <tr>
-                      <th class="col-date">Fecha</th>
-                      <th>Total cuentas</th>
-                      <th>Cuentas consideradas</th>
-                      <th>Saldo total</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {% for row in historico_saldos.totals %}
-                  <tr>
-                      <td class="date-cell">{{ row.fecha }}</td>
-                      <td class="cell-center">{{ row.totalCuentas }}</td>
-                      <td class="cell-center">{{ row.cuentasConsideradas }}</td>
-                      <td class="cell-center">{{ row.saldo }}</td>
-                  </tr>
-                  {% endfor %}
-              </tbody>
-          </table>
-          {% endif %}
-      </div>
-      {% endif %}
-
-      {% if evolucion_deuda_agregada.rows %}
-      <div class="section">
-          <h2>Evolución de la Deuda (Agregada) [EVOLUCIÓN]</h2>
-          <table class="table-fixed">
-              <thead>
-                  <tr>
-                      <th class="col-date">Trimestre</th>
-                      <th>Cupo total</th>
-                      <th>Saldo</th>
-                      <th class="col-saldo">Cuota</th>
-                      <th>% Uso</th>
-                      <th>Calif.</th>
-                      <th>Mora maxima</th>
-                      <th>Meses mora</th>
-                      <th>Abiertas</th>
-                      <th>Cerradas</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  {% for row in evolucion_deuda_agregada.rows %}
-                  <tr>
-                      <td class="date-cell">{{ row.fecha }}</td>
-                      <td class="cell-center">{{ row.cupoTotal }}</td>
-                      <td class="cell-center">{{ row.saldo }}</td>
-                      <td class="cell-center">{{ row.cuota }}</td>
-                      <td class="cell-center">{{ row.porcentajeUso }}</td>
-                      <td class="cell-center">{{ row.calificacion }}</td>
-                      <td class="cell-center">{{ row.moraMaxima }}</td>
-                      <td class="cell-center">{{ row.mesesMoraMaxima }}</td>
-                      <td class="cell-center">{{ row.totalAbiertas }}</td>
-                      <td class="cell-center">{{ row.totalCerradas }}</td>
-                  </tr>
-                  {% endfor %}
-                  {% if evolucion_deuda_agregada.promedio.cupoTotal %}
-                  <tr>
-                      <th class="total-row">Promedio</th>
-                      <td class="cell-center">{{ evolucion_deuda_agregada.promedio.cupoTotal }}</td>
-                      <td class="cell-center">{{ evolucion_deuda_agregada.promedio.saldo }}</td>
-                      <td class="cell-center">{{ evolucion_deuda_agregada.promedio.cuota }}</td>
-                      <td class="cell-center">{{ evolucion_deuda_agregada.promedio.porcentajeUso }}</td>
-                      <td class="cell-center">{{ evolucion_deuda_agregada.promedio.calificacion }}</td>
-                      <td class="cell-center">{{ evolucion_deuda_agregada.promedio.moraMaxima }}</td>
-                      <td class="cell-center">-</td>
-                      <td class="cell-center">-</td>
-                      <td class="cell-center">-</td>
-                  </tr>
-                  {% endif %}
-              </tbody>
-          </table>
-      </div>
-      {% endif %}
-
-      {% if evolucion_deuda_micro.sectors %}
-      <div class="section">
-          <h2>Evolución de la Deuda (Microcrédito) [MICROCRÉDITO]</h2>
-          {% for sec in evolucion_deuda_micro.sectors %}
-          <div class="small muted" style="margin:6px 0 4px;">Sector {{ sec.sector }}</div>
-          <table class="table-fixed">
-              <thead>
-                  <tr>
-                      <th>Tipo cuenta</th>
-                      {% for d in sec.dates %}
-                      <th>{{ d }}</th>
-                      {% endfor %}
-                  </tr>
-              </thead>
-              <tbody>
-                  {% for row in sec.rows %}
-                  <tr>
-                      <th>{{ row.tipoCuenta }}</th>
-                      {% for v in row.values %}
-                      <td class="cell-center">{{ v }}</td>
-                      {% endfor %}
-                  </tr>
-                  {% endfor %}
-              </tbody>
-          </table>
-          {% endfor %}
-      </div>
-      {% endif %}
-
-      <div class="note" style="text-align:center;">
-        Respuesta entregada por el proveedor. Documento desarrollado por Gerencia TI.
-    </div>
-
-    <div class="footer">
-        Congente · Experian - Historia de Crédito+
-    </div>
+    <div class="note">Respuesta entregada por el proveedor. Documento desarrollado por Gerencia TI.</div>
+    <div class="footer">Congente · Experian - Historia de Crédito+</div>
 </body>
 </html>
+
