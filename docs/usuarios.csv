@@ -1,0 +1,49 @@
+username,password,first_name,last_name,email,area,agency,can_view_rejected_history,is_active,must_change_password
+1121930576,Temporal2026*,ERIKA,MARULANDA,anaanalista.talento.humano@congente.coop,TALENTO_HUMANO,ADMINISTRATIVA,true,true,true
+1090515215,Temporal2026*,KARLA,CAICEDO,analista.cartera@congente.coop,CARTERA,ADMINISTRATIVA,true,true,true
+40411313,Temporal2026*,NANCY,ROMERO,director.credito-cartera@congente.coop,ADMIN_AUDITORIA,ADMINISTRATIVA,true,true,true
+1014180757,Temporal2026*,DIANA,CAÑON,coordinador.credito@congente.coop,ADMIN_AUDITORIA,ADMINISTRATIVA,true,true,true
+30518145,Temporal2026*,ALBA,SANTOFIMIO,director.barranca@congente.coop,AGENCIA,BARRANCA,false,true,true
+1123430700,Temporal2026*,ANGIE,ESPINOSA,ase.comercial-01.puertolleras@congente.coop,AGENCIA,PUERTO LLERAS,false,true,true
+1121877546,Temporal2026*,AYDEE,RUIZ,director.cabuyaro@congente.coop,AGENCIA,CABUYARO,false,true,true
+40449584,Temporal2026*,BLANCA,HENAO,ase.externo-01.granada@congente.coop,AGENCIA,GRANADA,false,true,true
+1084330189,Temporal2026*,BRAYAN,VALENCIA,subdirector.acacias@congente.coop,AGENCIA,ACACIAS,false,true,true
+1121911450,Temporal2026*,BRENDA,GORDILLO,subdirector.catama@congente.coop,AGENCIA,CATAMA,false,true,true
+17344545,Temporal2026*,CARLOS,MOLINA,director.popular@congente.coop,AGENCIA,POPULAR,false,true,true
+52330215,Temporal2026*,CLAUDIA,VELANDIA,subdirector.vistahermosa@congente.coop,AGENCIA,VISTA HERMOSA,false,true,true
+40391191,Temporal2026*,CONSUELO,PRIETO,aprendiz.comercial@congente.coop,AGENCIA,ADMINISTRATIVA,false,true,true
+1121871964,Temporal2026*,CRISTHIAN,RODRIGUEZ,director.porfia@congente.coop,AGENCIA,PORFIA,false,true,true
+1105685368,Temporal2026*,DIANA,CARTAGENA,ase.comercial-01.lejanias@congente.coop,AGENCIA,LEJANIAS,false,true,true
+1127391057,Temporal2026*,DIANA,ARAUJO,subdirector.barranca@congente.coop,AGENCIA,BARRANCA,false,true,true
+40362555,Temporal2026*,DIESMY,CORREA,director.granada@congente.coop,AGENCIA,GRANADA,false,true,true
+20855749,Temporal2026*,ELSA,MARTINEZ,subdirector.guayabetal@congente.coop,AGENCIA,GUAYABETAL,false,true,true
+35260566,Temporal2026*,ESMERALDA,OLMOS,subdirector.popular@congente.coop,AGENCIA,POPULAR,false,true,true
+40341131,Temporal2026*,GINA,CALDERON,ase.comercial-01.principal@congente.coop,AGENCIA,PRINCIPAL,false,true,true
+1006658341,Temporal2026*,GIOVANNI,CASAS,ase.externo-01.mesetas@congente.coop,AGENCIA,MESETAS,false,true,true
+1121877385,Temporal2026*,INDIRA,MORALES,ase.externo-01.castillo@congente.coop,AGENCIA,EL CASTILLO,false,true,true
+20855586,Temporal2026*,INELDA,VELASQUEZ,director.guayabetal@congente.coop,AGENCIA,GUAYABETAL,false,true,true
+1124192051,Temporal2026*,LOAIZA,JERSON,ase.externo-01.barranca@congente.coop,AGENCIA,BARRANCA,false,true,true
+1123560666,Temporal2026*,JHOJAN,VANEGAS,ase.externo-01.vistahermosa@congente.coop,AGENCIA,VISTA HERMOSA,false,true,true
+1122129294,Temporal2026*,JULIAN,GUTIERREZ,director.montecarlo@congente.coop,AGENCIA,MONTECARLO,false,true,true
+1004246876,Temporal2026*,KARLA,CASTRO,ase.externo-02.acacias@congente.coop,AGENCIA,ACACIAS,false,true,true
+1122512148,Temporal2026*,LAURA,IBARRA,ase.externo-01.uribe@congente.coop,AGENCIA,LA URIBE,false,true,true
+1002741258,Temporal2026*,LAURA,NIÑO,ase.comercial-01.yopal@congente.coop,AGENCIA,YOPAL,false,true,true
+1123059440,Temporal2026*,LAURA,SORZA,ase.comercial-01.elcastillo@congente.coop,AGENCIA,EL CASTILLO,false,true,true
+1124830343,Temporal2026*,LEIDY,RICAURTE,ase.externo-01.gaitan@congente.coop,AGENCIA,PUERTO GAITAN,false,true,true
+1118200342,Temporal2026*,LENDY,PATIÑO,ase.externo-01.villanueva@congente.coop,AGENCIA,VILLANUEVA,false,true,true
+1121840544,Temporal2026*,LEYDI,RIVEROS,subdirector.principal@congente.coop,AGENCIA,PRINCIPAL,false,true,true
+1006093280,Temporal2026*,LINDA,RODRIGUEZ,ase.externo-01.puertolleras@congente.coop,AGENCIA,PUERTO LLERAS,false,true,true
+40432359,Temporal2026*,LUCY,LADINO,ase.comercial-01.popular@congente.coop,AGENCIA,POPULAR,false,true,true
+40266402,Temporal2026*,LUZ,MENDOZA,ase.externo-01.puertorico@congente.coop,AGENCIA,PUERTO RICO,false,true,true
+40188354,Temporal2026*,LUZ,PULIDO,subdirector.porfia@congente.coop,AGENCIA,PORFIA,false,true,true
+39951195,Temporal2026*,MARIA,AMADOR,ase.comercial-01.villanueva@congente.coop,AGENCIA,VILLANUEVA,false,true,true
+1006455982,Temporal2026*,MARIA,RAQUEJO,ase.comercial-03.principal@congente.coop,AGENCIA,PRINCIPAL,false,true,true
+53159518,Temporal2026*,MONICA,GALLO,director.principal@congente.coop,AGENCIA,PRINCIPAL,false,true,true
+40400819,Temporal2026*,PATRICIA,GOMEZ,ase.comercial-01.puertorico@congente.coop,AGENCIA,PUERTO RICO,false,true,true
+1120505821,Temporal2026*,SILVIA,SANTAMARIA,subdirector.gaitan@congente.coop,AGENCIA,PUERTO GAITAN,false,true,true
+1121905644,Temporal2026*,VIVI,MANRIQUE,ase.comercial-01.uribe@congente.coop,AGENCIA,LA URIBE,false,true,true
+1113038249,Temporal2026*,YESENIA,ZAMORA,director.catama@congente.coop,AGENCIA,CATAMA,false,true,true
+1121923917,Temporal2026*,YESID,MARTINEZ,ase.externo-01.catama@congente.coop,AGENCIA,CATAMA,false,true,true
+1119888807,Temporal2026*,YINA,ARIZA,ase.comercial-01.cumaral@congente.coop,AGENCIA,CUMARAL,false,true,true
+1080180628,Temporal2026*,YINA,GUALTERO,ase.externo-01.porfia@congente.coop,AGENCIA,PORFIA,false,true,true
+40306372,Temporal2026*,YINSSY,GODOY,subdirector.granada@congente.coop,AGENCIA,GRANADA,false,true,true
