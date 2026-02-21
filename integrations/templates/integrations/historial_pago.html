@@ -29,10 +29,6 @@
             height: 65px;
             width: auto;
         }
-        .experian-logo {
-            height: 65px;
-            width: auto;
-        }
         .main-container {
             max-width: 980px;
             margin: 0 auto 2rem;
@@ -92,6 +88,42 @@
         .hidden {
             display: none;
         }
+        .user-session-chip {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.1rem;
+            background: #ffffff;
+            border: 1px solid #d4dbe4;
+            border-radius: 10px;
+            padding: 0.4rem 0.7rem;
+            line-height: 1.1;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        }
+        .user-session-chip .session-user {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #d05e1d;
+        }
+        .user-session-chip .session-meta {
+            font-size: 0.74rem;
+            color: #005695;
+            font-weight: 600;
+        }
+        .btn-logout-soft {
+            border: 1px solid #f4a8a8;
+            background: #fff3f3;
+            color: #a33636;
+            border-radius: 9px;
+            padding: 0.35rem 0.75rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+        .btn-logout-soft:hover {
+            background: #fee2e2;
+            border-color: #ef9a9a;
+            color: #8d2626;
+        }
     </style>
 </head>
 <body>
@@ -104,7 +136,20 @@
                     </a>
                 </div>
                 <div class="col-md-4 text-end">
-                    <img src="{% static 'img/Experian.png' %}" alt="Experian Logo" class="experian-logo">
+                    <div class="d-flex justify-content-end align-items-center gap-2 flex-wrap">
+                        <span class="user-session-chip">
+                            <span class="session-user">{{ request.user.get_full_name|default:request.user.username }}</span>
+                            <span class="session-meta">
+                                {{ request.user.access_profile.get_area_display }}: {{ request.user.access_profile.agency|default:"Sin agencia" }}
+                            </span>
+                        </span>
+                        <form method="post" action="{% url 'integrations:logout' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-logout-soft btn-sm">
+                                <i class="bi bi-box-arrow-right"></i> Salir
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -121,6 +166,11 @@
                 {% endfor %}
             </div>
         {% endif %}
+        <div class="alert alert-secondary py-2">
+            Intentos de historial este mes para esta persona:
+            <strong>{{ historial_attempts_used|default:0 }}/{{ historial_attempts_max|default:2 }}</strong>.
+            Limite maximo: 2.
+        </div>
         <div class="title-section">
             <div class="icon-circle"><i class="bi bi-search"></i></div>
             <div>

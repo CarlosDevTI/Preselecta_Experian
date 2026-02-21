@@ -234,7 +234,7 @@
             <a href="{% url 'integrations:admin_auditoria_list' %}">
                 <img src="{% static 'img/LogoHD.png' %}" alt="Congente" class="logo-image">
             </a>
-            <form method="post" action="{% url 'admin:logout' %}" class="d-inline">
+            <form method="post" action="{% url 'integrations:logout' %}" class="d-inline">
                 {% csrf_token %}
                 <input type="hidden" name="next" value="{% url 'integrations:admin_auditoria_list' %}">
                 <button type="submit" class="btn btn-logout btn-sm">
@@ -279,8 +279,17 @@
                 </div>
 
                 <div class="info-item">
-                    <div class="info-label">Numero de Telefono</div>
-                    <div class="info-value">{{ consent.phone_number }}</div>
+                    <div class="info-label">Autorizacion OTP</div>
+                    <div class="info-value">{{ authorization_summary }}</div>
+                </div>
+
+                <div class="info-item">
+                    <div class="info-label">Usuario Solicitante</div>
+                    <div class="info-value">
+                        {{ consent.requested_by_username|default:"-" }} |
+                        {{ consent.requested_by_area|default:"-" }} |
+                        {{ consent.requested_by_agency|default:"-" }}
+                    </div>
                 </div>
 
                 <div class="info-item">

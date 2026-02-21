@@ -1,4 +1,4 @@
-﻿import os
+import os
 import io
 from dataclasses import dataclass
 
@@ -19,6 +19,10 @@ class ConsentPdfData:
     day: str
     month_name: str
     year: str
+    authorized_channel: str = ""
+    authorized_otp_masked: str = ""
+    authorized_otp_full: str = ""
+    authorized_destination_full: str = ""
 
 
 def _template_path() -> str:
@@ -53,7 +57,18 @@ def _month_name_es(month_number: int) -> str:
     return months[month_number] if 1 <= month_number <= 12 else ""
 
 
-def build_consent_data(full_name: str, id_number: str, id_type: str, phone_number: str, place: str, issued_at):
+def build_consent_data(
+    full_name: str,
+    id_number: str,
+    id_type: str,
+    phone_number: str,
+    place: str,
+    issued_at,
+    authorized_channel: str = "",
+    authorized_otp_masked: str = "",
+    authorized_otp_full: str = "",
+    authorized_destination_full: str = "",
+):
     day = str(issued_at.day)
     month_name = _month_name_es(issued_at.month)
     year = str(issued_at.year)
@@ -68,6 +83,10 @@ def build_consent_data(full_name: str, id_number: str, id_type: str, phone_numbe
         day=day,
         month_name=month_name,
         year=year,
+        authorized_channel=(authorized_channel or "").strip().lower(),
+        authorized_otp_masked=(authorized_otp_masked or "").strip(),
+        authorized_otp_full=(authorized_otp_full or "").strip(),
+        authorized_destination_full=(authorized_destination_full or "").strip(),
     )
 
 
@@ -125,6 +144,16 @@ def fill_consent_pdf(data: ConsentPdfData) -> bytes:
         c.save()
         return buf.getvalue()
 
+    def _overlay_footer_text(text: str, page_width: float, page_height: float) -> bytes:
+        buf = io.BytesIO()
+        c = canvas.Canvas(buf, pagesize=(page_width, page_height))
+        c.setFont("Helvetica", 8)
+        c.setFillGray(0.35)
+        c.drawCentredString(page_width / 2.0, 14, text)
+        c.showPage()
+        c.save()
+        return buf.getvalue()
+
     for page in writer.pages:
         writer.update_page_form_field_values(page, fields)
         # Force checkbox appearance values for PDF viewers
@@ -150,6 +179,27 @@ def fill_consent_pdf(data: ConsentPdfData) -> bytes:
                     NameObject("/V"): NameObject("/Off"),
                     NameObject("/AS"): NameObject("/Off"),
                 })
+
+    if writer.pages:
+        channel = (data.authorized_channel or "").lower()
+        if channel == "sms":
+            destination = data.authorized_destination_full or data.phone_number or "N/A"
+            footer_text = f"Documento autorizado mediante OTP vía SMS al número {destination}"
+        elif channel == "email":
+            otp_value = data.authorized_otp_full or data.authorized_otp_masked or "N/A"
+            destination = data.authorized_destination_full or "N/A"
+            footer_text = f"Documento autorizado mediante OTP {otp_value} vía EMAIL al correo {destination}"
+        else:
+            otp_value = data.authorized_otp_full or data.authorized_otp_masked or "N/A"
+            footer_text = f"Documento autorizado mediante OTP {otp_value}"
+        first_page = writer.pages[0]
+        footer_pdf = _overlay_footer_text(
+            footer_text,
+            float(first_page.mediabox.width),
+            float(first_page.mediabox.height),
+        )
+        footer_page = PdfReader(io.BytesIO(footer_pdf)).pages[0]
+        first_page.merge_page(footer_page)
 
     output_io = io.BytesIO()
     writer.write(output_io)

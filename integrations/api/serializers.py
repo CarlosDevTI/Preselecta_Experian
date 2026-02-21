@@ -33,12 +33,12 @@ def _normalize_doc_type(value: str) -> str:
     return re.sub(r"[^a-z0-9]", "", ascii_value.lower())
 
 class KeyValueSerializer(serializers.Serializer):
-    #? Estructura para cada keyvalue del arreglo inquiryParameters
+    # Estructura para cada keyvalue del arreglo inquiryParameters
     key = serializers.CharField()
     value = serializers.CharField()
 
 class InquiryParameterSerializer(serializers.Serializer):
-    #? Cada parámetro de negocio que el servicio espera
+    # Cada parámetro de negocio que el servicio espera
     paramType = serializers.CharField()
     keyvalue = KeyValueSerializer()
 

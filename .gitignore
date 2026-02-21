@@ -40,7 +40,9 @@ historial*.pdf
 historial*.xml
 hc2_1121852431.pdf
 *_test_*.pdf
+prueba_*
 certs/
+tmp_sample_credit.xml
 
 # Credentials / provider files
 CLAVE_PRODUCCION.txt
@@ -53,3 +55,5 @@ CLAVE_PRODUCCION.txt
 1123038155-114655-130.pdf
 CLAVE WSS PRUEBAS CONGENTE HPN.txt
 CLAVE WSS PROD COOPERATIVA DE AHORRO Y CREDITO CONGENTE.txt
+# Deprecated local stub (SMS OTP propio removido)
+integrations/services/twilio_messaging.py

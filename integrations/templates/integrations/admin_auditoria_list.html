@@ -235,7 +235,7 @@
             <a href="{% url 'integrations:consulta' %}">
                 <img src="{% static 'img/LogoHD.png' %}" alt="Congente" class="logo-image">
             </a>
-            <form method="post" action="{% url 'admin:logout' %}" class="d-inline">
+            <form method="post" action="{% url 'integrations:logout' %}" class="d-inline">
                 {% csrf_token %}
                 <input type="hidden" name="next" value="{% url 'integrations:admin_auditoria_list' %}">
                 <button type="submit" class="btn btn-logout btn-sm">
@@ -273,6 +273,7 @@
                             <tr>
                                 <th>Nombre</th>
                                 <th>Documento</th>
+                                <th>Solicitante</th>
                                 <th>Fecha OTP</th>
                                 <th>Preselecta</th>
                                 <th>OTP</th>
@@ -291,6 +292,15 @@
                                         <div class="data-group">
                                             <span class="data-primary">{{ row.consent.id_number }}</span>
                                             <span class="data-secondary">{{ row.id_type_label }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="data-group">
+                                            <span class="data-primary">{{ row.consent.requested_by_username|default:"-" }}</span>
+                                            <span class="data-secondary">
+                                                {{ row.consent.requested_by_area|default:"-" }} |
+                                                {{ row.consent.requested_by_agency|default:"-" }}
+                                            </span>
                                         </div>
                                     </td>
                                     <td>
@@ -332,7 +342,7 @@
                                                     <i class="bi bi-exclamation-circle-fill"></i>{{ row.consent.status }}
                                                 </span>
                                             {% endif %}
-                                            <span class="data-secondary">{{ row.consent.phone_number }}</span>
+                                            <span class="data-secondary">{{ row.authorization_summary }}</span>
                                         </div>
                                     </td>
                                     <td>
@@ -375,7 +385,7 @@
                                 </tr>
                             {% empty %}
                                 <tr>
-                                    <td colspan="8">
+                                    <td colspan="9">
                                         <div class="empty-state">
                                             <i class="bi bi-inbox"></i>
                                             <p class="mb-0">No hay registros disponibles aun</p>
@@ -393,7 +403,7 @@
                         <ul class="pagination pagination-sm mb-0 justify-content-center">
                             {% if page_obj.has_previous %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                                    <a class="page-link" href="page={{ page_obj.previous_page_number }}">Anterior</a>
                                 </li>
                             {% else %}
                                 <li class="page-item disabled"><span class="page-link">Anterior</span></li>
@@ -407,7 +417,7 @@
 
                             {% if page_obj.has_next %}
                                 <li class="page-item">
-                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                                    <a class="page-link" href="page={{ page_obj.next_page_number }}">Siguiente</a>
                                 </li>
                             {% else %}
                                 <li class="page-item disabled"><span class="page-link">Siguiente</span></li>

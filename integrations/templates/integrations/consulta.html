@@ -74,6 +74,42 @@
             font-size: 0.85rem;
             font-weight: 500;
         }
+        .user-session-chip {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.1rem;
+            background: #ffffff;
+            border: 1px solid #d4dbe4;
+            border-radius: 10px;
+            padding: 0.4rem 0.7rem;
+            line-height: 1.1;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+        }
+        .user-session-chip .session-user {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #d05e1d;
+        }
+        .user-session-chip .session-meta {
+            font-size: 0.74rem;
+            color: #005695;
+            font-weight: 600;
+        }
+        .btn-logout-soft {
+            border: 1px solid #f4a8a8;
+            background: #fff3f3;
+            color: #a33636;
+            border-radius: 9px;
+            padding: 0.35rem 0.75rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+        .btn-logout-soft:hover {
+            background: #fee2e2;
+            border-color: #ef9a9a;
+            color: #8d2626;
+        }
         .card {
             border: none;
             border-radius: 12px;
@@ -138,6 +174,40 @@
         }
         .compact-form .mb-3 {
             margin-bottom: 0.75rem !important;
+        }
+        .otp-channel-selector .btn.active {
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+        }
+        #otpModal .btn-primary {
+            --bs-btn-bg: var(--primary-color);
+            --bs-btn-border-color: var(--primary-color);
+            --bs-btn-hover-bg: #a94a09;
+            --bs-btn-hover-border-color: #a94a09;
+            --bs-btn-active-bg: #8f3f08;
+            --bs-btn-active-border-color: #8f3f08;
+            --bs-btn-disabled-bg: #e5a77b;
+            --bs-btn-disabled-border-color: #e5a77b;
+            --bs-btn-disabled-color: #fff;
+        }
+        #otpModal .btn-outline-primary {
+            --bs-btn-color: var(--primary-color);
+            --bs-btn-border-color: var(--primary-color);
+            --bs-btn-hover-bg: rgba(215, 98, 12, 0.08);
+            --bs-btn-hover-border-color: var(--primary-color);
+            --bs-btn-active-bg: var(--primary-color);
+            --bs-btn-active-border-color: var(--primary-color);
+            --bs-btn-active-color: #fff;
+            --bs-btn-disabled-color: #c47f4d;
+            --bs-btn-disabled-border-color: #d9a983;
+        }
+        #otpModal .otp-channel-selector .btn {
+            font-weight: 600;
+        }
+        .otp-channel-pane {
+            display: none;
+        }
+        .otp-channel-pane.active {
+            display: block;
         }
         .step-indicator {
             font-size: 0.75rem;
@@ -410,7 +480,7 @@
 <body>
     <div class="page-loader" id="pageLoader">
         <div class="spinner-border text-warning" role="status"></div>
-        <div>Consultando Preselecta…</div>
+        <div>Consultando Preselecta...</div>
     </div>
     <header class="main-header">
         <div class="container">
@@ -418,14 +488,37 @@
                 <div class="logo-container">
                     <img src="/static/img/LogoHD.png" alt="Congente Logo" class="logo-img">
                 </div>
-                <span class="badge-produccion">
-                    <i class="bi bi-shield-check"></i> Entorno Producción
-                </span>
+                <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
+                    {% comment %} <span class="badge-produccion">
+                        <i class="bi bi-shield-check"></i> Entorno Produccion
+                    </span> {% endcomment %}
+                    <span class="user-session-chip">
+                        <span class="session-user">{{ request.user.get_full_name|default:request.user.username }}</span>
+                        <span class="session-meta">
+                            {{ request.user.access_profile.get_area_display }}: {{ request.user.access_profile.agency|default:"Sin agencia" }}
+                        </span>
+                    </span>
+                    <form method="post" action="{% url 'integrations:logout' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-logout-soft btn-sm">
+                            <i class="bi bi-box-arrow-right"></i> Salir
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </header>
     <main class="main-content">
         <div class="container">
+            {% if messages %}
+                <div class="mb-3">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} mb-2">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
             <div class="d-none d-print-block text-center mb-4">
                 <img src="/static/img/LogoHD.png" alt="Congente Logo" style="height: 60px; width: auto;">
             </div>
@@ -465,12 +558,19 @@
                             {% endif %}
                             {# Paso 1 solo se muestra cuando aún no hay paso 2 #}
                             {% if not show_step2 %}
-                            <div class="step-indicator">
-                                Paso <span>1</span> de 2 · Identificación
+                            <div class="d-flex justify-content-between align-items-center mb-2 gap-2">
+                                <div class="step-indicator mb-0">
+                                    Paso <span>1</span> de 2 · Identificación
+                                </div>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="toggleJuridicaBtn">
+                                    ¿Es persona jurídica
+                                </button>
                             </div>
                             <form method="post" class="needs-validation compact-form" novalidate data-loader="true">
                                 {% csrf_token %}
                                 <input type="hidden" name="step" value="1">
+                                <input type="hidden" name="is_juridica" id="is_juridica_input" value="{% if step1_data.isJuridica %}1{% else %}0{% endif %}">
+                                <div id="naturalFields" class="{% if step1_data.isJuridica %}d-none{% endif %}">
                                 <div class="mb-2">
                                     <label for="id_number" class="form-label">
                                         <i class="bi bi-card-text"></i> Número de Identificación
@@ -506,6 +606,33 @@
                                         <i class="bi bi-info-circle"></i> Requerido por Preselecta para continuar
                                     </div>
                                 </div>
+                                </div>
+                                <div id="juridicaFields" class="{% if not step1_data.isJuridica %}d-none{% endif %}">
+                                    <div class="alert alert-warning small py-2">
+                                        Flujo persona jurídica: no consulta Preselecta y continúa a OTP + Historial.
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="nit_number" class="form-label">
+                                            <i class="bi bi-building"></i> NIT <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" id="nit_number" name="nit_number"
+                                               value="{{ step1_data.nitNumber|default:'' }}" placeholder="Ej: 900123456">
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="nit_dv" class="form-label">
+                                            Dígito de verificación <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" id="nit_dv" name="nit_dv"
+                                               value="{{ step1_data.nitDv|default:'' }}" placeholder="Ej: 7">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="razon_social" class="form-label">
+                                            Razón social <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text" class="form-control" id="razon_social" name="razon_social"
+                                               value="{{ step1_data.razonSocial|default:'' }}" placeholder="Nombre empresa">
+                                    </div>
+                                </div>
                                 <div class="d-grid">
                                     <button type="submit" class="btn btn-primary">
                                         <i class="bi bi-chevron-double-right"></i> Continuar al paso 2
@@ -528,13 +655,22 @@
                                 <div class="mini-summary-title">Datos de identificación</div>
                                 <div>
                                     <span><strong>Número:</strong> {{ step1_data.idNumber }}</span>
-                                    <span><strong>Primer apellido:</strong> {{ step1_data.firstLastName }}</span>
+                                    {% if step1_data.isJuridica %}
+                                        <span><strong>Razón social:</strong> {{ step1_data.razonSocial }}</span>
+                                        <span><strong>NIT-DV:</strong> {{ step1_data.nitNumber }}-{{ step1_data.nitDv }}</span>
+                                    {% else %}
+                                        <span><strong>Primer apellido:</strong> {{ step1_data.firstLastName }}</span>
+                                    {% endif %}
                                 </div>
                             </div>
 
                             <div class="mb-2">
                                 <span class="badge bg-primary-subtle text-primary px-3 py-1">
-                                    Paso 2 - Variables PRECREDITO_CONGENTE
+                                    {% if request.user.access_profile.area == "CARTERA" or request.user.access_profile.area == "TALENTO_HUMANO" or step1_data.idType == "2" or step1_data.isJuridica %}
+                                        Paso 2 - Flujo directo a Historial con OTP
+                                    {% else %}
+                                        Paso 2 - Variables PRECREDITO_CONGENTE
+                                    {% endif %}
                                 </span>
                             </div>
 
@@ -545,7 +681,29 @@
                                 <input type="hidden" name="id_number" value="{{ step1_data.idNumber }}">
                                 <input type="hidden" name="id_type" value="{{ step1_data.idType }}">
                                 <input type="hidden" name="first_last_name" value="{{ step1_data.firstLastName }}">
+                                <input type="hidden" name="is_juridica" value="{% if step1_data.isJuridica %}1{% else %}0{% endif %}">
+                                <input type="hidden" name="nit_number" value="{{ step1_data.nitNumber|default:'' }}">
+                                <input type="hidden" name="nit_dv" value="{{ step1_data.nitDv|default:'' }}">
+                                <input type="hidden" name="razon_social" value="{{ step1_data.razonSocial|default:'' }}">
+                                <div class="alert alert-info small py-2">
+                                    Limites mensuales por persona: maximo 2 intentos
+                                </div>
 
+                                {% if request.user.access_profile.area == "CARTERA" or request.user.access_profile.area == "TALENTO_HUMANO" or step1_data.idType == "2" or step1_data.isJuridica %}
+                                <div class="alert alert-warning small">
+                                    {% if request.user.access_profile.area == "CARTERA" %}
+                                        Perfil Cartera: se omite Preselecta y se continua por OTP + Historial.
+                                    {% elif request.user.access_profile.area == "TALENTO_HUMANO" %}
+                                        Perfil Talento Humano: se omite Preselecta y se continua por OTP + Historial.
+                                    {% else %}
+                                        Persona juridica: se omite Preselecta y se continua por OTP + Historial.
+                                    {% endif %}
+                                </div>
+                                <input type="hidden" name="linea_credito" value="{{ step2_data.linea_credito|default:'' }}">
+                                <input type="hidden" name="tipo_asociado" value="{{ step2_data.tipo_asociado|default:'' }}">
+                                <input type="hidden" name="medio_pago" value="{{ step2_data.medio_pago|default:'' }}">
+                                <input type="hidden" name="actividad" value="{{ step2_data.actividad|default:'' }}">
+                                {% else %}
                                 <div class="mb-2">
                                     <label class="form-label" for="linea_credito">
                                         Línea de crédito <span class="text-danger">*</span>
@@ -593,33 +751,15 @@
                                         <option value="3" {% if step2_data.actividad == "3" %}selected{% endif %}>Independiente</option>
                                     </select>
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label" for="place">
-                                        Agencia / Municipio <span class="text-danger">*</span>
-                                    </label>
-                                    <select class="form-select" id="place" name="place" required>
-                                        <option value="" {% if not step2_data.place %}selected{% endif %} disabled>Selecciona...</option>
-                                        <optgroup label="Agencias - Villavicencio">
-                                            {% for opt in agencias_villavicencio %}
-                                                <option value="{{ opt }}" {% if step2_data.place == opt %}selected{% endif %}>{{ opt }}</option>
-                                            {% endfor %}
-                                        </optgroup>
-                                        <optgroup label="Agencias - Municipios">
-                                            {% for opt in agencias_municipios %}
-                                                <option value="{{ opt }}" {% if step2_data.place == opt %}selected{% endif %}>{{ opt }}</option>
-                                            {% endfor %}
-                                        </optgroup>
-                                        <optgroup label="Corresponsales">
-                                            {% for opt in corresponsales %}
-                                                <option value="{{ opt }}" {% if step2_data.place == opt %}selected{% endif %}>{{ opt }}</option>
-                                            {% endfor %}
-                                        </optgroup>
-                                    </select>
-                                </div>
-
+                                {% endif %}
                                 <div class="d-grid">
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="bi bi-search"></i> Enviar a Preselecta
+                                        <i class="bi bi-search"></i>
+                                        {% if request.user.access_profile.area == "CARTERA" or request.user.access_profile.area == "TALENTO_HUMANO" or step1_data.idType == "2" or step1_data.isJuridica %}
+                                            Continuar a OTP
+                                        {% else %}
+                                            Enviar a Preselecta
+                                        {% endif %}
                                     </button>
                                 </div>
                                 <div class="text-center mt-2">
@@ -988,9 +1128,88 @@
             const loader = document.getElementById("pageLoader");
             if (!loader) return;
             document.querySelectorAll("form[data-loader='true']").forEach((form) => {
-                form.addEventListener("submit", () => {
+                form.addEventListener("submit", (event) => {
+                    if (!form.checkValidity() || event.defaultPrevented) {
+                        loader.style.display = "none";
+                        return;
+                    }
                     loader.style.display = "flex";
                 });
+            });
+        })();
+    </script>
+    <script>
+        (function () {
+            const toggleBtn = document.getElementById("toggleJuridicaBtn");
+            const juridicaFields = document.getElementById("juridicaFields");
+            const naturalFields = document.getElementById("naturalFields");
+            const juridicaInput = document.getElementById("is_juridica_input");
+            const idNumber = document.getElementById("id_number");
+            const idType = document.getElementById("id_type");
+            const firstLast = document.getElementById("first_last_name");
+            const nit = document.getElementById("nit_number");
+            const dv = document.getElementById("nit_dv");
+            const razon = document.getElementById("razon_social");
+            if (!toggleBtn || !juridicaFields || !juridicaInput) return;
+
+            const setRequired = (el, enabled) => {
+                if (!el) return;
+                if (enabled) {
+                    el.setAttribute("required", "required");
+                } else {
+                    el.removeAttribute("required");
+                }
+            };
+
+            const setJuridicaMode = (enabled) => {
+                juridicaInput.value = enabled ? "1" : "0";
+                if (enabled) {
+                    if (naturalFields) {
+                        naturalFields.classList.add("d-none");
+                    }
+                    juridicaFields.classList.remove("d-none");
+                    toggleBtn.classList.add("btn-warning");
+                    toggleBtn.classList.remove("btn-outline-secondary");
+                    toggleBtn.textContent = "Persona juridica activada";
+                    setRequired(idNumber, false);
+                    setRequired(idType, false);
+                    setRequired(firstLast, false);
+                    setRequired(nit, true);
+                    setRequired(dv, true);
+                    setRequired(razon, true);
+                    if (idNumber) {
+                        idNumber.value = "";
+                        idNumber.setAttribute("disabled", "disabled");
+                    }
+                    if (idType) idType.value = "2";
+                    if (idType) idType.setAttribute("disabled", "disabled");
+                    if (firstLast) {
+                        firstLast.value = "";
+                        firstLast.setAttribute("disabled", "disabled");
+                    }
+                } else {
+                    if (naturalFields) {
+                        naturalFields.classList.remove("d-none");
+                    }
+                    juridicaFields.classList.add("d-none");
+                    toggleBtn.classList.remove("btn-warning");
+                    toggleBtn.classList.add("btn-outline-secondary");
+                    toggleBtn.textContent = "¿Es persona jurídica?";
+                    setRequired(idNumber, true);
+                    setRequired(idType, true);
+                    setRequired(firstLast, true);
+                    setRequired(nit, false);
+                    setRequired(dv, false);
+                    setRequired(razon, false);
+                    if (idNumber) idNumber.removeAttribute("disabled");
+                    if (idType) idType.removeAttribute("disabled");
+                    if (firstLast) firstLast.removeAttribute("disabled");
+                }
+            };
+
+            setJuridicaMode(juridicaInput.value === "1");
+            toggleBtn.addEventListener("click", () => {
+                setJuridicaMode(juridicaInput.value !== "1");
             });
         })();
     </script>
@@ -1008,58 +1227,66 @@
                             {{ form_error_message }}
                         </div>
                     {% endif %}
-                    {% if otp_stage != "verify" %}
-                    <p class="small text-muted">Se enviara un OTP al celular del asociado.</p>
-                    <form method="post" class="needs-validation" novalidate>
-                        {% csrf_token %}
-                        <input type="hidden" name="step" value="otp_send">
-                        <div class="mb-3">
-                            <label class="form-label" for="phone_number_modal">Celular <span class="text-danger">*</span></label>
-                            <input type="tel" class="form-control" id="phone_number_modal" name="phone_number"
-                                   placeholder="3XXXXXXXXX" required>
-                            <div class="form-text">
-                                <i class="bi bi-info-circle"></i> Se agrega +57 automaticamente
-                            </div>
-                        </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-send"></i> Enviar OTP
-                            </button>
-                        </div>
-                    </form>
-                    {% elif otp_stage == "success" %}
+                    {% if otp_stage == "success" %}
                     <div class="alert alert-success mb-0">
                         {{ otp_success_message|default:"OTP validado exitosamente." }}
                     </div>
                     {% elif otp_stage == "verify" %}
-                    <p class="small text-muted">Codigo enviado a {{ masked_phone|default:"tu celular" }}</p>
+                    <p class="small text-muted">
+                        {% if otp_channel == "email" %}
+                            Codigo enviado al correo {{ masked_phone|default:"registrado" }}
+                        {% else %}
+                            Codigo enviado al celular {{ masked_phone|default:"tu celular" }}
+                        {% endif %}
+                    </p>
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <div class="small text-muted">
                             Expira en <strong id="otpCountdown">--:--</strong>
                         </div>
-                        <form method="post" class="ms-2" id="otpResendForm">
-                            {% csrf_token %}
-                            <input type="hidden" name="step" value="otp_resend">
-                            <button
-                                type="submit"
-                                class="btn btn-link btn-sm p-0"
-                                id="otpResendButton"
-                                {% if not otp_can_resend %}disabled{% endif %}
-                            >
-                                Reenviar OTP
-                            </button>
-                        </form>
-                        <span class="small text-muted ms-2" id="otpResendWaitLabel">
-                            {% if otp_can_resend %}
-                                Reenvio disponible
-                            {% else %}
-                                Reenvio en {{ otp_resend_wait|default:"0" }}s
-                            {% endif %}
-                        </span>
                     </div>
                     <div class="small text-warning mb-2 d-none" id="otpDeliveryHint">
                         Si el mensaje no llega, por favor validar en spam o mensajes no deseados.
                     </div>
+                    {% if otp_can_switch_to_email %}
+                        <div class="border rounded p-2 mb-3 bg-light">
+                            <div class="small fw-semibold mb-1">Cambiar canal a EMAIL</div>
+                            <div class="small text-muted mb-2">
+                                Si el SMS no llega o expira, puedes enviar OTP por email.
+                            </div>
+                            <form method="post" class="row g-2 align-items-end">
+                                {% csrf_token %}
+                                <input type="hidden" name="step" value="otp_send">
+                                <input type="hidden" name="otp_channel" value="email">
+                                <input type="hidden" name="phone_number" value="{{ current_phone_number|default:'' }}">
+                                <div class="col-12 col-md-7">
+                                    <label class="form-label form-label-sm mb-1" for="otp_email_switch">Correo</label>
+                                    <input
+                                        type="email"
+                                        class="form-control form-control-sm"
+                                        id="otp_email_switch"
+                                        name="otp_email"
+                                        value="{{ fallback_email|default:'' }}"
+                                        placeholder="correo@dominio.com"
+                                    >
+                                </div>
+                                <div class="col-12 col-md-5 d-grid">
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                        Enviar OTP por EMAIL
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    {% elif otp_channel == "sms" %}
+                        <div class="border rounded p-2 mb-3 bg-light">
+                            <div class="small fw-semibold mb-1">Cambio a EMAIL bloqueado temporalmente</div>
+                            <div class="small text-muted mb-0">
+                                Debes esperar a que expire el OTP por SMS para habilitar envio por EMAIL.
+                                {% if otp_switch_email_wait %}
+                                    Tiempo restante: {{ otp_switch_email_wait }} segundos.
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
                     <form method="post" class="needs-validation" novalidate>
                         {% csrf_token %}
                         <input type="hidden" name="step" value="otp_verify">
@@ -1071,6 +1298,54 @@
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-shield-check"></i> Validar OTP
+                            </button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <p class="small text-muted">Selecciona el canal para enviar el OTP de autorizacion.</p>
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <input type="hidden" name="step" value="otp_send">
+                        <input type="hidden" name="otp_channel" id="otp_channel_modal" value="{{ otp_send_channel|default:'' }}">
+                        <div class="otp-channel-selector d-grid gap-2 mb-3">
+                            <button type="button" class="btn btn-primary otp-channel-btn" data-channel="sms" id="otpSelectSmsBtn">
+                                <i class="bi bi-phone"></i> Enviar OTP por SMS
+                            </button>
+                            <button type="button" class="btn btn-outline-primary otp-channel-btn" data-channel="email" id="otpSelectEmailBtn">
+                                <i class="bi bi-envelope"></i> Enviar OTP por EMAIL
+                            </button>
+                        </div>
+                        <div class="otp-channel-pane mb-3" id="otpSmsPane">
+                            <label class="form-label" for="phone_number_modal">Celular (requerido para SMS)</label>
+                            <input
+                                type="tel"
+                                class="form-control"
+                                id="phone_number_modal"
+                                name="phone_number"
+                                value="{{ current_phone_number|default:'' }}"
+                                placeholder="3XXXXXXXXX"
+                            >
+                            <div class="form-text">
+                                <i class="bi bi-info-circle"></i> Se agrega +57 automaticamente.
+                            </div>
+                        </div>
+                        <div class="otp-channel-pane mb-3" id="otpEmailPane">
+                            <label class="form-label" for="otp_email_modal">Correo para OTP por EMAIL</label>
+                            <input
+                                type="email"
+                                class="form-control"
+                                id="otp_email_modal"
+                                name="otp_email"
+                                value="{{ fallback_email|default:'' }}"
+                                placeholder="correo@dominio.com"
+                            >
+                            <div class="form-text">
+                                Se usara OTP interno por correo.
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary" id="otpSendBtn" disabled>
+                                Selecciona un canal para continuar
                             </button>
                         </div>
                     </form>
@@ -1094,6 +1369,69 @@
     <script>
         (function () {
             const stage = "{{ otp_stage|default:'' }}";
+            if (stage !== "send") return;
+
+            const hiddenChannel = document.getElementById("otp_channel_modal");
+            const smsBtn = document.getElementById("otpSelectSmsBtn");
+            const emailBtn = document.getElementById("otpSelectEmailBtn");
+            const smsPane = document.getElementById("otpSmsPane");
+            const emailPane = document.getElementById("otpEmailPane");
+            const sendBtn = document.getElementById("otpSendBtn");
+            const phoneInput = document.getElementById("phone_number_modal");
+            const emailInput = document.getElementById("otp_email_modal");
+            if (!hiddenChannel || !smsBtn || !emailBtn || !smsPane || !emailPane || !sendBtn) return;
+
+            const setChannel = (channel) => {
+                const isSms = channel === "sms";
+                const isEmail = channel === "email";
+                hiddenChannel.value = channel;
+
+                smsBtn.classList.toggle("active", isSms);
+                smsBtn.classList.toggle("btn-primary", isSms);
+                smsBtn.classList.toggle("btn-outline-primary", !isSms);
+
+                emailBtn.classList.toggle("active", isEmail);
+                emailBtn.classList.toggle("btn-primary", isEmail);
+                emailBtn.classList.toggle("btn-outline-primary", !isEmail);
+
+                smsPane.classList.toggle("active", isSms);
+                emailPane.classList.toggle("active", isEmail);
+
+                if (phoneInput) {
+                    if (isSms) {
+                        phoneInput.setAttribute("required", "required");
+                    } else {
+                        phoneInput.removeAttribute("required");
+                    }
+                }
+                if (emailInput) {
+                    if (isEmail) {
+                        emailInput.setAttribute("required", "required");
+                    } else {
+                        emailInput.removeAttribute("required");
+                    }
+                }
+
+                if (isSms) {
+                    sendBtn.disabled = false;
+                    sendBtn.innerHTML = '<i class="bi bi-phone"></i> Enviar OTP por SMS';
+                } else if (isEmail) {
+                    sendBtn.disabled = false;
+                    sendBtn.innerHTML = '<i class="bi bi-envelope"></i> Enviar OTP por EMAIL';
+                } else {
+                    sendBtn.disabled = true;
+                    sendBtn.textContent = "Selecciona un canal para continuar";
+                }
+            };
+
+            smsBtn.addEventListener("click", () => setChannel("sms"));
+            emailBtn.addEventListener("click", () => setChannel("email"));
+            setChannel(hiddenChannel.value || "");
+        })();
+    </script>
+    <script>
+        (function () {
+            const stage = "{{ otp_stage|default:'' }}";
             if (stage === "success") {
                 setTimeout(() => {
                     window.location.href = "{% url 'integrations:historial_pago' %}";
@@ -1105,6 +1443,7 @@
         (function () {
             const stage = "{{ otp_stage|default:'' }}";
             if (stage !== "verify") return;
+            const channel = "{{ otp_channel|default:'sms' }}";
             let secondsLeft = parseInt("{{ otp_expires_in|default:'' }}", 10);
             if (Number.isNaN(secondsLeft)) {
                 secondsLeft = 0;
@@ -1116,7 +1455,7 @@
                 const mins = Math.floor(secondsLeft / 60);
                 const secs = Math.max(0, secondsLeft % 60);
                 el.textContent = `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-                if (hintEl && secondsLeft <= 300 && secondsLeft > 0) {
+                if (channel === "sms" && hintEl && secondsLeft <= 300 && secondsLeft > 0) {
                     hintEl.classList.remove("d-none");
                 }
                 if (secondsLeft > 0) {
@@ -1127,33 +1466,7 @@
             setInterval(tick, 1000);
         })();
     </script>
-    <script>
-        (function () {
-            const stage = "{{ otp_stage|default:'' }}";
-            if (stage !== "verify") return;
-
-            let resendWait = parseInt("{{ otp_resend_wait|default:'0' }}", 10);
-            if (Number.isNaN(resendWait) || resendWait < 0) resendWait = 0;
-
-            const resendBtn = document.getElementById("otpResendButton");
-            const resendLabel = document.getElementById("otpResendWaitLabel");
-            if (!resendBtn || !resendLabel) return;
-
-            const updateResendUi = () => {
-                if (resendWait > 0) {
-                    resendBtn.disabled = true;
-                    resendLabel.textContent = `Reenvio en ${resendWait}s`;
-                    resendWait -= 1;
-                } else {
-                    resendBtn.disabled = false;
-                    resendLabel.textContent = "Reenvio disponible";
-                }
-            };
-
-            updateResendUi();
-            setInterval(updateResendUi, 1000);
-        })();
-    </script>
     {% endif %}
 </body>
 </html>
+

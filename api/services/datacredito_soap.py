@@ -7,6 +7,7 @@ import hashlib
 import html
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from xml.sax.saxutils import escape as xml_escape
 
 from lxml import etree
 from zeep import Client, Settings
@@ -108,15 +109,18 @@ class DatacreditoSoapClient:
         parameters: list | None = None,
         celebrity_id: str = "1",
     ) -> str:
+        def _safe(value) -> str:
+            return xml_escape(str(value or ""))
+
         minimal_fields = os.getenv("DATACREDITO_SOAP_MINIMAL_FIELDS", "0") in ("1", "true", "True")
         params_xml = ""
         if parameters and not minimal_fields:
             for p in parameters:
                 params_xml += f"""
                 <ns1:parametro>
-                    <ns1:tipo>{p.get('tipo', '0')}</ns1:tipo>
-                    <ns1:nombre>{p.get('nombre', '')}</ns1:nombre>
-                    <ns1:valor>{p.get('valor', '')}</ns1:valor>
+                    <ns1:tipo>{_safe(p.get('tipo', '0'))}</ns1:tipo>
+                    <ns1:nombre>{_safe(p.get('nombre', ''))}</ns1:nombre>
+                    <ns1:valor>{_safe(p.get('valor', ''))}</ns1:valor>
                 </ns1:parametro>"""
 
         timestamp_id = f"TS-{hashlib.sha1(os.urandom(16)).hexdigest()[:16].upper()}"
@@ -152,17 +156,17 @@ class DatacreditoSoapClient:
     <soapenv:Body wsu:Id="{body_id}">
         <ns1:{operation}>
             <ns1:solicitud>
-                <ns1:clave>{self.soap_password}</ns1:clave>
-                <ns1:identificacion>{identificacion}</ns1:identificacion>
-                <ns1:primerApellido>{primer_apellido}</ns1:primerApellido>
-                <ns1:producto>{self.product_id}</ns1:producto>
-                <ns1:tipoIdentificacion>{tipo_identificacion}</ns1:tipoIdentificacion>
-                <ns1:usuario>{self.soap_user}</ns1:usuario>"""
+                <ns1:clave>{_safe(self.soap_password)}</ns1:clave>
+                <ns1:identificacion>{_safe(identificacion)}</ns1:identificacion>
+                <ns1:primerApellido>{_safe(primer_apellido)}</ns1:primerApellido>
+                <ns1:producto>{_safe(self.product_id)}</ns1:producto>
+                <ns1:tipoIdentificacion>{_safe(tipo_identificacion)}</ns1:tipoIdentificacion>
+                <ns1:usuario>{_safe(self.soap_user)}</ns1:usuario>"""
 
         if not minimal_fields:
             envelope += f"""
-                <ns1:InfoTipoCuenta>{self.info_account_type}</ns1:InfoTipoCuenta>
-                <ns1:celebrityId>{celebrity_id}</ns1:celebrityId>"""
+                <ns1:InfoTipoCuenta>{_safe(self.info_account_type)}</ns1:InfoTipoCuenta>
+                <ns1:celebrityId>{_safe(celebrity_id)}</ns1:celebrityId>"""
 
         if params_xml:
             envelope += f"""

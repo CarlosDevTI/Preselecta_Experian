@@ -172,6 +172,32 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
+# Email SMTP (OTP contingencia por correo)
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = os.getenv("EMAIL_HOST", "")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True").lower() in ("true", "1", "t", "yes")
+EMAIL_USE_SSL = os.getenv("EMAIL_USE_SSL", "False").lower() in ("true", "1", "t", "yes")
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "20"))
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@congente.co")
+OTP_EMAIL_LOGO_URL = os.getenv("OTP_EMAIL_LOGO_URL", "").strip()
+OTP_EMAIL_CONSENT_URL = os.getenv(
+    "OTP_EMAIL_CONSENT_URL",
+    "https://congente.coop/images/consentimiento/autorizacion_centrales_riesgo.pdf",
+).strip()
+
+# OTP contingencia
+OTP_SMS_TTL_SECONDS = int(os.getenv("OTP_SMS_TTL_SECONDS", "600"))
+OTP_EMAIL_TTL_SECONDS = int(os.getenv("OTP_EMAIL_TTL_SECONDS", "600"))
+OTP_EMAIL_MAX_ATTEMPTS = int(os.getenv("OTP_EMAIL_MAX_ATTEMPTS", "5"))
+OTP_MAX_ATTEMPTS = int(os.getenv("OTP_MAX_ATTEMPTS", "5"))
+OTP_TEMP_BLOCK_SECONDS = int(os.getenv("OTP_TEMP_BLOCK_SECONDS", "900"))
+OTP_RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("OTP_RATE_LIMIT_WINDOW_SECONDS", "60"))
+OTP_RATE_LIMIT_IP_MAX = int(os.getenv("OTP_RATE_LIMIT_IP_MAX", "20"))
+OTP_RATE_LIMIT_USER_MAX = int(os.getenv("OTP_RATE_LIMIT_USER_MAX", "30"))
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

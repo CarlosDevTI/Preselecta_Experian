@@ -57,6 +57,8 @@ class Command(BaseCommand):
                     phone_number=c.phone_number or "",
                     place=c.place or "VILLAVICENCIO",
                     issued_at=issued_at,
+                    authorized_channel=c.authorized_channel or c.channel or "",
+                    authorized_otp_masked=c.authorized_otp_masked or "******",
                 )
                 pdf_bytes = fill_consent_pdf(pdf_data)
                 filename = f"consent_{c.id_number or 'SINID'}_{issued_at.strftime('%Y%m%d_%H%M%S')}.pdf"

@@ -18,14 +18,14 @@ class DecisionView(APIView):
         3 - Devuelve al cliente la respuesta tal cual (o un error controlado)
     """
     def post(self, request):
-        #? Validación de entrada (lanza 400 con detalle si falla)
+        # Validación de entrada (lanza 400 con detalle si falla)
         ser = DecisionPayloadSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
 
         client = PreselectaClient()
         try:
             # print(f"--- DecisionView: Llamando a call_decision con: {ser.validated_data} ---")
-            #? Llama al proveedor con el payload validado
+            # Llama al proveedor con el payload validado
             data = client.call_decision(ser.validated_data)
             logger.info(
                 "Consulta Preselecta exitosa para id_number=%s, first_last_name=%s",
@@ -34,7 +34,7 @@ class DecisionView(APIView):
             )
             return Response(data, status=status.HTTP_200_OK)
         except requests.HTTPError as e:
-            #? Muestra detalle del proveedor si viene en JSON/texto
+            # Muestra detalle del proveedor si viene en JSON/texto
             try:
                 detail = e.response.json()
             except Exception:
