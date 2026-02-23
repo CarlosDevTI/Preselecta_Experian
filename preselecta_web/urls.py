@@ -29,5 +29,6 @@ urlpatterns = [
     path('preselecta/', include("integrations.urls")),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Este despliegue usa Gunicorn directo sin Nginx dedicado para media.
+# Por eso exponemos /media tambien en produccion.
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
