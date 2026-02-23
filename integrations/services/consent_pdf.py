@@ -102,7 +102,7 @@ def fill_consent_pdf(data: ConsentPdfData) -> bytes:
             {NameObject("/NeedAppearances"): BooleanObject(True)}
         )
         writer._root_object["/AcroForm"].update(
-            {NameObject("/DA"): TextStringObject("/Helvetica 10 Tf 0 g")}
+            {NameObject("/DA"): TextStringObject("/Helvetica 12 Tf 0 g")}
         )
 
     def _checkbox_on_value(field) -> str:
@@ -131,6 +131,19 @@ def fill_consent_pdf(data: ConsentPdfData) -> bytes:
         "Telefono": data.phone_number,
     }
 
+    # Campo -> tamano de fuente (pt) para mejorar legibilidad en el PDF diligenciado.
+    text_field_font_sizes = {
+        "firma en": 12,
+        "a los": 12,
+        "d\u00edas del mes de": 12,
+        "del a\u00f1o": 12,
+        "dÃ­as del mes de": 12,
+        "del aÃ±o": 12,
+        "Nombre": 12,
+        "CC  NIT": 12,
+        "Telefono": 12,
+    }
+
     def _overlay_text(rect, text: str, page_width: float, page_height: float) -> bytes:
         buf = io.BytesIO()
         c = canvas.Canvas(buf, pagesize=(page_width, page_height))
@@ -155,6 +168,20 @@ def fill_consent_pdf(data: ConsentPdfData) -> bytes:
         return buf.getvalue()
 
     for page in writer.pages:
+        for annot in page.get("/Annots", []) or []:
+            field = annot.get_object()
+            field_name = str(field.get("/T", "") or "")
+            field_type = str(field.get("/FT", "") or "")
+            if field_type == "/Tx":
+                size = text_field_font_sizes.get(field_name, 11)
+                field.update(
+                    {
+                        NameObject("/DA"): TextStringObject(
+                            f"/Helvetica {size} Tf 0 g"
+                        )
+                    }
+                )
+
         writer.update_page_form_field_values(page, fields)
         # Force checkbox appearance values for PDF viewers
         for annot in page.get("/Annots", []) or []:
