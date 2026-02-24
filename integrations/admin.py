@@ -1,7 +1,15 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import AccessLog, ConsentOTP, PreselectaQuery, UserAccessProfile, OTPChallenge, OTPAuditLog
+from .models import (
+    AccessLog,
+    ConsentOTP,
+    OTPAuditLog,
+    OTPChallenge,
+    PreselectaAttemptException,
+    PreselectaQuery,
+    UserAccessProfile,
+)
 
 
 @admin.register(AccessLog)
@@ -113,3 +121,26 @@ class OTPAuditLogAdmin(admin.ModelAdmin):
     )
     search_fields = ("consent__id_number", "consent__full_name", "reason")
     list_filter = ("event_type", "channel", "provider", "created_at")
+
+
+@admin.register(PreselectaAttemptException)
+class PreselectaAttemptExceptionAdmin(admin.ModelAdmin):
+    list_display = (
+        "id_number",
+        "id_type",
+        "month_start",
+        "is_active",
+        "used",
+        "granted_by_username",
+        "consumed_by_username",
+        "used_at",
+        "created_at",
+    )
+    search_fields = ("id_number", "id_type", "granted_by_username", "consumed_by_username", "notes")
+    list_filter = ("month_start", "is_active", "used", "created_at")
+    readonly_fields = ("used", "used_at", "consumed_by_username", "created_at", "updated_at")
+
+    def save_model(self, request, obj, form, change):
+        if not obj.granted_by_username:
+            obj.granted_by_username = request.user.get_username()
+        super().save_model(request, obj, form, change)

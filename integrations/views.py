@@ -12,12 +12,22 @@ from django.http import HttpResponse
 from django.utils import timezone as dj_timezone
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.db.models import Q
 import json
 import logging
 import os
 import requests
 
-from .models import AccessLog, ConsentOTP, OTPAuditLog, OTPChallenge, PreselectaQuery, UserAccessProfile
+from .models import (
+    AccessLog,
+    ConsentOTP,
+    OTPAuditLog,
+    OTPChallenge,
+    PreselectaAttemptException,
+    PreselectaQuery,
+    UserAccessProfile,
+)
 from .forms import PreselectaAuthenticationForm, PreselectaPasswordChangeForm
 from .services.consent_pdf import build_consent_data, fill_consent_pdf
 from .services.otp_service import OTPService, OTPServiceConfig, OTPServiceError
@@ -505,6 +515,47 @@ class ConsultaView(PreselectaSecureMixin, View):
         ).count()
 
     @classmethod
+    def _has_available_preselecta_exception(cls, id_number: str, id_type: str) -> bool:
+        if not id_number:
+            return False
+        month_start = cls._month_start().date()
+        return PreselectaAttemptException.objects.filter(
+            id_number=str(id_number),
+            month_start=month_start,
+            is_active=True,
+            used=False,
+        ).filter(Q(id_type=str(id_type)) | Q(id_type="")).exists()
+
+    @classmethod
+    def _consume_preselecta_exception(
+        cls, *, id_number: str, id_type: str, consumed_by_username: str
+    ) -> PreselectaAttemptException | None:
+        if not id_number:
+            return None
+        month_start = cls._month_start().date()
+        with transaction.atomic():
+            exception = (
+                PreselectaAttemptException.objects.select_for_update()
+                .filter(
+                    id_number=str(id_number),
+                    month_start=month_start,
+                    is_active=True,
+                    used=False,
+                )
+                .filter(Q(id_type=str(id_type)) | Q(id_type=""))
+                .order_by("-created_at")
+                .first()
+            )
+            if not exception:
+                return None
+
+            exception.used = True
+            exception.used_at = timezone.now()
+            exception.consumed_by_username = consumed_by_username or ""
+            exception.save(update_fields=["used", "used_at", "consumed_by_username", "updated_at"])
+            return exception
+
+    @classmethod
     def _historial_attempts_this_month(cls, id_type: str, id_number: str) -> int:
         if not id_number:
             return 0
@@ -705,12 +756,17 @@ class ConsultaView(PreselectaSecureMixin, View):
         if step == "2":
             skip_preselecta, skip_reason = self._must_skip_preselecta(profile, id_type)
             preselecta_attempts = self._preselecta_attempts_this_month(id_number)
+            requires_exception = (
+                not skip_preselecta
+                and preselecta_attempts >= self.MAX_MONTHLY_PRESELECTA_ATTEMPTS
+            )
 
             # En flujo normal si llego al maximo mensual, se bloquea la persona.
-            if not skip_preselecta and preselecta_attempts >= self.MAX_MONTHLY_PRESELECTA_ATTEMPTS:
+            if requires_exception and not self._has_available_preselecta_exception(id_number, id_type):
                 form_error_message = (
                     f"Esta persona ya tiene {self.MAX_MONTHLY_PRESELECTA_ATTEMPTS} intentos "
-                    "de Preselecta en el mes. Consulta bloqueada."
+                    "de Preselecta en el mes. Consulta bloqueada. "
+                    "TI puede habilitar 1 excepcion unica para este mes."
                 )
                 return render(request, self.template_name, {
                     "step": "2",
@@ -753,6 +809,30 @@ class ConsultaView(PreselectaSecureMixin, View):
                     "agencias_municipios": self.AGENCIAS_MUNICIPIOS,
                     "corresponsales": self.CORRESPONSALES,
                 })
+
+            consumed_preselecta_exception = None
+            if requires_exception:
+                consumed_preselecta_exception = self._consume_preselecta_exception(
+                    id_number=id_number,
+                    id_type=id_type,
+                    consumed_by_username=requested_by_username,
+                )
+                if not consumed_preselecta_exception:
+                    form_error_message = (
+                        "La excepcion unica para esta persona no esta disponible o ya fue usada. "
+                        "Consulta bloqueada."
+                    )
+                    return render(request, self.template_name, {
+                        "step": "2",
+                        "show_step2": True,
+                        "show_step3": False,
+                        "form_error_message": form_error_message,
+                        "step1_data": step1_data,
+                        "step2_data": step2_data,
+                        "agencias_villavicencio": self.AGENCIAS_VILLAVICENCIO,
+                        "agencias_municipios": self.AGENCIAS_MUNICIPIOS,
+                        "corresponsales": self.CORRESPONSALES,
+                    })
 
             response_data = {}
             response_pretty = None
@@ -866,6 +946,11 @@ class ConsultaView(PreselectaSecureMixin, View):
                 request.session.pop("historial_data", None)
 
             datacredito_attempts = self._historial_attempts_this_month(id_type, id_number)
+            if consumed_preselecta_exception:
+                messages.warning(
+                    request,
+                    "Se aplico la excepcion unica de Preselecta para esta persona en el mes actual.",
+                )
             messages.info(
                 request,
                 (

@@ -687,6 +687,7 @@
                                 <input type="hidden" name="razon_social" value="{{ step1_data.razonSocial|default:'' }}">
                                 <div class="alert alert-info small py-2">
                                     Limites mensuales por persona: maximo 2 intentos
+                                    (TI puede habilitar 1 excepcion unica por persona y mes).
                                 </div>
 
                                 {% if request.user.access_profile.area == "CARTERA" or request.user.access_profile.area == "TALENTO_HUMANO" or step1_data.idType == "2" or step1_data.isJuridica %}
@@ -1469,4 +1470,3 @@
     {% endif %}
 </body>
 </html>
-

@@ -23,6 +23,11 @@ def _unique_path(path: str) -> str:
     return f"{base}_{suffix}.{ext}"
 
 
+def _current_month_start_date():
+    now_local = timezone.localtime(timezone.now())
+    return now_local.replace(day=1, hour=0, minute=0, second=0, microsecond=0).date()
+
+
 def consent_upload_to(instance: "ConsentOTP", filename: str) -> str:
     issued_at = instance.verified_at or timezone.now()
     date_path = issued_at.strftime("%Y/%m/%d")
@@ -309,3 +314,38 @@ class UserAccessProfile(models.Model):
     @property
     def allows_rejected_history(self) -> bool:
         return self.area == self.AREA_TALENTO_HUMANO or self.can_view_rejected_history
+
+
+class PreselectaAttemptException(models.Model):
+    """
+    Excepcion controlada para permitir 1 intento adicional de Preselecta
+    por persona y por mes.
+    """
+
+    id_number = models.CharField(max_length=50)
+    id_type = models.CharField(max_length=10, blank=True, default="")
+    month_start = models.DateField(
+        default=_current_month_start_date,
+        help_text="Primer dia del mes al que aplica la excepcion.",
+    )
+    is_active = models.BooleanField(default=True)
+    used = models.BooleanField(default=False)
+    used_at = models.DateTimeField(null=True, blank=True)
+    granted_by_username = models.CharField(max_length=150, blank=True)
+    consumed_by_username = models.CharField(max_length=150, blank=True)
+    notes = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["id_number", "id_type", "month_start"],
+                name="uniq_preselecta_exception_person_month",
+            )
+        ]
+
+    def __str__(self) -> str:
+        month_label = self.month_start.strftime("%Y-%m")
+        return f"{self.id_number} ({self.id_type or '-'}) {month_label} - {'used' if self.used else 'pending'}"
