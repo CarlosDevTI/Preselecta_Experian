@@ -1,4 +1,4 @@
-import base64
+﻿import base64
 import io
 import xml.etree.ElementTree as ET
 from datetime import datetime
@@ -69,7 +69,7 @@ def _clean_text(value: str | None) -> str:
     if value is None:
         return ""
     text = str(value)
-    if "Ã" in text or "Â" in text:
+    if "Ãƒ" in text or "Ã‚" in text:
         try:
             text = text.encode("latin1", errors="ignore").decode("utf-8", errors="ignore")
         except Exception:
@@ -569,7 +569,7 @@ def _map_genero(value: str) -> str:
 
 def _map_yes_no(value: str) -> str:
     raw = str(value or "").strip().lower()
-    if raw in {"true", "1", "si", "sí", "yes"}:
+    if raw in {"true", "1", "si", "sÃ­", "yes"}:
         return "SI"
     if raw in {"false", "0", "no"}:
         return "NO"
@@ -963,10 +963,13 @@ def _parse_xml(xml_str: str) -> dict:
         "BF": "Advance Inclusion",
     }
     for score in informe.findall("Score"):
+        score_type = _attr(score, "tipo")
+        if score_type != "DF":
+            continue
         razones = [_attr(r, "codigo") for r in score.findall("Razon")]
         scores.append(
             {
-                "tipo": score_labels.get(_attr(score, "tipo"), _attr(score, "tipo")),
+                "tipo": score_labels.get(score_type, score_type),
                 "puntaje": _format_number(_attr(score, "puntaje")),
                 "fecha": _attr(score, "fecha"),
                 "poblacion": _attr(score, "poblacion"),
@@ -979,13 +982,13 @@ def _parse_xml(xml_str: str) -> dict:
     perfil_general = resumen.find("PerfilGeneral") if resumen is not None else None
     if perfil_general is not None:
         label_map = {
-            "CreditosVigentes": "Créditos Vigentes",
-            "CreditosCerrados": "Créditos Cerrados",
-            "CreditosReestructurados": "Créditos Reestructurados",
-            "CreditosRefinanciados": "Créditos Refinanciados",
+            "CreditosVigentes": "CrÃ©ditos Vigentes",
+            "CreditosCerrados": "CrÃ©ditos Cerrados",
+            "CreditosReestructurados": "CrÃ©ditos Reestructurados",
+            "CreditosRefinanciados": "CrÃ©ditos Refinanciados",
             "ConsultaUlt6Meses": "Consultas en los ult. 6 Meses",
             "Desacuerdos": "Desacuerdos Vigentes a la Fecha",
-            "AntiguedadDesde": "Antigüedad desde",
+            "AntiguedadDesde": "AntigÃ¼edad desde",
         }
         for child in list(perfil_general):
             perfil_general_rows.append(
@@ -1029,12 +1032,12 @@ def _parse_xml(xml_str: str) -> dict:
             {"label": "Saldo Deuda Total (en miles)", "key": "saldoDeudaTotal"},
             {"label": "Saldo Deuda Total en Mora (en miles)", "key": "saldoDeudaTotalMora"},
             {"label": "Total Cuentas Mora", "key": "totalCuentasMora"},
-            {"label": "Moras máx Sector Financiero", "key": "morasMaxSectorFinanciero"},
-            {"label": "Moras máx Sector Real", "key": "morasMaxSectorReal"},
-            {"label": "Moras máx Sector Telcos", "key": "morasMaxSectorTelcos"},
-            {"label": "Total Moras Máximas", "key": "morasMaximas"},
-            {"label": "Núm créditos con mora > 30", "key": "numCreditos30"},
-            {"label": "Núm créditos con mora >= 60", "key": "numCreditosMayorIgual60"},
+            {"label": "Moras mÃ¡x Sector Financiero", "key": "morasMaxSectorFinanciero"},
+            {"label": "Moras mÃ¡x Sector Real", "key": "morasMaxSectorReal"},
+            {"label": "Moras mÃ¡x Sector Telcos", "key": "morasMaxSectorTelcos"},
+            {"label": "Total Moras MÃ¡ximas", "key": "morasMaximas"},
+            {"label": "NÃºm crÃ©ditos con mora > 30", "key": "numCreditos30"},
+            {"label": "NÃºm crÃ©ditos con mora >= 60", "key": "numCreditosMayorIgual60"},
         ]
         for row in saldos_moras_matrix["rows"]:
             row["values"] = [item.get(row["key"], "") for item in saldos_moras]
@@ -1951,3 +1954,5 @@ def xml_to_pdf_bytes(xml_str: str) -> bytes:
 
     html = _render_html(xml_str)
     return HTML(string=html, base_url=str(settings.BASE_DIR)).write_pdf()
+
+

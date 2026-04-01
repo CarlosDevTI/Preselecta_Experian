@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 {% load static %}
 <html lang="es">
 <head>
@@ -142,7 +142,7 @@
             margin: 0;
         }
 
-        /* ---- FORMULARIO MÁS COMPACTO ---- */
+        /* ---- FORMULARIO MÃS COMPACTO ---- */
         .card-body--compact {
             padding: 0.9rem 1rem 1.1rem;
         }
@@ -529,7 +529,7 @@
                             <i class="bi bi-search"></i> Consulta Preselecta
                         </h1>
                         <p class="page-description">
-                            Ingrese los datos de identificación para realizar la consulta al motor de decisión
+                            Ingrese los datos de identificaciÃ³n para realizar la consulta al motor de decisiÃ³n
                         </p>
                     </div>
                     <div>
@@ -556,14 +556,14 @@
                                     {{ form_error_message }}
                                 </div>
                             {% endif %}
-                            {# Paso 1 solo se muestra cuando aún no hay paso 2 #}
+                            {# Paso 1 solo se muestra cuando aÃºn no hay paso 2 #}
                             {% if not show_step2 %}
                             <div class="d-flex justify-content-between align-items-center mb-2 gap-2">
                                 <div class="step-indicator mb-0">
-                                    Paso <span>1</span> de 2 · Identificación
+                                    Paso <span>1</span> de 2 Â· IdentificaciÃ³n
                                 </div>
                                 <button type="button" class="btn btn-outline-secondary btn-sm" id="toggleJuridicaBtn">
-                                    ¿Es persona jurídica
+                                    Â¿Es persona jurÃ­dica
                                 </button>
                             </div>
                             <form method="post" class="needs-validation compact-form" novalidate data-loader="true">
@@ -573,28 +573,28 @@
                                 <div id="naturalFields" class="{% if step1_data.isJuridica %}d-none{% endif %}">
                                 <div class="mb-2">
                                     <label for="id_number" class="form-label">
-                                        <i class="bi bi-card-text"></i> Número de Identificación
+                                        <i class="bi bi-card-text"></i> NÃºmero de IdentificaciÃ³n
                                         <span class="text-danger">*</span>
                                     </label>
                                     <input type="text" class="form-control" id="id_number" name="id_number"
                                            value="{{ step1_data.idNumber|default:'' }}" placeholder="Ej: 1234567890" required>
-                                    <div class="invalid-feedback">Debe ingresar un número de identificación válido</div>
+                                    <div class="invalid-feedback">Debe ingresar un nÃºmero de identificaciÃ³n vÃ¡lido</div>
                                 </div>
                                 <div class="mb-2">
                                     <label for="id_type" class="form-label">
-                                        <i class="bi bi-file-text"></i> Tipo de Identificación
+                                        <i class="bi bi-file-text"></i> Tipo de IdentificaciÃ³n
                                         <span class="text-danger">*</span>
                                     </label>
                                     <select class="form-select" id="id_type" name="id_type" required>
                                         <option value="" {% if not step1_data.idType %}selected{% endif %} disabled>Selecciona...</option>
-                                        <option value="1" {% if step1_data.idType == "1" %}selected{% endif %}>Cédula de ciudadanía</option>
+                                        <option value="1" {% if step1_data.idType == "1" %}selected{% endif %}>CÃ©dula de ciudadanÃ­a</option>
                                         <option value="2" {% if step1_data.idType == "2" %}selected{% endif %}>NIT</option>
-                                        <option value="3" {% if step1_data.idType == "3" %}selected{% endif %}>NIT de extranjería</option>
-                                        <option value="4" {% if step1_data.idType == "4" %}selected{% endif %}>Cédula de extranjería</option>
+                                        <option value="3" {% if step1_data.idType == "3" %}selected{% endif %}>NIT de extranjerÃ­a</option>
+                                        <option value="4" {% if step1_data.idType == "4" %}selected{% endif %}>CÃ©dula de extranjerÃ­a</option>
                                         <option value="5" {% if step1_data.idType == "5" %}selected{% endif %}>Pasaporte</option>
-                                        <option value="6" {% if step1_data.idType == "6" %}selected{% endif %}>Carné diplomático</option>
+                                        <option value="6" {% if step1_data.idType == "6" %}selected{% endif %}>CarnÃ© diplomÃ¡tico</option>
                                     </select>
-                                    <div class="invalid-feedback">Debe especificar el tipo de identificación</div>
+                                    <div class="invalid-feedback">Debe especificar el tipo de identificaciÃ³n</div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="first_last_name" class="form-label">
@@ -609,7 +609,7 @@
                                 </div>
                                 <div id="juridicaFields" class="{% if not step1_data.isJuridica %}d-none{% endif %}">
                                     <div class="alert alert-warning small py-2">
-                                        Flujo persona jurídica: no consulta Preselecta y continúa a OTP + Historial.
+                                        Flujo persona jurÃ­dica: no consulta Preselecta y continÃºa a OTP + Historial.
                                     </div>
                                     <div class="mb-2">
                                         <label for="nit_number" class="form-label">
@@ -620,14 +620,14 @@
                                     </div>
                                     <div class="mb-2">
                                         <label for="nit_dv" class="form-label">
-                                            Dígito de verificación <span class="text-danger">*</span>
+                                            DÃ­gito de verificaciÃ³n <span class="text-danger">*</span>
                                         </label>
                                         <input type="text" class="form-control" id="nit_dv" name="nit_dv"
                                                value="{{ step1_data.nitDv|default:'' }}" placeholder="Ej: 7">
                                     </div>
                                     <div class="mb-3">
                                         <label for="razon_social" class="form-label">
-                                            Razón social <span class="text-danger">*</span>
+                                            RazÃ³n social <span class="text-danger">*</span>
                                         </label>
                                         <input type="text" class="form-control" id="razon_social" name="razon_social"
                                                value="{{ step1_data.razonSocial|default:'' }}" placeholder="Nombre empresa">
@@ -648,15 +648,15 @@
                             {% else %}
                             {# Paso 2: se muestra solo cuando show_step2 es True #}
                             <div class="step-indicator">
-                                Paso <span>2</span> de 2 · Variables de crédito
+                                Paso <span>2</span> de 2 Â· Variables de crÃ©dito
                             </div>
 
                             <div class="mini-summary">
-                                <div class="mini-summary-title">Datos de identificación</div>
+                                <div class="mini-summary-title">Datos de identificaciÃ³n</div>
                                 <div>
-                                    <span><strong>Número:</strong> {{ step1_data.idNumber }}</span>
+                                    <span><strong>NÃºmero:</strong> {{ step1_data.idNumber }}</span>
                                     {% if step1_data.isJuridica %}
-                                        <span><strong>Razón social:</strong> {{ step1_data.razonSocial }}</span>
+                                        <span><strong>RazÃ³n social:</strong> {{ step1_data.razonSocial }}</span>
                                         <span><strong>NIT-DV:</strong> {{ step1_data.nitNumber }}-{{ step1_data.nitDv }}</span>
                                     {% else %}
                                         <span><strong>Primer apellido:</strong> {{ step1_data.firstLastName }}</span>
@@ -685,10 +685,6 @@
                                 <input type="hidden" name="nit_number" value="{{ step1_data.nitNumber|default:'' }}">
                                 <input type="hidden" name="nit_dv" value="{{ step1_data.nitDv|default:'' }}">
                                 <input type="hidden" name="razon_social" value="{{ step1_data.razonSocial|default:'' }}">
-                                <div class="alert alert-info small py-2">
-                                    Limites mensuales por persona: maximo 2 intentos
-                                    (TI puede habilitar 1 excepcion unica por persona y mes).
-                                </div>
 
                                 {% if request.user.access_profile.area == "CARTERA" or request.user.access_profile.area == "TALENTO_HUMANO" or step1_data.idType == "2" or step1_data.isJuridica %}
                                 <div class="alert alert-warning small">
@@ -707,13 +703,13 @@
                                 {% else %}
                                 <div class="mb-2">
                                     <label class="form-label" for="linea_credito">
-                                        Línea de crédito <span class="text-danger">*</span>
+                                        LÃ­nea de crÃ©dito <span class="text-danger">*</span>
                                     </label>
                                     <select class="form-select" id="linea_credito" name="linea_credito" required>
                                         <option value="" {% if not step2_data.linea_credito %}selected{% endif %} disabled>Selecciona...</option>
                                         <option value="1" {% if step2_data.linea_credito == "1" %}selected{% endif %}>Consumo</option>
                                         <option value="2" {% if step2_data.linea_credito == "2" %}selected{% endif %}>Comercial</option>
-                                        <option value="3" {% if step2_data.linea_credito == "3" %}selected{% endif %}>Microcrédito</option>
+                                        <option value="3" {% if step2_data.linea_credito == "3" %}selected{% endif %}>MicrocrÃ©dito</option>
                                     </select>
                                 </div>
 
@@ -724,7 +720,7 @@
                                     <select class="form-select" id="tipo_asociado" name="tipo_asociado" required>
                                         <option value="" {% if not step2_data.tipo_asociado %}selected{% endif %} disabled>Selecciona...</option>
                                         <option value="1" {% if step2_data.tipo_asociado == "1" %}selected{% endif %}>Nuevo</option>
-                                        <option value="2" {% if step2_data.tipo_asociado == "2" %}selected{% endif %}>Renovación</option>
+                                        <option value="2" {% if step2_data.tipo_asociado == "2" %}selected{% endif %}>RenovaciÃ³n</option>
                                         <option value="3" {% if step2_data.tipo_asociado == "3" %}selected{% endif %}>No aplica</option>
                                     </select>
                                 </div>
@@ -736,7 +732,7 @@
                                     <select class="form-select" id="medio_pago" name="medio_pago" required>
                                         <option value="" {% if not step2_data.medio_pago %}selected{% endif %} disabled>Selecciona...</option>
                                         <option value="1" {% if step2_data.medio_pago == "1" %}selected{% endif %}>Ventanilla</option>
-                                        <option value="2" {% if step2_data.medio_pago == "2" %}selected{% endif %}>Nómina</option>
+                                        <option value="2" {% if step2_data.medio_pago == "2" %}selected{% endif %}>NÃ³mina</option>
                                         <option value="3" {% if step2_data.medio_pago == "3" %}selected{% endif %}>No aplica</option>
                                     </select>
                                 </div>
@@ -784,7 +780,7 @@
                                         <i class="bi bi-bar-chart-line"></i> Resultado de la Consulta
                                     </h2>
                                     <p class="card-subtitle">
-                                        Información del buró y motor de decisión
+                                        InformaciÃ³n del burÃ³ y motor de decisiÃ³n
                                     </p>
                                 </div>
                                 {% if response_json %}
@@ -865,7 +861,7 @@
 
                                                 <div class="col-md-6">
                                                     <div class="data-item">
-                                                        <div class="data-label">Decisión</div>
+                                                        <div class="data-label">DecisiÃ³n</div>
                                                         <div class="data-value">
                                                             {% for item in response_json.engineResponse %}
                                                                 {% if item.key|lower == 'decision' %}
@@ -926,13 +922,13 @@
                                                     <div class="data-value">{{ person.identification.status|default:'-' }}</div>
                                                 </div>
                                                 <div class="data-item">
-                                                    <div class="data-label">Ubicación</div>
+                                                    <div class="data-label">UbicaciÃ³n</div>
                                                     <div class="data-value">
                                                         {{ person.identification.city|default:'-' }}{% if person.identification.department %} / {{ person.identification.department }}{% endif %}
                                                     </div>
                                                 </div>
                                                 <div class="data-item">
-                                                    <div class="data-label">Fecha de expedición</div>
+                                                    <div class="data-label">Fecha de expediciÃ³n</div>
                                                     <div class="data-value">{{ person.identification.issueDate|default:'-' }}</div>
                                                 </div>
                                                 <div class="data-item">
@@ -944,7 +940,7 @@
                                                     <div class="data-value">{{ person.age.min|default:'-' }}</div>
                                                 </div>
                                                 <div class="data-item">
-                                                    <div class="data-label">Género</div>
+                                                    <div class="data-label">GÃ©nero</div>
                                                     <div class="data-value">{{ person.gender|default:'-' }}</div>
                                                 </div>
                                             {% else %}
@@ -965,11 +961,11 @@
                                                     <div class="data-value">{{ score.name|default:'-' }}</div>
                                                 </div>
                                                 <div class="data-item">
-                                                    <div class="data-label">Calificación numérica</div>
+                                                    <div class="data-label">CalificaciÃ³n numÃ©rica</div>
                                                     <div class="data-value">{{ score.rating|default:'-' }}</div>
                                                 </div>
                                                 <div class="data-item">
-                                                    <div class="data-label">Clasificación</div>
+                                                    <div class="data-label">ClasificaciÃ³n</div>
                                                     <div class="data-value">{{ score.classification|default:'-' }}</div>
                                                 </div>
                                                 {% if score.reasonCodes %}
@@ -1016,7 +1012,7 @@
                                                         <td>{{ response_json.programId|default:'-' }}</td>
                                                     </tr>
                                                     <tr>
-                                                        <th>Decisión</th>
+                                                        <th>DecisiÃ³n</th>
                                                         <td>
                                                             {% with eng=response_json.engineResponse %}
                                                                 {% if eng %}
@@ -1078,7 +1074,7 @@
                                         {% else %}
                                             <div class="empty-state">
                                                 <i class="bi bi-gear-wide"></i>
-                                                <p class="text-muted mb-0">No se recibió respuesta del motor</p>
+                                                <p class="text-muted mb-0">No se recibiÃ³ respuesta del motor</p>
                                             </div>
                                         {% endif %}
                                     </div>
@@ -1195,7 +1191,7 @@
                     juridicaFields.classList.add("d-none");
                     toggleBtn.classList.remove("btn-warning");
                     toggleBtn.classList.add("btn-outline-secondary");
-                    toggleBtn.textContent = "¿Es persona jurídica?";
+                    toggleBtn.textContent = "Â¿Es persona jurÃ­dica?";
                     setRequired(idNumber, true);
                     setRequired(idType, true);
                     setRequired(firstLast, true);
@@ -1470,3 +1466,4 @@
     {% endif %}
 </body>
 </html>
+
