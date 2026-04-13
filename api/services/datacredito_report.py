@@ -960,7 +960,6 @@ def _parse_xml(xml_str: str) -> dict:
     scores = []
     score_labels = {
         "DF": "Advance 1.1",
-        "BF": "Advance Inclusion",
     }
     for score in informe.findall("Score"):
         score_type = _attr(score, "tipo")
@@ -1954,5 +1953,6 @@ def xml_to_pdf_bytes(xml_str: str) -> bytes:
 
     html = _render_html(xml_str)
     return HTML(string=html, base_url=str(settings.BASE_DIR)).write_pdf()
+
 
 

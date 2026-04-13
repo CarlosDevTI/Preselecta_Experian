@@ -1,56 +1,56 @@
-# Preselecta Experian - Integración Congente
+﻿# Preselecta Experian - Integracion Congente
 
-Proyecto interno para integrar **Preselecta (Experian)** y **Historia de Crédito+** en un flujo de consulta con OTP, auditoría y generación de PDF.
+Proyecto interno para integrar **Preselecta (Experian)** y **Historia de Credito+** en un flujo de consulta con OTP, auditoria y generacion de PDF.
 
 ## Funcionalidad principal
 
-- Consulta Preselecta con validación de decisión (Aprobado / Zona Gris).
-- Envío y validación de OTP (Twilio Verify).
-- Generación de consentimiento legal en PDF (AcroForm).
-- Consulta de Historia de Crédito+ (SOAP) y generación de PDF.
-- Auditoría completa del flujo (eventos, PDFs y metadatos).
+- Consulta Preselecta con validacion de decision (Aprobado / Zona Gris).
+- Envio y validacion de OTP (SMS por Twilio Verify, Email por OTP interno).
+- Generacion de consentimiento legal en PDF (AcroForm).
+- Consulta de Historia de Credito+ (SOAP) y generacion de PDF.
+- Auditoria del flujo (eventos, PDFs y metadatos).
 
 ## Flujo resumido
 
-1. Se realiza la consulta Preselecta.
-2. Si la decisión es **Aprobado** o **Zona Gris**, se habilita el botón de **Historial de Pago**.
-3. Al hacer clic, se solicita OTP.
+1. Consulta Preselecta.
+2. Si la decision es **Aprobado** o **Zona Gris**, se habilita Historial de Pago.
+3. Se solicita OTP.
 4. OTP aprobado:
-   - Se genera el PDF de consentimiento.
-   - Se consulta el historial (SOAP → XML → PDF).
-   - Se guarda todo para auditoría.
+   - Se genera PDF de consentimiento.
+   - Se consulta historial (SOAP -> XML -> PDF).
+   - Se guarda evidencia para auditoria.
 
-## Estructura del proyecto
+## Estructura
 
 - `integrations/`
-  - Vistas principales (Preselecta, OTP, auditoría).
+  - Vistas principales (Preselecta, OTP, auditoria).
   - Templates de front y PDF.
-  - Servicios de integración.
+  - Servicios de integracion.
 - `api/`
   - Endpoints de consulta SOAP.
-  - Generación de PDF de Historia de Crédito+.
+  - Generacion de PDF de Historia de Credito+.
 - `static/`
   - Assets (logos, etc.).
 - `certs/`
-  - Certificados de cliente (NO se versiona).
+  - Certificados de cliente (no se versiona).
 
 ## Requisitos
 
 - Python 3.12+
 - Docker + Docker Compose
-- PostgreSQL (producción)
+- PostgreSQL (produccion)
 - SQLite (desarrollo local)
 
-## Configuración
+## Configuracion
 
-Copiar el `.env` y completar con credenciales:
-
+Completa `.env` con credenciales:
 - Preselecta (OKTA, token, URL)
-- Historia de Crédito+ (SOAP, certs, credenciales)
+- Historia de Credito+ (SOAP, certs, credenciales)
 - Twilio Verify
+- SMTP para OTP Email
 - Base de datos
 
-## Instalación local (desarrollo)
+## Instalacion local
 
 ```bash
 python -m venv venv
@@ -60,35 +60,27 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-## Docker (producción o staging)
+## Docker
 
 ```bash
 docker compose down
 docker compose up -d --build
 ```
 
-## Auditoría
+## Auditoria
 
-Vista custom:
+Ruta:
 
 ```
 /preselecta/admin-auditoria/
 ```
 
-Permite consultar:
-
-- Nombre / Documento
-- Resultado Preselecta
-- OTP (estado y fecha)
-- PDFs generados (consentimiento e historial)
-
 ## Seguridad
 
-- **No versionar certificados** (`certs/` está en `.gitignore`).
+- No versionar certificados (`certs/` esta en `.gitignore`).
 - Mantener credenciales solo en `.env`.
 - Evitar exponer OTP en logs.
 
 ## Notas
 
-Este proyecto es de uso **interno** para Congente.  
-Si necesitas cambios o soporte, contactar a Gerencia TI.
+Proyecto de uso interno para Congente.

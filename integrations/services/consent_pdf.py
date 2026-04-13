@@ -1,4 +1,4 @@
-import os
+﻿import os
 import io
 from dataclasses import dataclass
 
@@ -30,7 +30,7 @@ def _template_path() -> str:
         settings.BASE_DIR,
         "static",
         "pdf",
-        "COLO-FO.023 Autorización de consulta y reporte a centrales de riesgos FINAL.pdf",
+        "COLO-FO.023 Autorizacion de consulta y reporte a centrales de riesgos FINAL.pdf",
     )
     if os.path.exists(preferred):
         return preferred
@@ -137,8 +137,8 @@ def fill_consent_pdf(data: ConsentPdfData) -> bytes:
         "a los": 12,
         "d\u00edas del mes de": 12,
         "del a\u00f1o": 12,
-        "dÃ­as del mes de": 12,
-        "del aÃ±o": 12,
+        "días del mes de": 12,
+        "del año": 12,
         "Nombre": 12,
         "CC  NIT": 12,
         "Telefono": 12,
@@ -231,3 +231,5 @@ def fill_consent_pdf(data: ConsentPdfData) -> bytes:
     output_io = io.BytesIO()
     writer.write(output_io)
     return output_io.getvalue()
+
+

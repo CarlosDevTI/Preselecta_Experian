@@ -142,7 +142,7 @@
             margin: 0;
         }
 
-        /* ---- FORMULARIO MÃS COMPACTO ---- */
+        /* ---- FORMULARIO MAS COMPACTO ---- */
         .card-body--compact {
             padding: 0.9rem 1rem 1.1rem;
         }
@@ -529,7 +529,7 @@
                             <i class="bi bi-search"></i> Consulta Preselecta
                         </h1>
                         <p class="page-description">
-                            Ingrese los datos de identificaciÃ³n para realizar la consulta al motor de decisiÃ³n
+                            Ingrese los datos de identificación para realizar la consulta al motor de decisión
                         </p>
                     </div>
                     <div>
@@ -556,14 +556,14 @@
                                     {{ form_error_message }}
                                 </div>
                             {% endif %}
-                            {# Paso 1 solo se muestra cuando aÃºn no hay paso 2 #}
+                            {# Paso 1 solo se muestra cuando aún no hay paso 2 #}
                             {% if not show_step2 %}
                             <div class="d-flex justify-content-between align-items-center mb-2 gap-2">
                                 <div class="step-indicator mb-0">
-                                    Paso <span>1</span> de 2 Â· IdentificaciÃ³n
+                                    Paso <span>1</span> de 2 · Identificación
                                 </div>
                                 <button type="button" class="btn btn-outline-secondary btn-sm" id="toggleJuridicaBtn">
-                                    Â¿Es persona jurÃ­dica
+                                    ¿Es persona jurídica
                                 </button>
                             </div>
                             <form method="post" class="needs-validation compact-form" novalidate data-loader="true">
@@ -573,28 +573,28 @@
                                 <div id="naturalFields" class="{% if step1_data.isJuridica %}d-none{% endif %}">
                                 <div class="mb-2">
                                     <label for="id_number" class="form-label">
-                                        <i class="bi bi-card-text"></i> NÃºmero de IdentificaciÃ³n
+                                        <i class="bi bi-card-text"></i> Número de Identificación
                                         <span class="text-danger">*</span>
                                     </label>
                                     <input type="text" class="form-control" id="id_number" name="id_number"
                                            value="{{ step1_data.idNumber|default:'' }}" placeholder="Ej: 1234567890" required>
-                                    <div class="invalid-feedback">Debe ingresar un nÃºmero de identificaciÃ³n vÃ¡lido</div>
+                                    <div class="invalid-feedback">Debe ingresar un número de identificación válido</div>
                                 </div>
                                 <div class="mb-2">
                                     <label for="id_type" class="form-label">
-                                        <i class="bi bi-file-text"></i> Tipo de IdentificaciÃ³n
+                                        <i class="bi bi-file-text"></i> Tipo de Identificación
                                         <span class="text-danger">*</span>
                                     </label>
                                     <select class="form-select" id="id_type" name="id_type" required>
                                         <option value="" {% if not step1_data.idType %}selected{% endif %} disabled>Selecciona...</option>
-                                        <option value="1" {% if step1_data.idType == "1" %}selected{% endif %}>CÃ©dula de ciudadanÃ­a</option>
+                                        <option value="1" {% if step1_data.idType == "1" %}selected{% endif %}>Cédula de ciudadanía</option>
                                         <option value="2" {% if step1_data.idType == "2" %}selected{% endif %}>NIT</option>
-                                        <option value="3" {% if step1_data.idType == "3" %}selected{% endif %}>NIT de extranjerÃ­a</option>
-                                        <option value="4" {% if step1_data.idType == "4" %}selected{% endif %}>CÃ©dula de extranjerÃ­a</option>
+                                        <option value="3" {% if step1_data.idType == "3" %}selected{% endif %}>NIT de extranjería</option>
+                                        <option value="4" {% if step1_data.idType == "4" %}selected{% endif %}>Cédula de extranjería</option>
                                         <option value="5" {% if step1_data.idType == "5" %}selected{% endif %}>Pasaporte</option>
-                                        <option value="6" {% if step1_data.idType == "6" %}selected{% endif %}>CarnÃ© diplomÃ¡tico</option>
+                                        <option value="6" {% if step1_data.idType == "6" %}selected{% endif %}>Carné diplomático</option>
                                     </select>
-                                    <div class="invalid-feedback">Debe especificar el tipo de identificaciÃ³n</div>
+                                    <div class="invalid-feedback">Debe especificar el tipo de identificación</div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="first_last_name" class="form-label">
@@ -609,7 +609,7 @@
                                 </div>
                                 <div id="juridicaFields" class="{% if not step1_data.isJuridica %}d-none{% endif %}">
                                     <div class="alert alert-warning small py-2">
-                                        Flujo persona jurÃ­dica: no consulta Preselecta y continÃºa a OTP + Historial.
+                                        Flujo persona jurídica: no consulta Preselecta y continúa a OTP + Historial.
                                     </div>
                                     <div class="mb-2">
                                         <label for="nit_number" class="form-label">
@@ -620,14 +620,14 @@
                                     </div>
                                     <div class="mb-2">
                                         <label for="nit_dv" class="form-label">
-                                            DÃ­gito de verificaciÃ³n <span class="text-danger">*</span>
+                                            Dígito de verificación <span class="text-danger">*</span>
                                         </label>
                                         <input type="text" class="form-control" id="nit_dv" name="nit_dv"
                                                value="{{ step1_data.nitDv|default:'' }}" placeholder="Ej: 7">
                                     </div>
                                     <div class="mb-3">
                                         <label for="razon_social" class="form-label">
-                                            RazÃ³n social <span class="text-danger">*</span>
+                                            Razón social <span class="text-danger">*</span>
                                         </label>
                                         <input type="text" class="form-control" id="razon_social" name="razon_social"
                                                value="{{ step1_data.razonSocial|default:'' }}" placeholder="Nombre empresa">
@@ -648,15 +648,15 @@
                             {% else %}
                             {# Paso 2: se muestra solo cuando show_step2 es True #}
                             <div class="step-indicator">
-                                Paso <span>2</span> de 2 Â· Variables de crÃ©dito
+                                Paso <span>2</span> de 2 · Variables de crédito
                             </div>
 
                             <div class="mini-summary">
-                                <div class="mini-summary-title">Datos de identificaciÃ³n</div>
+                                <div class="mini-summary-title">Datos de identificación</div>
                                 <div>
-                                    <span><strong>NÃºmero:</strong> {{ step1_data.idNumber }}</span>
+                                    <span><strong>Número:</strong> {{ step1_data.idNumber }}</span>
                                     {% if step1_data.isJuridica %}
-                                        <span><strong>RazÃ³n social:</strong> {{ step1_data.razonSocial }}</span>
+                                        <span><strong>Razón social:</strong> {{ step1_data.razonSocial }}</span>
                                         <span><strong>NIT-DV:</strong> {{ step1_data.nitNumber }}-{{ step1_data.nitDv }}</span>
                                     {% else %}
                                         <span><strong>Primer apellido:</strong> {{ step1_data.firstLastName }}</span>
@@ -703,13 +703,13 @@
                                 {% else %}
                                 <div class="mb-2">
                                     <label class="form-label" for="linea_credito">
-                                        LÃ­nea de crÃ©dito <span class="text-danger">*</span>
+                                        Línea de crédito <span class="text-danger">*</span>
                                     </label>
                                     <select class="form-select" id="linea_credito" name="linea_credito" required>
                                         <option value="" {% if not step2_data.linea_credito %}selected{% endif %} disabled>Selecciona...</option>
                                         <option value="1" {% if step2_data.linea_credito == "1" %}selected{% endif %}>Consumo</option>
                                         <option value="2" {% if step2_data.linea_credito == "2" %}selected{% endif %}>Comercial</option>
-                                        <option value="3" {% if step2_data.linea_credito == "3" %}selected{% endif %}>MicrocrÃ©dito</option>
+                                        <option value="3" {% if step2_data.linea_credito == "3" %}selected{% endif %}>Microcrédito</option>
                                     </select>
                                 </div>
 
@@ -720,7 +720,7 @@
                                     <select class="form-select" id="tipo_asociado" name="tipo_asociado" required>
                                         <option value="" {% if not step2_data.tipo_asociado %}selected{% endif %} disabled>Selecciona...</option>
                                         <option value="1" {% if step2_data.tipo_asociado == "1" %}selected{% endif %}>Nuevo</option>
-                                        <option value="2" {% if step2_data.tipo_asociado == "2" %}selected{% endif %}>RenovaciÃ³n</option>
+                                        <option value="2" {% if step2_data.tipo_asociado == "2" %}selected{% endif %}>Renovación</option>
                                         <option value="3" {% if step2_data.tipo_asociado == "3" %}selected{% endif %}>No aplica</option>
                                     </select>
                                 </div>
@@ -732,7 +732,7 @@
                                     <select class="form-select" id="medio_pago" name="medio_pago" required>
                                         <option value="" {% if not step2_data.medio_pago %}selected{% endif %} disabled>Selecciona...</option>
                                         <option value="1" {% if step2_data.medio_pago == "1" %}selected{% endif %}>Ventanilla</option>
-                                        <option value="2" {% if step2_data.medio_pago == "2" %}selected{% endif %}>NÃ³mina</option>
+                                        <option value="2" {% if step2_data.medio_pago == "2" %}selected{% endif %}>Nómina</option>
                                         <option value="3" {% if step2_data.medio_pago == "3" %}selected{% endif %}>No aplica</option>
                                     </select>
                                 </div>
@@ -780,7 +780,7 @@
                                         <i class="bi bi-bar-chart-line"></i> Resultado de la Consulta
                                     </h2>
                                     <p class="card-subtitle">
-                                        InformaciÃ³n del burÃ³ y motor de decisiÃ³n
+                                        Información del buró y motor de decisión
                                     </p>
                                 </div>
                                 {% if response_json %}
@@ -861,7 +861,7 @@
 
                                                 <div class="col-md-6">
                                                     <div class="data-item">
-                                                        <div class="data-label">DecisiÃ³n</div>
+                                                        <div class="data-label">Decisión</div>
                                                         <div class="data-value">
                                                             {% for item in response_json.engineResponse %}
                                                                 {% if item.key|lower == 'decision' %}
@@ -922,13 +922,13 @@
                                                     <div class="data-value">{{ person.identification.status|default:'-' }}</div>
                                                 </div>
                                                 <div class="data-item">
-                                                    <div class="data-label">UbicaciÃ³n</div>
+                                                    <div class="data-label">Ubicación</div>
                                                     <div class="data-value">
                                                         {{ person.identification.city|default:'-' }}{% if person.identification.department %} / {{ person.identification.department }}{% endif %}
                                                     </div>
                                                 </div>
                                                 <div class="data-item">
-                                                    <div class="data-label">Fecha de expediciÃ³n</div>
+                                                    <div class="data-label">Fecha de expedición</div>
                                                     <div class="data-value">{{ person.identification.issueDate|default:'-' }}</div>
                                                 </div>
                                                 <div class="data-item">
@@ -940,7 +940,7 @@
                                                     <div class="data-value">{{ person.age.min|default:'-' }}</div>
                                                 </div>
                                                 <div class="data-item">
-                                                    <div class="data-label">GÃ©nero</div>
+                                                    <div class="data-label">Género</div>
                                                     <div class="data-value">{{ person.gender|default:'-' }}</div>
                                                 </div>
                                             {% else %}
@@ -961,11 +961,11 @@
                                                     <div class="data-value">{{ score.name|default:'-' }}</div>
                                                 </div>
                                                 <div class="data-item">
-                                                    <div class="data-label">CalificaciÃ³n numÃ©rica</div>
+                                                    <div class="data-label">Calificación numérica</div>
                                                     <div class="data-value">{{ score.rating|default:'-' }}</div>
                                                 </div>
                                                 <div class="data-item">
-                                                    <div class="data-label">ClasificaciÃ³n</div>
+                                                    <div class="data-label">Clasificación</div>
                                                     <div class="data-value">{{ score.classification|default:'-' }}</div>
                                                 </div>
                                                 {% if score.reasonCodes %}
@@ -1012,7 +1012,7 @@
                                                         <td>{{ response_json.programId|default:'-' }}</td>
                                                     </tr>
                                                     <tr>
-                                                        <th>DecisiÃ³n</th>
+                                                        <th>Decisión</th>
                                                         <td>
                                                             {% with eng=response_json.engineResponse %}
                                                                 {% if eng %}
@@ -1074,7 +1074,7 @@
                                         {% else %}
                                             <div class="empty-state">
                                                 <i class="bi bi-gear-wide"></i>
-                                                <p class="text-muted mb-0">No se recibiÃ³ respuesta del motor</p>
+                                                <p class="text-muted mb-0">No se recibió respuesta del motor</p>
                                             </div>
                                         {% endif %}
                                     </div>
@@ -1191,7 +1191,7 @@
                     juridicaFields.classList.add("d-none");
                     toggleBtn.classList.remove("btn-warning");
                     toggleBtn.classList.add("btn-outline-secondary");
-                    toggleBtn.textContent = "Â¿Es persona jurÃ­dica?";
+                    toggleBtn.textContent = "¿Es persona jurídica?";
                     setRequired(idNumber, true);
                     setRequired(idType, true);
                     setRequired(firstLast, true);
@@ -1244,13 +1244,23 @@
                     <div class="small text-warning mb-2 d-none" id="otpDeliveryHint">
                         Si el mensaje no llega, por favor validar en spam o mensajes no deseados.
                     </div>
-                    {% if otp_can_switch_to_email %}
-                        <div class="border rounded p-2 mb-3 bg-light">
+                    {% if otp_channel == "sms" %}
+                        <div class="border rounded p-2 mb-3 bg-light" id="otpEmailSwitchCard">
                             <div class="small fw-semibold mb-1">Cambiar canal a EMAIL</div>
                             <div class="small text-muted mb-2">
                                 Si el SMS no llega o expira, puedes enviar OTP por email.
                             </div>
-                            <form method="post" class="row g-2 align-items-end">
+                            <div class="small {% if otp_can_switch_to_email %}text-success{% else %}text-muted{% endif %} mb-2" id="otpEmailSwitchWait">
+                                {% if otp_can_switch_to_email %}
+                                    Cambio a EMAIL disponible.
+                                {% else %}
+                                    Debes esperar a que expire el OTP por SMS para habilitar envio por EMAIL.
+                                    {% if otp_switch_email_wait %}
+                                        Tiempo restante: {{ otp_switch_email_wait }} segundos.
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <form method="post" class="row g-2 align-items-end" id="otpEmailSwitchForm">
                                 {% csrf_token %}
                                 <input type="hidden" name="step" value="otp_send">
                                 <input type="hidden" name="otp_channel" value="email">
@@ -1264,24 +1274,15 @@
                                         name="otp_email"
                                         value="{{ fallback_email|default:'' }}"
                                         placeholder="correo@dominio.com"
+                                        {% if not otp_can_switch_to_email %}disabled{% endif %}
                                     >
                                 </div>
                                 <div class="col-12 col-md-5 d-grid">
-                                    <button type="submit" class="btn btn-outline-secondary btn-sm">
+                                    <button type="submit" class="btn btn-outline-secondary btn-sm" id="otpEmailSwitchBtn" {% if not otp_can_switch_to_email %}disabled{% endif %}>
                                         Enviar OTP por EMAIL
                                     </button>
                                 </div>
                             </form>
-                        </div>
-                    {% elif otp_channel == "sms" %}
-                        <div class="border rounded p-2 mb-3 bg-light">
-                            <div class="small fw-semibold mb-1">Cambio a EMAIL bloqueado temporalmente</div>
-                            <div class="small text-muted mb-0">
-                                Debes esperar a que expire el OTP por SMS para habilitar envio por EMAIL.
-                                {% if otp_switch_email_wait %}
-                                    Tiempo restante: {{ otp_switch_email_wait }} segundos.
-                                {% endif %}
-                            </div>
                         </div>
                     {% endif %}
                     <form method="post" class="needs-validation" novalidate>
@@ -1447,13 +1448,40 @@
             }
             const el = document.getElementById("otpCountdown");
             const hintEl = document.getElementById("otpDeliveryHint");
+            const emailSwitchInput = document.getElementById("otp_email_switch");
+            const emailSwitchBtn = document.getElementById("otpEmailSwitchBtn");
+            const emailSwitchWait = document.getElementById("otpEmailSwitchWait");
             if (!el) return;
+
+            const setEmailSwitchEnabled = (enabled) => {
+                if (emailSwitchInput) {
+                    emailSwitchInput.disabled = !enabled;
+                }
+                if (emailSwitchBtn) {
+                    emailSwitchBtn.disabled = !enabled;
+                }
+                if (emailSwitchWait && channel === "sms") {
+                    if (enabled) {
+                        emailSwitchWait.textContent = "Cambio a EMAIL disponible.";
+                        emailSwitchWait.classList.remove("text-muted");
+                        emailSwitchWait.classList.add("text-success");
+                    } else {
+                        emailSwitchWait.textContent = `Debes esperar a que expire el OTP por SMS para habilitar envio por EMAIL. Tiempo restante: ${secondsLeft} segundos.`;
+                        emailSwitchWait.classList.remove("text-success");
+                        emailSwitchWait.classList.add("text-muted");
+                    }
+                }
+            };
+
             const tick = () => {
-                const mins = Math.floor(secondsLeft / 60);
+                const mins = Math.floor(Math.max(secondsLeft, 0) / 60);
                 const secs = Math.max(0, secondsLeft % 60);
                 el.textContent = `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
                 if (channel === "sms" && hintEl && secondsLeft <= 300 && secondsLeft > 0) {
                     hintEl.classList.remove("d-none");
+                }
+                if (channel === "sms") {
+                    setEmailSwitchEnabled(secondsLeft <= 0);
                 }
                 if (secondsLeft > 0) {
                     secondsLeft -= 1;
@@ -1466,4 +1494,7 @@
     {% endif %}
 </body>
 </html>
+
+
+
 
